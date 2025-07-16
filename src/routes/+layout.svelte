@@ -5,17 +5,33 @@
   including the login page and the main app pages.
 -->
 <script>
-	import '../app.css';
-	import { ModeWatcher } from 'mode-watcher';
-	import { Toaster } from '$lib/components/ui/sonner';
+import '../app.css';
+import { ModeWatcher } from 'mode-watcher';
+import { Toaster } from '$lib/components/ui/sonner';
+import { invalidate } from '$app/navigation';
+import { onMount } from 'svelte';
+import GlobalAvatar from '$lib/components/global-avatar.svelte';
 
-	let { children } = $props();
+let { data, children } = $props();
+let { session, supabase, user } = $derived(data);
+
+onMount(() => {
+	const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+		if (newSession?.expires_at !== session?.expires_at) {
+			invalidate('supabase:auth');
+		}
+	});
+
+	return () => data.subscription.unsubscribe();
+});
 </script>
+
 
 <ModeWatcher />
 <Toaster />
+<GlobalAvatar {session} {user} />
 
 <!-- This {@render children()} tag is where SvelteKit will inject the content of your pages -->
-	{@render children?.()}
+{@render children?.()}
 
 

@@ -19,7 +19,8 @@
         Trigger as AccordionTrigger,
         Content as AccordionContent
     } from '$lib/components/ui/accordion';
-    import { Share2, Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser } from 'lucide-svelte';
+    import { Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser } from 'lucide-svelte';
+    import ShareDrawer from '$lib/components/share-drawer.svelte';
 
     // Map icon names to Svelte components
     const iconComponents = {
@@ -134,14 +135,51 @@
                         <p class="text-muted-foreground">{photo.photographer.username}</p>
                     </div>
                     <div class="flex gap-2">
-                        <Button variant="outline">
-                            <Share2 class="h-4 w-4 mr-2" />
-                            Share
-                        </Button>
+                        <ShareDrawer 
+                            title={photo.photographer.name}
+                            description="Check out this amazing photo"
+                        />
                         <Button>
                             <Download class="h-4 w-4 mr-2" />
                             Download
                         </Button>
+                    </div>
+
+                    <Separator />
+
+                    <div class="grid gap-2">
+                        <h3 class="font-semibold">History</h3>
+                        <Accordion class="w-full" type="single" collapsible>
+                            {#each photo.history as item (item.id)}
+                                <AccordionItem value="item-{item.id}">
+                                    <AccordionTrigger>
+                                        <div class="flex items-center w-full gap-3">
+                                            <svelte:component
+                                                this={iconComponents[item.icon]}
+                                                class="h-5 w-5 text-muted-foreground"
+                                            />
+                                            <span>{item.title}</span>
+                                            <div class="flex-grow"></div>
+                                            <span class="text-xs text-muted-foreground font-normal">{item.date}</span>
+                                        </div>
+                                    </AccordionTrigger>
+                                    <AccordionContent>
+                                        Details about the "{item.title}" edit can be displayed here.
+                                    </AccordionContent>
+                                </AccordionItem>
+                            {/each}
+                        </Accordion>
+                    </div>
+                    
+                    <Separator />
+
+                    <div class="grid gap-2">
+                        <h3 class="font-semibold">Tags</h3>
+                        <div class="flex flex-wrap gap-2">
+                            {#each photo.tags as tag}
+                                <Badge variant="secondary">{tag}</Badge>
+                            {/each}
+                        </div>
                     </div>
 
                     <Separator />
@@ -174,42 +212,6 @@
                         </TabsContent>
                     </Tabs>
 
-                    <Separator />
-
-                    <div class="grid gap-2">
-                        <h3 class="font-semibold">Tags</h3>
-                        <div class="flex flex-wrap gap-2">
-                            {#each photo.tags as tag}
-                                <Badge variant="secondary">{tag}</Badge>
-                            {/each}
-                        </div>
-                    </div>
-
-                    <Separator />
-
-                    <div class="grid gap-2">
-                        <h3 class="font-semibold">History</h3>
-                        <Accordion class="w-full" type="single" collapsible>
-                            {#each photo.history as item (item.id)}
-                                <AccordionItem value="item-{item.id}">
-                                    <AccordionTrigger>
-                                        <div class="flex items-center w-full gap-3">
-                                            <svelte:component
-                                                this={iconComponents[item.icon]}
-                                                class="h-5 w-5 text-muted-foreground"
-                                            />
-                                            <span>{item.title}</span>
-                                            <div class="flex-grow"></div>
-                                            <span class="text-xs text-muted-foreground font-normal">{item.date}</span>
-                                        </div>
-                                    </AccordionTrigger>
-                                    <AccordionContent>
-                                        Details about the "{item.title}" edit can be displayed here.
-                                    </AccordionContent>
-                                </AccordionItem>
-                            {/each}
-                        </Accordion>
-                    </div>
 
                     <Separator />
 

@@ -35,10 +35,13 @@
 		"tailwind-variants": "^1.0.0",
 		"tailwindcss": "^4.0.0",
 		"tw-animate-css": "^1.3.4",
+		"vaul-svelte": "^1.0.0-next.7",
 		"vite": "^6.2.6",
 		"vite-plugin-devtools-json": "^0.2.0"
 	},
 	"dependencies": {
+		"@supabase/ssr": "^0.6.1",
+		"@supabase/supabase-js": "^2.51.0",
 		"lucide-svelte": "^0.522.0",
 		"mode-watcher": "^1.0.8"
 	}
