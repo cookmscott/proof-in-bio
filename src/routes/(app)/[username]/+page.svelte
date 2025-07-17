@@ -8,12 +8,19 @@
     import { AspectRatio } from '$lib/ui/aspect-ratio';
 
     // This is a Svelte 5 rune, which is a new feature.
-    // In a real app, this data would likely come from a load function.
-    let { data } = $props();
+    // Securely get the authenticated user from the load function
+    let { user } = $props();
 
     // --- Placeholder Data ---
-    // In a real app, this would come from your backend, loaded in +page.ts
-    const userProfile = {
+    // In a real app, this would come from your backend, loaded in +page.server.js
+    // Fallback to placeholder if no user
+    const userProfile = user ? {
+        username: user.user_metadata?.username || user.email,
+        name: user.user_metadata?.name || user.email,
+        description: user.user_metadata?.description || 'No description provided.',
+        interests: user.user_metadata?.interests || ['Photography', 'Travel', 'Nature', 'Art'],
+        avatarUrl: user.user_metadata?.avatarUrl || `https://i.pravatar.cc/256?u=${user.id}`
+    } : {
         username: 'janedoe',
         name: 'Jane Doe',
         description: 'Capturing moments, one click at a time. Lover of landscapes and candid portraits.',
@@ -102,7 +109,7 @@
             <!-- Photo Gallery Section -->
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">
                 {#each photos as photo (photo.id)}
-                    <a href={`/photo/${photo.id}`} class="group">
+                    <a href={`/${userProfile.username}/${photo.id}`} class="group">
                         <Card class="overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1">
                             <AspectRatio ratio={1}>
                                 <img

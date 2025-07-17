@@ -19,7 +19,7 @@
         Trigger as AccordionTrigger,
         Content as AccordionContent
     } from '$lib/ui/accordion';
-    import { Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser } from 'lucide-svelte';
+    import { Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser, CheckCircle2 } from 'lucide-svelte';
     import ShareDrawer from '$lib/components/share-drawer.svelte';
     import ImageCarousel from '$lib/components/image-carousel.svelte';
 
@@ -112,7 +112,7 @@
                 <img
                     src={photo.imageUrl}
                     alt="Photo by {photo.photographer.name}"
-                    class="w-full"                    
+                    class="w-full rounded-lg"                    
                 />
                 <!-- Carousel below the main image on desktop only -->
                 <div class="hidden lg:block mt-4">
@@ -130,8 +130,9 @@
                 <div class="grid gap-6">
                     <div>
                         <h1 class="text-3xl font-bold">{photo.photographer.name}</h1>
-                        <p class="text-muted-foreground">{photo.photographer.username}</p>
+                        <p class="text-slate-500 dark:text-slate-400">{photo.photographer.username}</p>
                     </div>
+                    
                     <div class="flex gap-2">
                         <ShareDrawer 
                             title={photo.photographer.name}
@@ -145,8 +146,15 @@
 
                     <Separator />
 
-                    <div class="grid gap-2">
-                        <h3 class="font-semibold">History</h3>
+                    <!-- Refined History Section with Dark Mode -->
+                    <div class="grid gap-3 border border-green-200 dark:border-green-800 bg-green-50 dark:bg-transparent rounded-lg p-4">
+                        <div class="flex items-start gap-3">
+                            <CheckCircle2 class="h-5 w-5 text-green-600 dark:text-green-500 mt-0.5 flex-shrink-0" />
+                            <div>
+                                <h3 class="font-semibold text-base leading-tight">C2PA Verified History</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400">This photo is authentic and its history is securely tracked.</p>
+                            </div>
+                        </div>
                         <Accordion class="w-full" type="single" collapsible>
                             {#each photo.history as item (item.id)}
                                 <AccordionItem value="item-{item.id}">
@@ -154,11 +162,11 @@
                                         <div class="flex items-center w-full gap-3">
                                             <svelte:component
                                                 this={iconComponents[item.icon]}
-                                                class="h-5 w-5 text-muted-foreground"
+                                                class="h-5 w-5 text-slate-500 dark:text-slate-400"
                                             />
-                                            <span>{item.title}</span>
+                                            <span class="text-sm">{item.title}</span>
                                             <div class="flex-grow"></div>
-                                            <span class="text-xs text-muted-foreground font-normal">{item.date}</span>
+                                            <span class="text-xs text-slate-500 dark:text-slate-400 font-normal">{item.date}</span>
                                         </div>
                                     </AccordionTrigger>
                                     <AccordionContent>
@@ -189,24 +197,24 @@
                         </TabsList>
                         <TabsContent value="details" class="mt-4">
                             <div class="grid grid-cols-2 gap-y-2 gap-x-4 text-sm">
-                                <div class="text-muted-foreground">Uploaded</div>
+                                <div class="text-slate-500 dark:text-slate-400">Uploaded</div>
                                 <div>{photo.details.uploaded}</div>
-                                <div class="text-muted-foreground">Dimensions</div>
+                                <div class="text-slate-500 dark:text-slate-400">Dimensions</div>
                                 <div>{photo.details.dimensions}</div>
-                                <div class="text-muted-foreground">Focal Length</div>
+                                <div class="text-slate-500 dark:text-slate-400">Focal Length</div>
                                 <div>{photo.details.focalLength}</div>
-                                <div class="text-muted-foreground">Aperture</div>
+                                <div class="text-slate-500 dark:text-slate-400">Aperture</div>
                                 <div>{photo.details.aperture}</div>
-                                <div class="text-muted-foreground">Shutter Speed</div>
+                                <div class="text-slate-500 dark:text-slate-400">Shutter Speed</div>
                                 <div>{photo.details.shutterSpeed}</div>
-                                <div class="text-muted-foreground">ISO</div>
+                                <div class="text-slate-500 dark:text-slate-400">ISO</div>
                                 <div>{photo.details.iso}</div>
-                                <div class="text-muted-foreground">Camera</div>
+                                <div class="text-slate-500 dark:text-slate-400">Camera</div>
                                 <div>{photo.details.camera}</div>
                             </div>
                         </TabsContent>
                         <TabsContent value="exif" class="mt-4">
-                            <p class="text-sm text-muted-foreground">EXIF data would be displayed here.</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">EXIF data would be displayed here.</p>
                         </TabsContent>
                     </Tabs>
 
@@ -224,7 +232,7 @@
                                 {/if}
                             {/each}
                         </div>
-                        <div class="text-sm text-muted-foreground">
+                        <div class="text-sm text-slate-500 dark:text-slate-400">
                             Liked by <strong>{photo.likes.users[0].name}</strong> and
                             <strong>{photo.likes.count - 1} others</strong>
                         </div>
