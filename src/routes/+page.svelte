@@ -5,9 +5,9 @@
   Design emphasizes authenticity with bold visuals and clear messaging
 -->
 <script>
-    import { Button } from '$lib/components/ui/button/index.js';
-    import { Card } from '$lib/components/ui/card/index.js';
-    import { Badge } from '$lib/components/ui/badge/index.js';
+    import { Button } from '$lib/ui/button/index.js';
+    import { Card } from '$lib/ui/card/index.js';
+    import { Badge } from '$lib/ui/badge/index.js';
     import { 
         CheckCircle2, 
         ShieldCheck, 
@@ -56,7 +56,6 @@
             </a>
             <div class="flex items-center gap-3">
                 <Button variant="ghost" size="sm">How it Works</Button>
-                <Button variant="ghost" size="sm">Pricing</Button>
                 <Button size="sm">Get Started</Button>
             </div>
         </nav>
@@ -373,7 +372,6 @@
                     <h4 class="font-semibold">Product</h4>
                     <ul class="space-y-2 text-sm text-muted-foreground">
                         <li><a href="/features" class="hover:text-foreground">Features</a></li>
-                        <li><a href="/pricing" class="hover:text-foreground">Pricing</a></li>
                         <li><a href="/examples" class="hover:text-foreground">Examples</a></li>
                     </ul>
                 </div>

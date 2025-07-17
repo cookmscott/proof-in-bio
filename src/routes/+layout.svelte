@@ -7,7 +7,7 @@
 <script>
 import '../app.css';
 import { ModeWatcher } from 'mode-watcher';
-import { Toaster } from '$lib/components/ui/sonner';
+import { Toaster } from '$lib/ui/sonner';
 import { invalidate } from '$app/navigation';
 import { onMount } from 'svelte';
 import GlobalAvatar from '$lib/components/global-avatar.svelte';
@@ -29,7 +29,7 @@ onMount(() => {
 
 <ModeWatcher />
 <Toaster />
-<GlobalAvatar {session} {user} />
+<GlobalAvatar {session} {user} {supabase} />
 
 <!-- This {@render children()} tag is where SvelteKit will inject the content of your pages -->
 {@render children?.()}

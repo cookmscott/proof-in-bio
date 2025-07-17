@@ -1,8 +1,8 @@
 <script>
-  import { Button } from "$lib/components/ui/button/index.js";
-  import * as Card from "$lib/components/ui/card/index.js";
-  import { Label } from "$lib/components/ui/label/index.js";
-  import { Input } from "$lib/components/ui/input/index.js";
+  import { Button } from "$lib/ui/button/index.js";
+  import * as Card from "$lib/ui/card/index.js";
+  import { Label } from "$lib/ui/label/index.js";
+  import { Input } from "$lib/ui/input/index.js";
   import { cn } from "$lib/utils.js";
 
   export let className = "";
@@ -55,7 +55,7 @@
 					</div>
 					<div class="text-center text-sm">
 						Already have an account?
-						<a href="/login" class="underline underline-offset-4">
+						<a href="/auth" class="underline underline-offset-4">
 							Login
 						</a>
 					</div>

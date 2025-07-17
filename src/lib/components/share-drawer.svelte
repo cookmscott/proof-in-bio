@@ -1,6 +1,6 @@
 <script>
-    import * as Drawer from "$lib/components/ui/drawer/index.js";
-    import { Button } from "$lib/components/ui/button/index.js";
+    import * as Drawer from "$lib/ui/drawer/index.js";
+    import { Button } from "$lib/ui/button/index.js";
     import { Share, Copy, Twitter, Facebook, Linkedin, Mail, Check, Share2 } from 'lucide-svelte';
     import { onMount } from 'svelte';
 

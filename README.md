@@ -1,38 +1,24 @@
-# sv
+# Proof in Bio
 
-Everything you need to build a Svelte project, powered by [`sv`](https://github.com/sveltejs/cli).
+This project uses [SvelteKit](https://kit.svelte.dev) with components from [shadcn-svelte](https://github.com/shadcn-ui/ui). It requires a Supabase backend for authentication.
 
-## Creating a project
+## Getting Started
 
-If you're seeing this, you've probably already done this step. Congrats!
+1. Install dependencies
+   ```bash
+   npm install
+   ```
+2. Copy `.env.example` to `.env` and provide your `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` values.
+3. Start the development server
+   ```bash
+   npm run dev
+   ```
 
-```bash
-# create a new project in the current directory
-npx sv create
+## Linting
 
-# create a new project in my-app
-npx sv create my-app
-```
+Run `npm run lint` to format and lint the project.
 
-## Developing
+## Deployment
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+The project uses the default `adapter-auto`. Configure another adapter in `svelte.config.js` if you plan to deploy to environments like Vercel or Netlify.
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
-```
-
-## Building
-
-To create a production version of your app:
-
-```bash
-npm run build
-```
-
-You can preview the production build with `npm run preview`.
-
-> To deploy your app, you may need to install an [adapter](https://svelte.dev/docs/kit/adapters) for your target environment.

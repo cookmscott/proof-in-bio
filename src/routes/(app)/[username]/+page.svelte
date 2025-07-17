@@ -1,11 +1,11 @@
 <script>
     import { CheckCircle, Share2, Plus, User } from 'lucide-svelte';
-    import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
-    import { Button } from '$lib/components/ui/button';
-    import { Badge } from '$lib/components/ui/badge';
-    import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
-    import { Card } from '$lib/components/ui/card';
-    import { AspectRatio } from '$lib/components/ui/aspect-ratio';
+    import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
+    import { Button } from '$lib/ui/button';
+    import { Badge } from '$lib/ui/badge';
+    import { Alert, AlertDescription, AlertTitle } from '$lib/ui/alert';
+    import { Card } from '$lib/ui/card';
+    import { AspectRatio } from '$lib/ui/aspect-ratio';
 
     // This is a Svelte 5 rune, which is a new feature.
     // In a real app, this data would likely come from a load function.
@@ -55,7 +55,7 @@
           'relative' and 'z-10' ensure it stacks on top of the absolute background.
           'container', 'mx-auto', and 'max-w-screen-lg' center and constrain the content.
         -->
-        <main class="relative z-10 container mx-auto max-w-screen-lg px-4 py-8">
+        <main class="relative z-10 container mx-auto max-w-screen-lg px-4 pt-20 pb-8">
             <!-- Profile Header Section -->
             <div class="relative z-10 mb-8 flex flex-col items-center gap-4 text-center md:flex-row md:text-left">
                 <Avatar class="h-24 w-24 md:h-32 md:w-32">
