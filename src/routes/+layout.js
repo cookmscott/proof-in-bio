@@ -25,14 +25,19 @@ export const load = async ({ data, depends, fetch }) => {
         },
       })
 
-  /**
-   * It's fine to use `getSession` here, because on the client, `getSession` is
-   * safe, and on the server, it reads `session` from the `LayoutData`, which
-   * safely checked the session using `safeGetSession`.
-   */
-  const {
-    data: { session },
-  } = await supabase.auth.getSession()
+  // Use the server-validated session when running on the server to avoid
+  // relying on cookie data that hasn't been verified. On the client, getSession
+  // is safe to call.
+  let session
+
+  if (isBrowser()) {
+    const {
+      data: { session: browserSession },
+    } = await supabase.auth.getSession()
+    session = browserSession
+  } else {
+    session = data.session
+  }
 
   const {
     data: { user },
