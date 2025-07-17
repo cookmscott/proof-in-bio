@@ -5,9 +5,9 @@
   Design emphasizes authenticity with bold visuals and clear messaging
 -->
 <script>
-    import { Button } from '$lib/components/ui/button/index.js';
-    import { Card } from '$lib/components/ui/card/index.js';
-    import { Badge } from '$lib/components/ui/badge/index.js';
+    import { Button } from '$lib/ui/button/index.js';
+    import { Card } from '$lib/ui/card/index.js';
+    import { Badge } from '$lib/ui/badge/index.js';
     import { 
         CheckCircle2, 
         ShieldCheck, 

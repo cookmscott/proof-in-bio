@@ -1,24 +1,24 @@
 <script>
-    import { Button } from '$lib/components/ui/button';
+    import { Button } from '$lib/ui/button';
     import {
         Root as Tabs,
         List as TabsList,
         Trigger as TabsTrigger,
         Content as TabsContent
-    } from '$lib/components/ui/tabs';
-    import { Separator } from '$lib/components/ui/separator';
-    import { Badge } from '$lib/components/ui/badge';
+    } from '$lib/ui/tabs';
+    import { Separator } from '$lib/ui/separator';
+    import { Badge } from '$lib/ui/badge';
     import {
         Root as Avatar,
         Image as AvatarImage,
         Fallback as AvatarFallback
-    } from '$lib/components/ui/avatar';
+    } from '$lib/ui/avatar';
     import {
         Root as Accordion,
         Item as AccordionItem,
         Trigger as AccordionTrigger,
         Content as AccordionContent
-    } from '$lib/components/ui/accordion';
+    } from '$lib/ui/accordion';
     import { Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser } from 'lucide-svelte';
     import ShareDrawer from '$lib/components/share-drawer.svelte';
 

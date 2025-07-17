@@ -1,11 +1,11 @@
 <script>
     import { CheckCircle, Share2, Plus, User } from 'lucide-svelte';
-    import { Avatar, AvatarFallback, AvatarImage } from '$lib/components/ui/avatar';
-    import { Button } from '$lib/components/ui/button';
-    import { Badge } from '$lib/components/ui/badge';
-    import { Alert, AlertDescription, AlertTitle } from '$lib/components/ui/alert';
-    import { Card } from '$lib/components/ui/card';
-    import { AspectRatio } from '$lib/components/ui/aspect-ratio';
+    import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
+    import { Button } from '$lib/ui/button';
+    import { Badge } from '$lib/ui/badge';
+    import { Alert, AlertDescription, AlertTitle } from '$lib/ui/alert';
+    import { Card } from '$lib/ui/card';
+    import { AspectRatio } from '$lib/ui/aspect-ratio';
 
     // This is a Svelte 5 rune, which is a new feature.
     // In a real app, this data would likely come from a load function.

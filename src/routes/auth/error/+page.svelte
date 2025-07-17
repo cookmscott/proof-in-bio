@@ -1,6 +1,6 @@
 <script>
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
+	import { Button } from '$lib/ui/button/index.js';
+	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/ui/card/index.js';
 	import { AlertTriangle } from 'lucide-svelte';
 </script>
 

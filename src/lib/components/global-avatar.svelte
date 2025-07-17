@@ -1,8 +1,8 @@
 <script>
-import { Avatar, AvatarImage, AvatarFallback } from '$lib/components/ui/avatar/index.js';
-import { Button } from '$lib/components/ui/button/index.js';
+import { Avatar, AvatarImage, AvatarFallback } from '$lib/ui/avatar/index.js';
+import { Button } from '$lib/ui/button/index.js';
 import { page } from '$app/stores';
-import * as DropdownMenu from "$lib/components/ui/dropdown-menu/index.js";
+import * as DropdownMenu from "$lib/ui/dropdown-menu/index.js";
 import { supabase } from '$lib/supabaseClient';
 import { goto } from '$app/navigation';
 
@@ -11,7 +11,7 @@ export let session = null;
 export let user = null;
 
 // Hide on auth pages
-$: isAuthPage = $page.route.id?.includes('/auth') || $page.route.id?.includes('/login') || $page.route.id?.includes('/signup');
+$: isAuthPage = $page.route.id?.includes('/auth');
 
 // Get user data from Supabase user object
 $: avatarUrl = user?.user_metadata?.avatar_url || user?.avatar_url || '';

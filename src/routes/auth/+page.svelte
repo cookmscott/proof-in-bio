@@ -1,8 +1,8 @@
 <script>
-	import { Button } from '$lib/components/ui/button/index.js';
-	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/components/ui/card/index.js';
-	import { Input } from '$lib/components/ui/input/index.js';
-	import { Label } from '$lib/components/ui/label/index.js';
+	import { Button } from '$lib/ui/button/index.js';
+	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/ui/card/index.js';
+	import { Input } from '$lib/ui/input/index.js';
+	import { Label } from '$lib/ui/label/index.js';
 	import { GalleryVerticalEnd } from 'lucide-svelte';
 
 	let email = '';
