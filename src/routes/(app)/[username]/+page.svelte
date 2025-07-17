@@ -55,7 +55,7 @@
           'relative' and 'z-10' ensure it stacks on top of the absolute background.
           'container', 'mx-auto', and 'max-w-screen-lg' center and constrain the content.
         -->
-        <main class="relative z-10 container mx-auto max-w-screen-lg px-4 py-8">
+        <main class="relative z-10 container mx-auto max-w-screen-lg px-4 pt-20 pb-8">
             <!-- Profile Header Section -->
             <div class="relative z-10 mb-8 flex flex-col items-center gap-4 text-center md:flex-row md:text-left">
                 <Avatar class="h-24 w-24 md:h-32 md:w-32">

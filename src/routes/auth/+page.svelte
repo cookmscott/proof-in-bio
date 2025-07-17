@@ -8,10 +8,15 @@
 	let email = '';
 	let password = '';
 	let isLogin = true;
+	let i = Math.floor(Math.random() * 1000);
 </script>
 
-<div class="bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10">
-	<div class="flex w-full max-w-sm flex-col gap-6">
+<div class="relative bg-muted flex min-h-svh flex-col items-center justify-center gap-6 p-6 md:p-10"
+	style="background-image: url('https://picsum.photos/1200/1200?random={i}'); background-size: cover; background-position: center;"
+>
+	<!-- Dark overlay -->
+	<div class="absolute inset-0 bg-black/50 pointer-events-none z-0"></div>
+	<div class="relative z-10 flex w-full max-w-sm flex-col gap-6">
 		<a href="/" class="flex items-center gap-2 self-center font-medium">
 			<div class="bg-primary text-primary-foreground flex size-6 items-center justify-center rounded-md">
 				<GalleryVerticalEnd class="size-4" />

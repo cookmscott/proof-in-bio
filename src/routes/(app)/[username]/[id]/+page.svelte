@@ -21,6 +21,7 @@
     } from '$lib/ui/accordion';
     import { Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser } from 'lucide-svelte';
     import ShareDrawer from '$lib/components/share-drawer.svelte';
+    import ImageCarousel from '$lib/components/image-carousel.svelte';
 
     // Map icon names to Svelte components
     const iconComponents = {
@@ -90,6 +91,9 @@
     // We'll just grab the photo data for ID '33' for this example.
     const photo = photoData['33'];
 
+    // Array of 20 image URLs for the carousel
+    const carouselImages = Array.from({ length: 20 }, (_, i) => `https://picsum.photos/400/400?random=${i + 1}`);
+
     // Helper function to get initials from a name
     function getInitials(name = '') {
         return name
@@ -103,23 +107,17 @@
 
 <div class="container mx-auto my-12 px-4 md:px-6">
     {#if photo}
-        <!-- 
-          MODIFIED LAYOUT:
-          - On mobile and tablets (default): `flex-col` stacks the image on top of the content.
-          - On large desktops (`lg:`): `flex-row` places them side-by-side.
-        -->
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
-            <!-- 
-              IMAGE CONTAINER:
-              - `flex-1`: Allows this container to grow and take up any available space.
-              - `min-w-0`: An important fix that allows flex items to shrink below their minimum content size, preventing overflow issues.
-            -->
             <div class="flex-1 min-w-0">
                 <img
                     src={photo.imageUrl}
                     alt="Photo by {photo.photographer.name}"
                     class="w-full"                    
                 />
+                <!-- Carousel below the main image on desktop only -->
+                <div class="hidden lg:block mt-4">
+                    <ImageCarousel images={carouselImages} />
+                </div>
             </div>
 
             <!-- 
@@ -233,6 +231,10 @@
                     </div>
                 </div>
             </div>
+        </div>
+        <!-- Carousel at the bottom on mobile only -->
+        <div class="block lg:hidden mt-8">
+            <ImageCarousel images={carouselImages} />
         </div>
     {:else}
         <div class="text-center">

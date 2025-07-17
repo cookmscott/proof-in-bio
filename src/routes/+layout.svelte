@@ -29,7 +29,7 @@ onMount(() => {
 
 <ModeWatcher />
 <Toaster />
-<GlobalAvatar {session} {user} />
+<GlobalAvatar {session} {user} {supabase} />
 
 <!-- This {@render children()} tag is where SvelteKit will inject the content of your pages -->
 {@render children?.()}
