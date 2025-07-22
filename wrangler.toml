@@ -1,0 +1,4 @@
+name = "proof-in-bio"
+main = "./.svelte-kit/cloudflare/_worker.js"
+compatibility_date = "2025-07-22"
+assets = { directory = "./static/", binding = "ASSETS" }
