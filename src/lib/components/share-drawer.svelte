@@ -75,20 +75,21 @@
                     <!-- Copy URL -->
                     <div class="space-y-2">
                         <label class="text-sm font-medium">Copy link</label>
-                        <div class="flex gap-2">
+                        <div class="flex gap-2 items-center">
                             <input
                                 type="text"
                                 value={currentUrl}
                                 readonly
-                                class="flex-1 px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                                    border-gray-200 bg-gray-50 text-gray-900
-                                    dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100"
+                                class="flex-1 px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
+                                    border border-gray-200 bg-white text-gray-900
+                                    dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100
+                                    h-10"
                             />
                             <Button
                                 variant="outline"
                                 size="sm"
                                 on:click={copyToClipboard}
-                                class="flex-shrink-0"
+                                class="flex-shrink-0 h-10 px-3"
                             >
                                 {#if copied}
                                     <Check class="h-4 w-4 text-green-600" />

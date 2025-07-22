@@ -6,6 +6,8 @@
     import { Alert, AlertDescription, AlertTitle } from '$lib/ui/alert';
     import { Card } from '$lib/ui/card';
     import { AspectRatio } from '$lib/ui/aspect-ratio';
+    // I've imported the Skeleton component, assuming it's in your project's UI library.
+    import { Skeleton } from '$lib/ui/skeleton';
 
     // This is a Svelte 5 rune, which is a new feature.
     // Securely get the authenticated user from the load function
@@ -34,6 +36,16 @@
         alt: `Portfolio image ${i + 1}`
     }));
     // --- End Placeholder Data ---
+
+    // Track loaded state for each image in the gallery
+    let loaded = $state(Array(photos.length).fill(false));
+
+    // Reset loaded state if photos array changes (Svelte 5 runes)
+    $effect(() => {
+        if (photos.length !== loaded.length) {
+            loaded = Array(photos.length).fill(false);
+        }
+    });
 </script>
 
 <!-- Main wrapper for the entire page -->
@@ -108,14 +120,19 @@
             
             <!-- Photo Gallery Section -->
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">
-                {#each photos as photo (photo.id)}
+                {#each photos as photo, i (photo.id)}
                     <a href={`/${userProfile.username}/${photo.id}`} class="group">
                         <Card class="overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1">
-                            <AspectRatio ratio={1}>
+                            <AspectRatio ratio={1} class="bg-slate-100 dark:bg-slate-800 rounded-sm relative">
+                                {#if !loaded[i]}
+                                    <Skeleton class="h-full w-full absolute" />
+                                {/if}
                                 <img
                                     src={photo.url}
                                     alt={photo.alt}
-                                    class="h-full w-full object-cover"
+                                    class="h-full w-full object-cover rounded-sm transition-opacity duration-300"
+                                    style="opacity: {loaded[i] ? 1 : 0};"
+                                    onload={() => loaded[i] = true}
                                 />
                             </AspectRatio>
                         </Card>

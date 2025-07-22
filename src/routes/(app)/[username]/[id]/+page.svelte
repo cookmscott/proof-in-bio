@@ -130,7 +130,15 @@
                 <div class="grid gap-6">
                     <div>
                         <h1 class="text-3xl font-bold">{photo.photographer.name}</h1>
-                        <p class="text-slate-500 dark:text-slate-400">{photo.photographer.username}</p>
+                        <div class="flex items-center gap-2">
+                            <p class="text-slate-500 dark:text-slate-400">{photo.photographer.username}</p>
+                            <a
+                                href="/{photo.photographer.username.replace('@', '')}"
+                                class="text-blue-600 dark:text-blue-400 text-sm underline hover:text-blue-800"
+                            >
+                                View profile
+                            </a>
+                        </div>
                     </div>
                     
                     <div class="flex gap-2">
@@ -162,7 +170,7 @@
                                         <div class="flex items-center w-full gap-3">
                                             <svelte:component
                                                 this={iconComponents[item.icon]}
-                                                class="h-5 w-5 text-slate-500 dark:text-slate-400"
+                                                class="h-5 w-5 text-slate-700 dark:text-slate-600"
                                             />
                                             <span class="text-sm">{item.title}</span>
                                             <div class="flex-grow"></div>
