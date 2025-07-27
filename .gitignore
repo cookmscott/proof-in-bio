@@ -1,4 +1,9 @@
 node_modules
+.claude
+
+# Supabase
+.branches
+.temp
 
 # Output
 .output
@@ -17,7 +22,13 @@ Thumbs.db
 .env.*
 !.env.example
 !.env.test
+.env.keys
+.env.local
+.env.*.local
 
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Editor
+/.vscode
