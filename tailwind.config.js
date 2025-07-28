@@ -8,6 +8,7 @@ export default {
       extend: {
         fontFamily: {
           sans: ['Satoshi', 'system-ui', '-apple-system', 'sans-serif'],
+          alpino: ['Alpino', 'sans-serif'],
         },
       },
     },

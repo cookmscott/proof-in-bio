@@ -89,13 +89,64 @@ This app implements a secure server-side authentication flow using Supabase Auth
 - **Reliability**: Server-side session validation prevents auth bypass
 - **Standards**: Follows OAuth 2.0 and SvelteKit SSR best practices
 
-### OAuth Configuration
+### Google OAuth Configuration
 
-Google OAuth is configured in your Supabase dashboard under **Authentication → Providers → Google**. The client ID you provided (`1070526418426-htdmkourcddj4ag404vfj4v3t2fn3nms.apps.googleusercontent.com`) should be added there along with the client secret.
+This project implements Google OAuth through a three-part setup involving Google Cloud Console, Supabase, and your application. Here's how they work together:
 
-**Required OAuth Settings:**
-- **Authorized JavaScript origins**: Your domain (e.g., `http://localhost:5173` for dev)
-- **Authorized redirect URIs**: `https://<your-supabase-ref>.supabase.co/auth/v1/callback`
+#### 1. Google Cloud Console Setup
+
+**Create OAuth 2.0 Credentials:**
+1. Go to [Google Cloud Console](https://console.cloud.google.com/)
+2. Navigate to **APIs & Services** → **Credentials**
+3. Create OAuth 2.0 Client ID (Web application)
+4. Configure the following URIs:
+
+**Authorized JavaScript Origins:**
+```
+http://localhost:5173                                    # Development
+https://your-supabase-ref.supabase.co                   # Supabase (required)
+https://your-domain.workers.dev                         # Production deployment
+```
+
+**Authorized Redirect URIs:**
+```
+http://localhost:5173/auth/callback                     # Development callback
+https://your-supabase-ref.supabase.co/auth/v1/callback  # Supabase OAuth callback
+https://your-domain.workers.dev/auth/callback           # Production callback
+```
+
+#### 2. Supabase Configuration
+
+**Enable Google Provider:**
+1. Go to your Supabase Dashboard
+2. Navigate to **Authentication** → **Providers**
+3. Find **Google** and toggle **Enable sign in with Google**
+4. Add your Google OAuth credentials:
+   - **Client ID**: From Google Console (ends with `.apps.googleusercontent.com`)
+   - **Client Secret**: From Google Console (keep this secure)
+
+#### 3. OAuth Flow in Application
+
+**Authentication Flow:**
+1. User clicks "Sign in with Google" button in `/auth`
+2. Client calls `supabase.auth.signInWithOAuth({ provider: 'google' })`
+3. User redirected to Google's OAuth consent screen
+4. Google redirects to Supabase callback: `https://your-supabase-ref.supabase.co/auth/v1/callback`
+5. Supabase processes OAuth and redirects to your app: `/auth/callback`
+6. Your callback handler (`/auth/callback/+server.js`) exchanges code for session
+7. User authenticated and redirected to protected area
+
+**Key Integration Points:**
+- **Supabase handles OAuth flow**: No need to implement Google's OAuth directly
+- **Secure callback handling**: Server-side code exchange prevents token exposure
+- **Cookie-based sessions**: Secure HTTP-only cookies for session management
+- **Multiple environment support**: Same flow works for dev, staging, and production
+
+**Important Notes:**
+- The Supabase callback URL (`/auth/v1/callback`) must be exact in Google Console
+- JavaScript origins must include your Supabase URL for the OAuth popup to work
+- Client ID and secret are tied to your specific Google Cloud project
+- Changes in Google Console can take 5-10 minutes to propagate
 
 ## Linting
 
@@ -104,6 +155,27 @@ Run `npm run lint` to format and lint the project.
 ## Deployment
 
 The project uses the default `adapter-auto`. Configure another adapter in `svelte.config.js` if you plan to deploy to environments like Vercel or Netlify.
+
+## Cloudflare Workers Deployment
+
+This project is configured for deployment to Cloudflare Workers using `@sveltejs/adapter-cloudflare` and Wrangler.
+
+### Prerequisites
+- [Wrangler CLI](https://developers.cloudflare.com/workers/wrangler/) installed (`npm install -g wrangler` or use `npx wrangler`)
+- Cloudflare account and authentication (`npx wrangler login`)
+- Ensure the `_headers` file is in the project root (not in `static/`)
+
+### Steps
+1. **Build the project:**
+   ```sh
+   npm run build
+   ```
+2. **Deploy to Cloudflare Workers:**
+   ```sh
+   npx wrangler deploy
+   ```
+
+Wrangler will use the configuration in `wrangler.toml` and output your deployed URL after a successful deployment.
 
 ## Structure
 

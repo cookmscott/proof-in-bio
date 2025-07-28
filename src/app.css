@@ -125,3 +125,8 @@
     @apply cursor-pointer;
   }
 }
+
+/* Ensure Alpino font is applied correctly */
+.font-alpino {
+  font-family: 'Karma', sans-serif !important;
+}

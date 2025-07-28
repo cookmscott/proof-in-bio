@@ -75,7 +75,7 @@
                             <span class="font-bold">C2PA Verified Platform</span>
                         </Badge>
                         
-                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-tight">
+                        <h1 class="text-5xl md:text-6xl lg:text-7xl font-bold tracking-tighter leading-tight font-alpino">
                             Your photos.<br/>
                             <span class="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
                                 Actually yours.
@@ -158,7 +158,7 @@
                             <Ban class="h-5 w-5" />
                             <span class="font-semibold">The Problem</span>
                         </div>
-                        <h2 class="text-3xl md:text-4xl font-bold">
+                        <h2 class="text-3xl md:text-4xl font-bold font-alpino">
                             Nobody knows what's real anymore
                         </h2>
                         <div class="space-y-4 text-muted-foreground">
@@ -183,7 +183,7 @@
                             <CheckCircle2 class="h-5 w-5" />
                             <span class="font-semibold">The Solution</span>
                         </div>
-                        <h2 class="text-3xl md:text-4xl font-bold">
+                        <h2 class="text-3xl md:text-4xl font-bold font-alpino">
                             One link that proves it all
                         </h2>
                         <div class="space-y-4">
@@ -217,7 +217,7 @@
         <!-- How It Works -->
         <section class="container mx-auto max-w-6xl px-6 py-20 md:py-28">
             <div class="text-center space-y-4 mb-16">
-                <h2 class="text-4xl md:text-5xl font-bold">
+                <h2 class="text-4xl md:text-5xl font-bold font-alpino">
                     Dead simple. Crazy powerful.
                 </h2>
                 <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -230,7 +230,7 @@
                     <div class="mx-auto w-16 h-16 rounded-2xl bg-blue-500/10 flex items-center justify-center">
                         <Upload class="h-8 w-8 text-blue-500" />
                     </div>
-                    <h3 class="text-xl font-semibold">1. Upload with C2PA</h3>
+                    <h3 class="text-xl font-semibold font-alpino">1. Upload with C2PA</h3>
                     <p class="text-muted-foreground">
                         Drag and drop photos straight from your camera or verified editing tools
                     </p>
@@ -240,7 +240,7 @@
                     <div class="mx-auto w-16 h-16 rounded-2xl bg-green-500/10 flex items-center justify-center">
                         <ShieldCheck class="h-8 w-8 text-green-500" />
                     </div>
-                    <h3 class="text-xl font-semibold">2. Instant Verification</h3>
+                    <h3 class="text-xl font-semibold font-alpino">2. Instant Verification</h3>
                     <p class="text-muted-foreground">
                         We check the cryptographic proof - if it's not real, it doesn't get in
                     </p>
@@ -250,7 +250,7 @@
                     <div class="mx-auto w-16 h-16 rounded-2xl bg-purple-500/10 flex items-center justify-center">
                         <Link2 class="h-8 w-8 text-purple-500" />
                     </div>
-                    <h3 class="text-xl font-semibold">3. Share Your Link</h3>
+                    <h3 class="text-xl font-semibold font-alpino">3. Share Your Link</h3>
                     <p class="text-muted-foreground">
                         Get your unique gallery URL to drop in any bio - instant credibility
                     </p>
@@ -262,7 +262,7 @@
         <section class="bg-muted/30 py-20">
             <div class="container mx-auto max-w-6xl px-6">
                 <div class="text-center space-y-4 mb-12">
-                    <h2 class="text-3xl md:text-4xl font-bold">
+                    <h2 class="text-3xl md:text-4xl font-bold font-alpino">
                         Creators are taking back control
                     </h2>
                 </div>
@@ -330,7 +330,7 @@
             <Card class="relative overflow-hidden">
                 <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-10" />
                 <div class="relative p-12 md:p-16 text-center space-y-6">
-                    <h2 class="text-4xl md:text-5xl font-bold">
+                    <h2 class="text-4xl md:text-5xl font-bold font-alpino">
                         Prove it's human.
                     </h2>
                     <p class="text-xl text-muted-foreground max-w-2xl mx-auto">
