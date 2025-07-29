@@ -65,7 +65,7 @@
     <main>
         <!-- Hero Section -->
         <section class="py-20 md:py-32">
-            <div class="container mx-auto max-w-7xl px-6">
+            <div class="container mx-auto max-w-7xl px-6 xl:px-16">
                 <div class="grid lg:grid-cols-2 gap-12 items-center">
                     <!-- Left: Text Content -->
                     <div class="text-center lg:text-left">
