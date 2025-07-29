@@ -3,6 +3,7 @@ import { Avatar, AvatarImage, AvatarFallback } from '$lib/ui/avatar/index.js';
 import { Button } from '$lib/ui/button/index.js';
 import { page } from '$app/stores';
 import * as DropdownMenu from "$lib/ui/dropdown-menu/index.js";
+import AuthDialog from '$lib/components/auth-dialog.svelte';
 import { onMount } from 'svelte';
 import { goto, invalidate } from '$app/navigation';
 import { get } from 'svelte/store';
@@ -27,18 +28,30 @@ onMount(() => {
   observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
   return () => observer.disconnect();
 });
+
 // Props from layout
-export let session = null;
-export let user = null;
-export let supabase = null;
+let { session = null, user = null, supabase = null } = $props();
+
+// Auth dialog state
+let showAuthDialog = $state(false);
+
+function handleAuthSuccess(event) {
+	console.log('User authenticated:', event.detail);
+	showAuthDialog = false;
+	// User will be automatically redirected by the dialog
+}
+
+function handleAuthClose() {
+	showAuthDialog = false;
+}
 
 // Hide on auth pages
-$: isAuthPage = $page.route.id?.includes('/auth');
+let isAuthPage = $derived($page.route.id?.includes('/auth'));
 
 // Get user data from Supabase user object
-$: avatarUrl = user?.user_metadata?.avatar_url || user?.avatar_url || '';
-$: displayName = user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || 'User';
-$: initials = displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+let avatarUrl = $derived(user?.user_metadata?.avatar_url || user?.avatar_url || '');
+let displayName = $derived(user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || 'User');
+let initials = $derived(displayName.split(' ').map(n => n[0]).join('').toUpperCase());
 
 async function handleLogout() {
 	console.log('Logging out...');
@@ -100,7 +113,7 @@ async function handleLogout() {
 			   </DropdownMenu.Item>
 						<DropdownMenu.Separator />
 			   <DropdownMenu.Item asChild>
-	<button type="button" class="cursor-pointer w-full text-left flex items-center" on:click={handleLogout}>
+	<button type="button" class="cursor-pointer w-full text-left flex items-center" onclick={handleLogout}>
 		<span>{@html LogoutIcon}</span>Logout
 	</button>
 </DropdownMenu.Item>
@@ -108,7 +121,15 @@ async function handleLogout() {
 				</DropdownMenu.Content>
 			</DropdownMenu.Root>
 		{:else}
-			<Button href="/auth" variant="outline">Login</Button>
+			<Button variant="outline" onclick={() => showAuthDialog = true}>Login</Button>
 		{/if}
 	</div>
 {/if}
+
+<!-- Auth Dialog -->
+<AuthDialog 
+	supabase={supabase}
+	open={showAuthDialog}
+	onclose={handleAuthClose}
+	onsuccess={handleAuthSuccess}
+/>
