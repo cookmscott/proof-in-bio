@@ -8,6 +8,7 @@
     import { Button } from '$lib/ui/button/index.js';
     import { Card } from '$lib/ui/card/index.js';
     import { Badge } from '$lib/ui/badge/index.js';
+    import AuthDialog from '$lib/components/auth-dialog.svelte';
     import { 
         CheckCircle2, 
         ShieldCheck, 
@@ -20,6 +21,22 @@
         Users,
         Zap
     } from 'lucide-svelte';
+
+    // Get data from layout (includes supabase client)
+    let { data } = $props();
+
+    // Auth dialog state
+    let showAuthDialog = $state(false);
+
+    function handleAuthSuccess(event) {
+        console.log('User authenticated:', event.detail);
+        showAuthDialog = false;
+        // User will be automatically redirected by the dialog
+    }
+
+    function handleAuthClose() {
+        showAuthDialog = false;
+    }
 
     // Hero gallery images with verification badges
     const heroImages = Array.from({ length: 5 }, (_, i) => ({
@@ -56,7 +73,7 @@
             </a>
             <div class="flex items-center gap-3">
                 <Button variant="ghost" size="sm">How it Works</Button>
-                <Button size="sm">Get Started</Button>
+                <Button size="sm" onclick={() => showAuthDialog = true}>Get Started</Button>
             </div>
         </nav>
     </header>
@@ -85,7 +102,7 @@
                             One link in your bio that proves every photo is real. No AI. No heavy edits. Just authentic creativity from verified humans.
                         </p>
                         <div class="mt-8 flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
-                            <Button size="lg" class="group">
+                            <Button size="lg" class="group" onclick={() => showAuthDialog = true}>
                                 <Upload class="mr-2 h-5 w-5" />
                                 Upload Your First Photo
                                 <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
@@ -278,7 +295,7 @@
                             "Finally, a way to show my photography is actually mine. Game changer for client trust."
                         </p>
                         <div class="flex items-center gap-2">
-                            <div class="h-8 w-8 rounded-full bg-muted" />
+                            <div class="h-8 w-8 rounded-full bg-muted"></div>
                             <div>
                                 <p class="text-sm font-medium">Sarah Chen</p>
                                 <p class="text-xs text-muted-foreground">@sarahcaptures</p>
@@ -296,7 +313,7 @@
                             "My illustrations stand out now. Collectors know they're getting authentic human art."
                         </p>
                         <div class="flex items-center gap-2">
-                            <div class="h-8 w-8 rounded-full bg-muted" />
+                            <div class="h-8 w-8 rounded-full bg-muted"></div>
                             <div>
                                 <p class="text-sm font-medium">Marcus Rodriguez</p>
                                 <p class="text-xs text-muted-foreground">@marcusdraws</p>
@@ -314,7 +331,7 @@
                             "Proof in Bio = instant credibility. My engagement went through the roof."
                         </p>
                         <div class="flex items-center gap-2">
-                            <div class="h-8 w-8 rounded-full bg-muted" />
+                            <div class="h-8 w-8 rounded-full bg-muted"></div>
                             <div>
                                 <p class="text-sm font-medium">Alex Kim</p>
                                 <p class="text-xs text-muted-foreground">@alexshootsfilm</p>
@@ -328,7 +345,7 @@
         <!-- Final CTA -->
         <section class="container mx-auto max-w-6xl px-6 py-20 md:py-28">
             <Card class="relative overflow-hidden">
-                <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-10" />
+                <div class="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-600 opacity-10"></div>
                 <div class="relative p-12 md:p-16 text-center space-y-6">
                     <h2 class="text-4xl md:text-5xl font-bold font-alpino">
                         Prove it's human.
@@ -338,7 +355,7 @@
                         Free to start, powerful forever.
                     </p>
                     <div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
-                        <Button size="lg" class="group">
+                        <Button size="lg" class="group" onclick={() => showAuthDialog = true}>
                             Create Your Gallery
                             <ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
                         </Button>
@@ -404,4 +421,12 @@
             </div>
         </div>
     </footer>
+
+    <!-- Auth Dialog -->
+    <AuthDialog 
+        supabase={data.supabase}
+        open={showAuthDialog}
+        onclose={handleAuthClose}
+        onsuccess={handleAuthSuccess}
+    />
 </div>
