@@ -54,7 +54,6 @@ let displayName = $derived(user?.user_metadata?.full_name || user?.user_metadata
 let initials = $derived(displayName.split(' ').map(n => n[0]).join('').toUpperCase());
 
 async function handleLogout() {
-	console.log('Logging out...');
 	try {
 		// Ensure supabase client is available
 		if (!supabase) {
