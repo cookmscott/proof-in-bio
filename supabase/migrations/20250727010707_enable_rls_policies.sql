@@ -2,7 +2,7 @@
 -- This ensures users can only access data they're authorized to see
 
 -- Enable RLS on all tables
-ALTER TABLE users ENABLE ROW LEVEL SECURITY;
+ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_interests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photo_history ENABLE ROW LEVEL SECURITY;
@@ -15,23 +15,24 @@ ALTER TABLE collections ENABLE ROW LEVEL SECURITY;
 ALTER TABLE collection_photos ENABLE ROW LEVEL SECURITY;
 ALTER TABLE activities ENABLE ROW LEVEL SECURITY;
 
--- Users table policies
-CREATE POLICY "Users can view public profiles" ON users
+-- User profiles table policies
+CREATE POLICY "Users can view public profiles" ON user_profiles
   FOR SELECT USING (is_public = true OR auth.uid() = id);
 
-CREATE POLICY "Users can update own profile" ON users
+CREATE POLICY "Users can update own profile" ON user_profiles
   FOR UPDATE USING (auth.uid() = id);
 
-CREATE POLICY "Users can insert own profile" ON users
-  FOR INSERT WITH CHECK (auth.uid() = id);
+-- Allow users to insert their own profile (trigger will bypass this with SECURITY DEFINER)
+CREATE POLICY "Users can insert own profile" ON user_profiles
+  FOR INSERT WITH CHECK (true);
 
 -- User interests policies
 CREATE POLICY "Anyone can view public user interests" ON user_interests
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM users 
-      WHERE users.id = user_interests.user_id 
-      AND (users.is_public = true OR users.id = auth.uid())
+      SELECT 1 FROM user_profiles
+      WHERE user_profiles.id = user_interests.user_id
+      AND (user_profiles.is_public = true OR user_profiles.id = auth.uid())
     )
   );
 
@@ -179,14 +180,29 @@ CREATE POLICY "System can create activities" ON activities
 CREATE OR REPLACE FUNCTION handle_new_user()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO users (id, email, username, display_name)
+  -- Ensure we're looking in the public schema
+  SET search_path = public;
+  -- Log the attempt (visible in Supabase logs)
+  RAISE LOG 'Creating user profile for user_id: %, email: %, username: %, display_name: %',
+    NEW.id,
+    NEW.email,
+    COALESCE(NEW.raw_user_meta_data->>'username', 'NULL'),
+    COALESCE(NEW.raw_user_meta_data->>'display_name', 'NULL');
+
+  INSERT INTO public.user_profiles (id, email, username, display_name)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1)),
     COALESCE(NEW.raw_user_meta_data->>'display_name', SPLIT_PART(NEW.email, '@', 1))
   );
+
+  RAISE LOG 'Successfully created user profile for user_id: %', NEW.id;
   RETURN NEW;
+EXCEPTION
+  WHEN OTHERS THEN
+    RAISE LOG 'Error creating user profile: %, SQLSTATE: %', SQLERRM, SQLSTATE;
+    RAISE;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 

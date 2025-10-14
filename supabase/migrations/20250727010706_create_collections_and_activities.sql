@@ -4,7 +4,7 @@
 -- Collections table for user-created photo albums
 CREATE TABLE IF NOT EXISTS collections (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   name VARCHAR(100) NOT NULL,
   description TEXT,
   slug VARCHAR(100) NOT NULL,
@@ -37,7 +37,7 @@ CREATE INDEX collection_photos_photo_id_idx ON collection_photos(photo_id);
 -- Activities table for user activity feeds and notifications
 CREATE TABLE IF NOT EXISTS activities (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   activity_type VARCHAR(50) NOT NULL, -- 'photo_upload', 'like', 'comment', 'follow', 'collection_create'
   target_type VARCHAR(50), -- 'photo', 'user', 'collection', 'comment'
   target_id UUID, -- ID of the target object

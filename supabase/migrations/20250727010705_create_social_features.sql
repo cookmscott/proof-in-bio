@@ -4,7 +4,7 @@
 -- Likes table for photo engagement
 CREATE TABLE IF NOT EXISTS likes (
   id SERIAL PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   photo_id UUID REFERENCES photos(id) ON DELETE CASCADE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
@@ -19,7 +19,7 @@ CREATE INDEX likes_created_at_idx ON likes(created_at DESC);
 CREATE TABLE IF NOT EXISTS comments (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   photo_id UUID REFERENCES photos(id) ON DELETE CASCADE NOT NULL,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   parent_id UUID REFERENCES comments(id), -- for threaded comments
   content TEXT NOT NULL,
   is_edited BOOLEAN DEFAULT FALSE,
@@ -40,8 +40,8 @@ ALTER TABLE comments ADD CONSTRAINT comments_content_not_empty CHECK (LENGTH(TRI
 -- Follows table for user relationships
 CREATE TABLE IF NOT EXISTS follows (
   id SERIAL PRIMARY KEY,
-  follower_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
-  following_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  follower_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
+  following_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
 

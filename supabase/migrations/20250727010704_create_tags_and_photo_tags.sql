@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS photo_tags (
   id SERIAL PRIMARY KEY,
   photo_id UUID REFERENCES photos(id) ON DELETE CASCADE NOT NULL,
   tag_id INTEGER REFERENCES tags(id) ON DELETE CASCADE NOT NULL,
-  added_by UUID REFERENCES users(id), -- who added this tag
+  added_by UUID REFERENCES user_profiles(id), -- who added this tag
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
 

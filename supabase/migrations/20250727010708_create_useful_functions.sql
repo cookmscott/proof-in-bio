@@ -35,7 +35,7 @@ BEGIN
     EXISTS(SELECT 1 FROM likes WHERE photo_id = p.id AND user_id = user_uuid) AS is_liked,
     p.created_at
   FROM photos p
-  JOIN users u ON p.user_id = u.id
+  JOIN user_profiles u ON p.user_id = u.id
   LEFT JOIN (
     SELECT photo_id, COUNT(*) AS like_count
     FROM likes
@@ -88,7 +88,7 @@ BEGIN
     COALESCE(c.comment_count, 0) AS comment_count,
     p.created_at
   FROM photos p
-  JOIN users u ON p.user_id = u.id
+  JOIN user_profiles u ON p.user_id = u.id
   LEFT JOIN (
     SELECT photo_id, COUNT(*) AS like_count
     FROM likes
@@ -139,7 +139,7 @@ BEGIN
     COALESCE(fg.following_count, 0) AS following_count,
     COALESCE(l.total_likes, 0) AS total_likes,
     u.created_at
-  FROM users u
+  FROM user_profiles u
   LEFT JOIN (
     SELECT user_id, COUNT(*) AS photo_count
     FROM photos
@@ -204,7 +204,7 @@ BEGIN
     COALESCE(l.like_count, 0) AS like_count,
     p.created_at
   FROM photos p
-  JOIN users u ON p.user_id = u.id
+  JOIN user_profiles u ON p.user_id = u.id
   LEFT JOIN (
     SELECT photo_id, COUNT(*) AS like_count
     FROM likes
@@ -289,7 +289,7 @@ BEGIN
     p.view_count,
     p.created_at
   FROM photos p
-  JOIN users u ON p.user_id = u.id
+  JOIN user_profiles u ON p.user_id = u.id
   LEFT JOIN (
     SELECT photo_id, COUNT(*) AS like_count
     FROM likes

@@ -5,6 +5,7 @@ import { env } from '$env/dynamic/private';
 
 const supabase = async ({ event, resolve }) => {
   const supabase = createSupabaseServer(event.cookies);
+  
   event.locals.supabase = supabase;
   event.locals.safeGetSession = () => safeGetSession(supabase);
 
@@ -29,11 +30,12 @@ const authGuard = async ({ event, resolve }) => {
         }
       };
       event.locals.user = event.locals.session.user;
-    } else {
+    } 
+    else {
       event.locals.session = null;
       event.locals.user = null;
     }
-  } 
+  }
   else {
     const { session, user } = await event.locals.safeGetSession();
     event.locals.session = session;
@@ -43,8 +45,7 @@ const authGuard = async ({ event, resolve }) => {
   if (!event.locals.session && event.url.pathname.startsWith('/private')) {
     redirect(303, '/auth');
   }
-
-  if (event.locals.session && event.url.pathname === '/auth') {
+  else if (event.locals.session && event.url.pathname === '/auth') {
     redirect(303, '/private');
   }
 

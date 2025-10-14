@@ -6,6 +6,13 @@ export const actions = {
     const formData = await request.formData()
     const email = formData.get('email')
     const password = formData.get('password')
+    const username = formData.get('username')
+    const display_name = formData.get('display_name')
+
+    console.log('=== SIGNUP ATTEMPT ===')
+    console.log('Email:', email)
+    console.log('Username:', username)
+    console.log('Display Name:', display_name)
 
     // Local dev bypass
     if (env.USE_LOCAL_AUTH === 'true') {
@@ -13,13 +20,35 @@ export const actions = {
       redirect(303, '/')
     }
 
-    const { error } = await supabase.auth.signUp({ email, password })
+    // Sign up the user with Supabase Auth
+    // Pass username and display_name in user metadata so the trigger can access it
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: {
+          username,
+          display_name
+        }
+      }
+    })
+
     if (error) {
-      console.error(error)
+      console.error('=== SIGNUP ERROR ===')
+      console.error('Error code:', error.code)
+      console.error('Error message:', error.message)
+      console.error('Error details:', JSON.stringify(error, null, 2))
       redirect(303, '/auth/error')
-    } else {
-      redirect(303, '/')
     }
+
+    console.log('=== SIGNUP SUCCESS ===')
+    console.log('User ID:', data.user?.id)
+    console.log('User email:', data.user?.email)
+    console.log('User metadata:', data.user?.user_metadata)
+
+    // The user_profiles record will be automatically created by the database trigger
+    // defined in 20250727010707_enable_rls_policies.sql
+    redirect(303, '/')
   },
   login: async ({ request, locals: { supabase }, cookies }) => {
     const formData = await request.formData()

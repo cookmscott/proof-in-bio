@@ -3,7 +3,7 @@
 
 CREATE TABLE IF NOT EXISTS photos (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   filename VARCHAR(255) NOT NULL,
   original_filename VARCHAR(255) NOT NULL,
   title VARCHAR(200),

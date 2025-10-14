@@ -9,7 +9,8 @@ VALUES (
   true, -- publicly accessible URLs
   52428800, -- 50MB limit
   ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/heic', 'image/heif']
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 -- Create bucket for photo thumbnails
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -19,7 +20,8 @@ VALUES (
   true,
   5242880, -- 5MB limit
   ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 -- Create bucket for user avatars
 INSERT INTO storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
@@ -29,7 +31,8 @@ VALUES (
   true,
   2097152, -- 2MB limit
   ARRAY['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
-);
+)
+ON CONFLICT (id) DO NOTHING;
 
 -- Storage policies for photos bucket
 -- Allow authenticated users to upload photos

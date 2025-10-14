@@ -1,7 +1,7 @@
--- Create users table to extend auth.users with profile information
+-- Create user_profiles table to extend auth.users with profile information
 -- This table stores additional user profile data beyond Supabase auth
 
-CREATE TABLE IF NOT EXISTS users (
+CREATE TABLE IF NOT EXISTS user_profiles (
   id UUID REFERENCES auth.users(id) ON DELETE CASCADE PRIMARY KEY,
   email VARCHAR(255) NOT NULL UNIQUE,
   username VARCHAR(50) NOT NULL UNIQUE,
@@ -17,13 +17,13 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- Create indexes for performance
-CREATE UNIQUE INDEX users_username_idx ON users(username);
-CREATE UNIQUE INDEX users_email_idx ON users(email);
+CREATE UNIQUE INDEX user_profiles_username_idx ON user_profiles(username);
+CREATE UNIQUE INDEX user_profiles_email_idx ON user_profiles(email);
 
 -- Create user_interests table for profile tags
 CREATE TABLE IF NOT EXISTS user_interests (
   id SERIAL PRIMARY KEY,
-  user_id UUID REFERENCES users(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
   interest VARCHAR(50) NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
 );
@@ -41,6 +41,6 @@ BEGIN
 END;
 $$ language 'plpgsql';
 
--- Create trigger for users table
-CREATE TRIGGER update_users_updated_at BEFORE UPDATE ON users
+-- Create trigger for user_profiles table
+CREATE TRIGGER update_user_profiles_updated_at BEFORE UPDATE ON user_profiles
     FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();

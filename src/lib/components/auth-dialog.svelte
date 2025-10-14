@@ -13,6 +13,8 @@
 	// Internal state
 	let email = $state('');
 	let password = $state('');
+	let username = $state('');
+	let display_name = $state('');
 	let isLogin = $state(true);
 	let loading = $state(false);
 	let error = $state('');
@@ -39,14 +41,32 @@
 					goto('/private');
 				}
 			} else {
-				const { error: authError } = await supabase.auth.signUp({
+				console.log('=== CLIENT SIGNUP ATTEMPT ===');
+				console.log('Email:', email);
+				console.log('Username:', username);
+				console.log('Display Name:', display_name);
+
+				const { data: signupData, error: authError } = await supabase.auth.signUp({
 					email,
-					password
+					password,
+					options: {
+						data: {
+							username,
+							display_name
+						}
+					}
 				});
-				
+
 				if (authError) {
-					error = authError.message;
+					console.error('=== CLIENT SIGNUP ERROR ===');
+					console.error('Error code:', authError.code);
+					console.error('Error message:', authError.message);
+					console.error('Error status:', authError.status);
+					console.error('Full error:', JSON.stringify(authError, null, 2));
+					error = `${authError.message} - Please make sure the database has been reset with the new schema.`;
 				} else {
+					console.log('=== CLIENT SIGNUP SUCCESS ===');
+					console.log('User:', signupData.user);
 					dispatch('success', { type: 'signup' });
 					// For signup, usually redirect to confirmation page or show success message
 					error = 'Check your email for a confirmation link!';
@@ -121,6 +141,31 @@
 					{#if error}
 						<div class="p-3 text-sm text-red-600 bg-red-50 border border-red-200 rounded-md">
 							{error}
+						</div>
+					{/if}
+
+					{#if !isLogin}
+						<div class="grid gap-3">
+							<Label for="username">Username</Label>
+							<Input
+								id="username"
+								name="username"
+								type="text"
+								placeholder="johndoe"
+								bind:value={username}
+								required
+							/>
+						</div>
+						<div class="grid gap-3">
+							<Label for="display_name">Display Name</Label>
+							<Input
+								id="display_name"
+								name="display_name"
+								type="text"
+								placeholder="John Doe"
+								bind:value={display_name}
+								required
+							/>
 						</div>
 					{/if}
 
