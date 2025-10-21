@@ -1,5 +1,5 @@
 <script>
-    import { User } from 'lucide-svelte';
+    import { User, Upload, Camera } from 'lucide-svelte';
     import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
     import { Button } from '$lib/ui/button';
     import { Badge } from '$lib/ui/badge';
@@ -18,9 +18,41 @@
         interests: data.interests?.join(', ') || ''
     });
 
+    let avatarFile = $state(null);
+    let avatarPreview = $state(null);
+
+    function handleAvatarChange(event) {
+        const file = event.target.files?.[0];
+        if (file) {
+            avatarFile = file;
+            // Create preview
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                avatarPreview = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
     $effect(() => {
         if (form?.success) {
             editing = false;
+        }
+    });
+
+    $effect(() => {
+        if (editing) {
+            formData = {
+                username: data.profile?.username || '',
+                display_name: data.profile?.display_name || '',
+                bio: data.profile?.bio || '',
+                website: data.profile?.website || '',
+                location: data.profile?.location || '',
+                interests: data.interests?.join(', ') || ''
+            };
+            // Reset avatar preview when entering edit mode
+            avatarFile = null;
+            avatarPreview = null;
         }
     });
 </script>
@@ -87,17 +119,49 @@
                         </div>
                     {/if}
 
-                    <form method="POST" action="?/updateProfile" use:enhance>
+                    <form method="POST" action="?/updateProfile" use:enhance enctype="multipart/form-data">
                         <div class="space-y-4">
+                            <!-- Profile Picture Upload -->
+                            <div>
+                                <span class="block text-sm font-medium mb-2">Profile Picture</span>
+                                <div class="flex items-center gap-4">
+                                    <Avatar class="h-24 w-24">
+                                        <AvatarImage src={avatarPreview || data.profile?.avatar_url} alt="Profile preview" />
+                                        <AvatarFallback>
+                                            <User class="h-12 w-12" />
+                                        </AvatarFallback>
+                                    </Avatar>
+                                    <div class="flex-1">
+                                        <input
+                                            type="file"
+                                            id="avatar"
+                                            name="avatar"
+                                            accept="image/jpeg,image/jpg,image/png,image/webp"
+                                            onchange={handleAvatarChange}
+                                            class="hidden"
+                                        />
+                                        <label for="avatar">
+                                            <Button type="button" variant="outline" onclick={() => document.getElementById('avatar').click()}>
+                                                <Camera class="h-4 w-4 mr-2" />
+                                                {avatarPreview ? 'Change Photo' : 'Upload Photo'}
+                                            </Button>
+                                        </label>
+                                        <p class="text-xs text-muted-foreground mt-2">
+                                            JPG, PNG or WebP. Max 2MB.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div>
                                 <label for="username" class="block text-sm font-medium mb-1">Username</label>
                                 <input
                                     type="text"
                                     id="username"
-                                    name="username"
-                                    bind:value={formData.username}
-                                    required
-                                    class="w-full px-3 py-2 border rounded-md bg-background"
+                                    value={formData.username}
+                                    readonly
+                                    disabled
+                                    class="w-full px-3 py-2 border rounded-md bg-muted text-muted-foreground cursor-not-allowed"
                                 />
                             </div>
 
