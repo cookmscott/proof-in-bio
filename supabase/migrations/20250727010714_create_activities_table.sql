@@ -1,40 +1,8 @@
--- Create collections (albums) and activity tracking system
--- Collections allow users to group photos, activities power feeds and notifications
+-- Create activities table for user activity feeds and notifications
+-- This table powers the activity feed/timeline showing what users and people they follow are doing
+-- It's an event log that captures all major user actions (uploads, likes, follows, comments)
+-- The metadata JSONB field stores additional context specific to each activity type
 
--- Collections table for user-created photo albums
-CREATE TABLE IF NOT EXISTS collections (
-  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
-  name VARCHAR(100) NOT NULL,
-  description TEXT,
-  slug VARCHAR(100) NOT NULL,
-  cover_photo_id UUID REFERENCES photos(id),
-  is_public BOOLEAN DEFAULT TRUE,
-  sort_order INTEGER DEFAULT 0,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
-);
-
--- Create indexes and constraints
-CREATE UNIQUE INDEX collections_user_slug_idx ON collections(user_id, slug);
-CREATE INDEX collections_user_id_idx ON collections(user_id);
-CREATE INDEX collections_is_public_idx ON collections(is_public);
-
--- Collection_photos junction table
-CREATE TABLE IF NOT EXISTS collection_photos (
-  id SERIAL PRIMARY KEY,
-  collection_id UUID REFERENCES collections(id) ON DELETE CASCADE NOT NULL,
-  photo_id UUID REFERENCES photos(id) ON DELETE CASCADE NOT NULL,
-  sort_order INTEGER DEFAULT 0,
-  added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
-);
-
--- Create indexes and constraints
-CREATE UNIQUE INDEX collection_photos_unique_idx ON collection_photos(collection_id, photo_id);
-CREATE INDEX collection_photos_collection_id_idx ON collection_photos(collection_id);
-CREATE INDEX collection_photos_photo_id_idx ON collection_photos(photo_id);
-
--- Activities table for user activity feeds and notifications
 CREATE TABLE IF NOT EXISTS activities (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
@@ -50,10 +18,6 @@ CREATE INDEX activities_user_id_idx ON activities(user_id);
 CREATE INDEX activities_type_idx ON activities(activity_type);
 CREATE INDEX activities_created_at_idx ON activities(created_at DESC);
 CREATE INDEX activities_target_idx ON activities(target_type, target_id);
-
--- Create trigger for collections updated_at
-CREATE TRIGGER update_collections_updated_at BEFORE UPDATE ON collections
-    FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
 -- Function to automatically create activity when users perform actions
 CREATE OR REPLACE FUNCTION create_activity_on_like()
@@ -87,10 +51,9 @@ CREATE OR REPLACE FUNCTION create_activity_on_photo_upload()
 RETURNS TRIGGER AS $$
 BEGIN
   INSERT INTO activities (user_id, activity_type, target_type, target_id, metadata)
-  VALUES (NEW.user_id, 'photo_upload', 'photo', NEW.id, 
+  VALUES (NEW.user_id, 'photo_upload', 'photo', NEW.id,
     jsonb_build_object(
-      'filename', NEW.filename,
-      'c2pa_status', NEW.c2pa_status
+      'filename', NEW.filename
     )
   );
   RETURN NEW;

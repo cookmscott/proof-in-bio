@@ -5,6 +5,7 @@
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE user_interests ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photos ENABLE ROW LEVEL SECURITY;
+ALTER TABLE photos_metadata ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photo_history ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tags ENABLE ROW LEVEL SECURITY;
 ALTER TABLE photo_tags ENABLE ROW LEVEL SECURITY;
@@ -46,6 +47,25 @@ CREATE POLICY "Anyone can view public photos" ON photos
 CREATE POLICY "Users can manage own photos" ON photos
   FOR ALL USING (user_id = auth.uid());
 
+-- Photos metadata table policies
+CREATE POLICY "Anyone can view metadata for visible photos" ON photos_metadata
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM photos
+      WHERE photos.id = photos_metadata.photo_id
+      AND (photos.is_public = true OR photos.user_id = auth.uid())
+    )
+  );
+
+CREATE POLICY "Photo owners can manage metadata" ON photos_metadata
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM photos
+      WHERE photos.id = photos_metadata.photo_id
+      AND photos.user_id = auth.uid()
+    )
+  );
+
 -- Photo history policies (read-only for transparency)
 CREATE POLICY "Anyone can view photo history for visible photos" ON photo_history
   FOR SELECT USING (
@@ -56,8 +76,14 @@ CREATE POLICY "Anyone can view photo history for visible photos" ON photo_histor
     )
   );
 
-CREATE POLICY "System can insert photo history" ON photo_history
-  FOR INSERT WITH CHECK (true); -- Allow system to insert history
+CREATE POLICY "Photo owners can insert history" ON photo_history
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM photos
+      WHERE photos.id = photo_history.photo_id
+      AND photos.user_id = auth.uid()
+    )
+  );
 
 -- Tags table policies (public read, authenticated users can create)
 CREATE POLICY "Anyone can view tags" ON tags FOR SELECT USING (true);
@@ -167,9 +193,31 @@ CREATE POLICY "Users can view own activities" ON activities
 CREATE POLICY "Users can view activities of users they follow" ON activities
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM follows 
-      WHERE follows.following_id = activities.user_id 
+      SELECT 1 FROM follows
+      WHERE follows.following_id = activities.user_id
       AND follows.follower_id = auth.uid()
+    )
+  );
+
+CREATE POLICY "Anyone can view public photo activities" ON activities
+  FOR SELECT USING (
+    activity_type IN ('photo_upload', 'like', 'comment') AND
+    target_type = 'photo' AND
+    EXISTS (
+      SELECT 1 FROM photos
+      WHERE photos.id = activities.target_id
+      AND photos.is_public = true
+    )
+  );
+
+CREATE POLICY "Anyone can view public user activities" ON activities
+  FOR SELECT USING (
+    activity_type = 'follow' AND
+    target_type = 'user' AND
+    EXISTS (
+      SELECT 1 FROM user_profiles
+      WHERE user_profiles.id = activities.target_id
+      AND user_profiles.is_public = true
     )
   );
 
@@ -177,11 +225,10 @@ CREATE POLICY "System can create activities" ON activities
   FOR INSERT WITH CHECK (true); -- Allow triggers to insert
 
 -- Create a function to handle user creation
-CREATE OR REPLACE FUNCTION handle_new_user()
-RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION handle_new_user() RETURNS trigger AS $$
 BEGIN
   -- Ensure we're looking in the public schema
-  SET search_path = public;
+  SET search_path = auth;
   -- Log the attempt (visible in Supabase logs)
   RAISE LOG 'Creating user profile for user_id: %, email: %, username: %, display_name: %',
     NEW.id,

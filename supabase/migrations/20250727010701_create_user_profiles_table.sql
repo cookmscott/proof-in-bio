@@ -20,23 +20,12 @@ CREATE TABLE IF NOT EXISTS user_profiles (
 CREATE UNIQUE INDEX user_profiles_username_idx ON user_profiles(username);
 CREATE UNIQUE INDEX user_profiles_email_idx ON user_profiles(email);
 
--- Create user_interests table for profile tags
-CREATE TABLE IF NOT EXISTS user_interests (
-  id SERIAL PRIMARY KEY,
-  user_id UUID REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
-  interest VARCHAR(50) NOT NULL,
-  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
-);
-
--- Create indexes
-CREATE UNIQUE INDEX user_interests_unique_idx ON user_interests(user_id, interest);
-CREATE INDEX user_interests_user_id_idx ON user_interests(user_id);
-
 -- Create updated_at trigger function
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
+    
     RETURN NEW;
 END;
 $$ language 'plpgsql';
