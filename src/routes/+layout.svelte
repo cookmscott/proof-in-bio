@@ -9,20 +9,20 @@ import '../app.css';
 import { ModeWatcher } from 'mode-watcher';
 import { Toaster } from '$lib/ui/sonner';
 import { invalidate } from '$app/navigation';
-import { onMount } from 'svelte';
 import GlobalAvatar from '$lib/components/global-avatar.svelte';
+import { untrack } from 'svelte';
 
 let { data, children } = $props();
 let { session, supabase, user } = $derived(data);
 
-onMount(() => {
-	const { data } = supabase.auth.onAuthStateChange((_, newSession) => {
+$effect(() => {
+	const { data: authData } = supabase.auth.onAuthStateChange((_, newSession) => {
 		if (newSession?.expires_at !== session?.expires_at) {
 			invalidate('supabase:auth');
 		}
 	});
 
-	return () => data.subscription.unsubscribe();
+	return () => authData.subscription.unsubscribe();
 });
 </script>
 

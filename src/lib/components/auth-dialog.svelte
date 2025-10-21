@@ -3,12 +3,11 @@
 	import { Card, CardContent, CardHeader, CardTitle } from '$lib/ui/card/index.js';
 	import { Input } from '$lib/ui/input/index.js';
 	import { Label } from '$lib/ui/label/index.js';
-	import { createEventDispatcher } from 'svelte';
 	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 
 	// Props
-	let { supabase, open = true } = $props();
+	let { supabase, open = true, onsuccess, onclose } = $props();
 
 	// Internal state
 	let email = $state('');
@@ -18,8 +17,6 @@
 	let isLogin = $state(true);
 	let loading = $state(false);
 	let error = $state('');
-
-	const dispatch = createEventDispatcher();
 
 	async function handleSubmit(e) {
 		e.preventDefault();
@@ -37,7 +34,7 @@
 					error = authError.message;
 				} else {
 					await invalidateAll();
-					dispatch('success', { type: 'login' });
+					onsuccess?.({ detail: { type: 'login' } });
 					goto('/private');
 				}
 			} else {
@@ -67,7 +64,7 @@
 				} else {
 					console.log('=== CLIENT SIGNUP SUCCESS ===');
 					console.log('User:', signupData.user);
-					dispatch('success', { type: 'signup' });
+					onsuccess?.({ detail: { type: 'signup' } });
 					// For signup, usually redirect to confirmation page or show success message
 					error = 'Check your email for a confirmation link!';
 				}
@@ -108,7 +105,7 @@
 	}
 
 	function closeDialog() {
-		dispatch('close');
+		onclose?.();
 	}
 </script>
 

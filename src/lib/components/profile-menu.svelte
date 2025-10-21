@@ -1,6 +1,5 @@
 <script>
 	import { DropdownMenu, Button, Avatar } from 'bits-ui';
-	import { onMount } from 'svelte';
 
 	// Simulated auth state - replace with real auth later
 	let isLoggedIn = true;
@@ -11,9 +10,9 @@
 	};
 
 	// Dark mode state
-	let darkMode = false;
+	let darkMode = $state(false);
 
-	onMount(() => {
+	$effect(() => {
 	  const saved = localStorage.getItem("theme");
 	  if (saved === "dark") {
 		darkMode = true;
@@ -96,7 +95,7 @@
 							<input
 								type="checkbox"
 								checked={darkMode}
-								on:change={toggleDarkMode}
+								onchange={toggleDarkMode}
 								class="form-checkbox accent-primary"
 							/>
 							<span class="ml-2 text-xs">{darkMode ? 'On' : 'Off'}</span>

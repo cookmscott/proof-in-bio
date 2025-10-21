@@ -11,12 +11,13 @@
 
     // This is a Svelte 5 rune, which is a new feature.
     // Securely get the authenticated user from the load function
-    let { user } = $props();
+    let { data } = $props();
+    let user = $derived(data?.user);
 
     // --- Placeholder Data ---
     // In a real app, this would come from your backend, loaded in +page.server.js
     // Fallback to placeholder if no user
-    const userProfile = user ? {
+    let userProfile = $derived(user ? {
         username: user.user_metadata?.username || user.email,
         name: user.user_metadata?.name || user.email,
         description: user.user_metadata?.description || 'No description provided.',
@@ -28,7 +29,7 @@
         description: 'Capturing moments, one click at a time. Lover of landscapes and candid portraits.',
         interests: ['Photography', 'Travel', 'Nature', 'Art'],
         avatarUrl: 'https://i.pravatar.cc/256?img=23'
-    };
+    });
 
     const photos = Array.from({ length: 12 }, (_, i) => ({
         id: i + 1,

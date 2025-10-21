@@ -1,15 +1,17 @@
 <script>
   import { Root as CarouselRoot, Content as CarouselContent, Item as CarouselItem, Previous as CarouselPrevious, Next as CarouselNext } from '$lib/ui/carousel';
   import { Skeleton } from '$lib/ui/skeleton';
-  export let images = [];
+  let { images = [] } = $props();
 
   // Track loaded state for each image
-  let loaded = Array(images.length).fill(false);
+  let loaded = $state(Array(images.length).fill(false));
 
   // Reset loaded state if images prop changes
-  $: if (images.length !== loaded.length) {
-    loaded = Array(images.length).fill(false);
-  }
+  $effect(() => {
+    if (images.length !== loaded.length) {
+      loaded = Array(images.length).fill(false);
+    }
+  });
 </script>
 
 <div class="mt-4 relative">
@@ -32,7 +34,7 @@
               alt={`Carousel image ${i + 1}`}
               class="w-full h-full object-cover rounded transition-opacity duration-300"
               style="opacity: {loaded[i] ? 1 : 0};"
-              on:load={() => loaded[i] = true}
+              onload={() => loaded[i] = true}
             />
           </div>
         </CarouselItem>

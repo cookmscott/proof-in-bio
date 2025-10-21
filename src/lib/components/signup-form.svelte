@@ -5,8 +5,7 @@
   import { Input } from "$lib/ui/input/index.js";
   import { cn } from "$lib/utils.js";
 
-  export let className = "";
-  export let restProps = {};
+  let { class: className, ...restProps } = $props();
   const id = Math.random().toString(36).substr(2, 9);
 </script>
 

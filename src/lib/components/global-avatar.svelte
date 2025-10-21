@@ -4,9 +4,8 @@ import { Button } from '$lib/ui/button/index.js';
 import { page } from '$app/stores';
 import * as DropdownMenu from "$lib/ui/dropdown-menu/index.js";
 import AuthDialog from '$lib/components/auth-dialog.svelte';
-import { onMount } from 'svelte';
 import { goto, invalidate } from '$app/navigation';
-import { get } from 'svelte/store';
+import { untrack } from 'svelte';
 
 // Example icons, replace with your icon components or SVGs
 const ProfileIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>`;
@@ -15,8 +14,11 @@ const TeamIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="cur
 const SubscriptionIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/></svg>`;
 const LogoutIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>`;
 
+// Props from layout
+let { session = null, user = null, supabase = null } = $props();
+
 // Fix: Prevent body overflow and paddingRight from being set by dropdown (if any)
-onMount(() => {
+$effect(() => {
   const observer = new MutationObserver(() => {
     if (document.body.style.overflow === 'hidden') {
       document.body.style.overflow = '';
@@ -28,9 +30,6 @@ onMount(() => {
   observer.observe(document.body, { attributes: true, attributeFilter: ['style'] });
   return () => observer.disconnect();
 });
-
-// Props from layout
-let { session = null, user = null, supabase = null } = $props();
 
 // Auth dialog state
 let showAuthDialog = $state(false);
