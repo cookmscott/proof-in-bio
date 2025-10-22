@@ -1,6 +1,6 @@
 <script>
 	import { Button } from '$lib/ui/button/index.js';
-	import { Card, CardContent, CardHeader, CardTitle } from '$lib/ui/card/index.js';
+	import { Card, CardContent } from '$lib/ui/card/index.js';
 	import { Input } from '$lib/ui/input/index.js';
 	import { Label } from '$lib/ui/label/index.js';
 	import { goto, invalidateAll } from '$app/navigation';
@@ -78,12 +78,7 @@
 					goto('/private');
 				}
 			} else {
-				console.log('=== CLIENT SIGNUP ATTEMPT ===');
-				console.log('Email:', email);
-				console.log('Username:', username);
-				console.log('Display Name:', display_name);
-
-				const { data: signupData, error: authError } = await supabase.auth.signUp({
+				const { error: authError } = await supabase.auth.signUp({
 					email,
 					password,
 					options: {
@@ -95,21 +90,14 @@
 				});
 
 				if (authError) {
-					console.error('=== CLIENT SIGNUP ERROR ===');
-					console.error('Error code:', authError.code);
-					console.error('Error message:', authError.message);
-					console.error('Error status:', authError.status);
-					console.error('Full error:', JSON.stringify(authError, null, 2));
 					error = `${authError.message} - Please make sure the database has been reset with the new schema.`;
 				} else {
-					console.log('=== CLIENT SIGNUP SUCCESS ===');
-					console.log('User:', signupData.user);
 					onsuccess?.({ detail: { type: 'signup' } });
 					// For signup, usually redirect to confirmation page or show success message
 					error = 'Check your email for a confirmation link!';
 				}
 			}
-		} catch (e) {
+		} catch {
 			error = 'An unexpected error occurred';
 		} finally {
 			loading = false;
@@ -133,7 +121,7 @@
 				loading = false;
 			}
 			// Note: OAuth redirects, so we don't set loading = false here
-		} catch (e) {
+		} catch {
 			error = 'Failed to sign in with Google';
 			loading = false;
 		}

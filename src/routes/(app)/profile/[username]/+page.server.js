@@ -1,157 +1,153 @@
-import { redirect, fail, error } from '@sveltejs/kit';
+import { fail, error } from '@sveltejs/kit';
 
 export async function load({ params, locals }) {
-    const session = locals.session;
-    const currentUser = locals.user;
-    const { username } = params;
+	const currentUser = locals.user;
+	const { username } = params;
 
-    // Fetch the profile by username
-    const { data: profile, error: profileError } = await locals.supabase
-        .from('user_profiles')
-        .select('*')
-        .eq('username', username)
-        .single();
+	// Fetch the profile by username
+	const { data: profile, error: profileError } = await locals.supabase
+		.from('user_profiles')
+		.select('*')
+		.eq('username', username)
+		.single();
 
-    if (profileError || !profile) {
-        throw error(404, 'User not found');
-    }
+	if (profileError || !profile) {
+		throw error(404, 'User not found');
+	}
 
-    // Fetch user interests
-    const { data: interests, error: interestsError } = await locals.supabase
-        .from('user_interests')
-        .select('interest')
-        .eq('user_id', profile.id);
+	// Fetch user interests
+	const { data: interests } = await locals.supabase
+		.from('user_interests')
+		.select('interest')
+		.eq('user_id', profile.id);
 
-    // Determine if the current user can edit this profile
-    const canEdit = currentUser && currentUser.id === profile.id;
+	// Determine if the current user can edit this profile
+	const canEdit = currentUser && currentUser.id === profile.id;
 
-    return {
-        session,
-        user: currentUser,
-        profile: profile || null,
-        interests: interests?.map(i => i.interest) || [],
-        canEdit, // This is the key: tells the component if editing is allowed
-        isOwnProfile: canEdit
-    };
+	return {
+		profile: profile || null,
+		interests: interests?.map((i) => i.interest) || [],
+		canEdit, // This is the key: tells the component if editing is allowed
+		isOwnProfile: canEdit
+	};
 }
 
 export const actions = {
-    updateProfile: async ({ request, locals, params }) => {
-        const session = locals.session;
-        const currentUser = locals.user;
-        const { username } = params;
+	updateProfile: async ({ request, locals, params }) => {
+		const currentUser = locals.user;
+		const { username } = params;
 
-        if (!session || !currentUser) {
-            return fail(401, { error: 'Unauthorized' });
-        }
+		if (!currentUser) {
+			return fail(401, { error: 'Unauthorized' });
+		}
 
-        // Verify the current user owns this profile
-        const { data: profile } = await locals.supabase
-            .from('user_profiles')
-            .select('id')
-            .eq('username', username)
-            .single();
+		// Verify the current user owns this profile
+		const { data: profile } = await locals.supabase
+			.from('user_profiles')
+			.select('id')
+			.eq('username', username)
+			.single();
 
-        if (!profile || profile.id !== currentUser.id) {
-            return fail(403, { error: 'You can only edit your own profile' });
-        }
+		if (!profile || profile.id !== currentUser.id) {
+			return fail(403, { error: 'You can only edit your own profile' });
+		}
 
-        const formData = await request.formData();
-        const display_name = formData.get('display_name');
-        const bio = formData.get('bio');
-        const website = formData.get('website');
-        const location = formData.get('location');
-        const interests = formData.get('interests')?.split(',').map(i => i.trim()).filter(Boolean) || [];
-        const avatarFile = formData.get('avatar');
+		const formData = await request.formData();
+		const display_name = formData.get('display_name');
+		const bio = formData.get('bio');
+		const website = formData.get('website');
+		const location = formData.get('location');
+		const interests =
+			formData
+				.get('interests')
+				?.split(',')
+				.map((i) => i.trim())
+				.filter(Boolean) || [];
+		const avatarFile = formData.get('avatar');
 
-        let avatar_url = null;
+		let avatar_url = null;
 
-        // Upload avatar if provided
-        if (avatarFile && avatarFile.size > 0) {
-            // Validate file size (2MB max)
-            if (avatarFile.size > 2097152) {
-                return fail(400, { error: 'Avatar file size must be less than 2MB' });
-            }
+		// Upload avatar if provided
+		if (avatarFile && avatarFile.size > 0) {
+			// Validate file size (2MB max)
+			if (avatarFile.size > 2097152) {
+				return fail(400, { error: 'Avatar file size must be less than 2MB' });
+			}
 
-            // Validate file type
-            const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
-            if (!validTypes.includes(avatarFile.type)) {
-                return fail(400, { error: 'Avatar must be a JPG, PNG, or WebP image' });
-            }
+			// Validate file type
+			const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+			if (!validTypes.includes(avatarFile.type)) {
+				return fail(400, { error: 'Avatar must be a JPG, PNG, or WebP image' });
+			}
 
-            // Create unique filename
-            const fileExt = avatarFile.name.split('.').pop();
-            const fileName = `${currentUser.id}/avatar.${fileExt}`;
+			// Create unique filename
+			const fileExt = avatarFile.name.split('.').pop();
+			const fileName = `${currentUser.id}/avatar.${fileExt}`;
 
-            // Convert File to ArrayBuffer
-            const arrayBuffer = await avatarFile.arrayBuffer();
+			// Convert File to ArrayBuffer
+			const arrayBuffer = await avatarFile.arrayBuffer();
 
-            // Upload to Supabase Storage
-            const { data: uploadData, error: uploadError } = await locals.supabase.storage
-                .from('avatars')
-                .upload(fileName, arrayBuffer, {
-                    contentType: avatarFile.type,
-                    upsert: true // Replace if exists
-                });
+			// Upload to Supabase Storage
+			const { error: uploadError } = await locals.supabase.storage
+				.from('avatars')
+				.upload(fileName, arrayBuffer, {
+					contentType: avatarFile.type,
+					upsert: true // Replace if exists
+				});
 
-            if (uploadError) {
-                console.error('Avatar upload error:', uploadError);
-                return fail(400, { error: `Failed to upload avatar: ${uploadError.message}` });
-            }
+			if (uploadError) {
+				console.error('Avatar upload error:', uploadError);
+				return fail(400, { error: `Failed to upload avatar: ${uploadError.message}` });
+			}
 
-            // Get public URL
-            const { data: urlData } = locals.supabase.storage
-                .from('avatars')
-                .getPublicUrl(fileName);
+			// Get public URL
+			const { data: urlData } = locals.supabase.storage.from('avatars').getPublicUrl(fileName);
 
-            avatar_url = urlData.publicUrl;
-        }
+			avatar_url = urlData.publicUrl;
+		}
 
-        // Prepare update data (no username - it shouldn't be changed)
-        const updateData = {
-            display_name,
-            bio,
-            website,
-            location
-        };
+		// Prepare update data (no username - it shouldn't be changed)
+		const updateData = {
+			display_name,
+			bio,
+			website,
+			location
+		};
 
-        // Add avatar_url if it was uploaded
-        if (avatar_url) {
-            updateData.avatar_url = avatar_url;
-        }
+		// Add avatar_url if it was uploaded
+		if (avatar_url) {
+			updateData.avatar_url = avatar_url;
+		}
 
-        // Update user profile
-        const { error: updateError } = await locals.supabase
-            .from('user_profiles')
-            .update(updateData)
-            .eq('id', currentUser.id);
+		// Update user profile
+		const { error: updateError } = await locals.supabase
+			.from('user_profiles')
+			.update(updateData)
+			.eq('id', currentUser.id);
 
-        if (updateError) {
-            console.error('Profile update error:', updateError);
-            return fail(400, { error: updateError.message });
-        }
+		if (updateError) {
+			console.error('Profile update error:', updateError);
+			return fail(400, { error: updateError.message });
+		}
 
-        // Delete existing interests and insert new ones
-        await locals.supabase
-            .from('user_interests')
-            .delete()
-            .eq('user_id', currentUser.id);
+		// Delete existing interests and insert new ones
+		await locals.supabase.from('user_interests').delete().eq('user_id', currentUser.id);
 
-        if (interests.length > 0) {
-            const interestsData = interests.map(interest => ({
-                user_id: currentUser.id,
-                interest
-            }));
+		if (interests.length > 0) {
+			const interestsData = interests.map((interest) => ({
+				user_id: currentUser.id,
+				interest
+			}));
 
-            const { error: interestsError } = await locals.supabase
-                .from('user_interests')
-                .insert(interestsData);
+			const { error: interestsError } = await locals.supabase
+				.from('user_interests')
+				.insert(interestsData);
 
-            if (interestsError) {
-                return fail(400, { error: interestsError.message });
-            }
-        }
+			if (interestsError) {
+				return fail(400, { error: interestsError.message });
+			}
+		}
 
-        return { success: true };
-    }
+		return { success: true };
+	}
 };

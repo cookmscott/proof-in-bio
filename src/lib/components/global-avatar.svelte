@@ -5,14 +5,7 @@
 	import * as DropdownMenu from '$lib/ui/dropdown-menu/index.js';
 	import AuthDialog from '$lib/components/auth-dialog.svelte';
 	import { goto, invalidate } from '$app/navigation';
-	import { untrack } from 'svelte';
-
-	// Example icons, replace with your icon components or SVGs
-	const ProfileIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 8-4 8-4s8 0 8 4"/></svg>`;
-	const BillingIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 3v4"/><path d="M8 3v4"/></svg>`;
-	const TeamIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="7" r="4"/><path d="M5.5 21a7.5 7.5 0 0 1 13 0"/></svg>`;
-	const SubscriptionIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4"/><path d="M8 2v4"/></svg>`;
-	const LogoutIcon = `<svg class="w-4 h-4 mr-2 inline-block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M17 16l4-4m0 0l-4-4m4 4H7"/><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/></svg>`;
+	import { User, CreditCard, Users, Package, LogOut } from 'lucide-svelte';
 
 	// Props from layout
 	let { session = null, user = null, supabase = null } = $props();
@@ -123,18 +116,28 @@
 						<DropdownMenu.Label>My Account</DropdownMenu.Label>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Item asChild>
-							<a href={username ? `/profile/${username}` : '/profile'}
-								><span>{@html ProfileIcon}</span>Profile</a
-							>
+							<a href={username ? `/profile/${username}` : '/profile'} class="flex items-center">
+								<User class="w-4 h-4 mr-2" />
+								Profile
+							</a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item asChild>
-							<a href="/billing"><span>{@html BillingIcon}</span>Billing</a>
+							<a href="/billing" class="flex items-center">
+								<CreditCard class="w-4 h-4 mr-2" />
+								Billing
+							</a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item asChild>
-							<a href="/team"><span>{@html TeamIcon}</span>Team</a>
+							<a href="/team" class="flex items-center">
+								<Users class="w-4 h-4 mr-2" />
+								Team
+							</a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Item asChild>
-							<a href="/subscription"><span>{@html SubscriptionIcon}</span>Subscription</a>
+							<a href="/subscription" class="flex items-center">
+								<Package class="w-4 h-4 mr-2" />
+								Subscription
+							</a>
 						</DropdownMenu.Item>
 						<DropdownMenu.Separator />
 						<DropdownMenu.Item asChild>
@@ -143,7 +146,8 @@
 								class="cursor-pointer w-full text-left flex items-center"
 								onclick={handleLogout}
 							>
-								<span>{@html LogoutIcon}</span>Logout
+								<LogOut class="w-4 h-4 mr-2" />
+								Logout
 							</button>
 						</DropdownMenu.Item>
 					</DropdownMenu.Group>
