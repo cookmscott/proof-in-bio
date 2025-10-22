@@ -101,15 +101,16 @@
                     {/if}
                 </div>
 
-                {#if !editing}
+                <!-- Only show Edit button if user can edit (viewing their own profile) -->
+                {#if !editing && data.canEdit}
                     <div class="mt-4 md:mt-0 md:absolute md:top-0 md:right-0">
                         <Button onclick={() => editing = true}>Edit Profile</Button>
                     </div>
                 {/if}
             </div>
 
-            <!-- Edit Form -->
-            {#if editing}
+            <!-- Edit Form - Only visible if user can edit -->
+            {#if editing && data.canEdit}
                 <Card class="p-6 mb-8">
                     <h2 class="text-xl font-semibold mb-4">Edit Profile</h2>
 
@@ -253,8 +254,16 @@
                 <Card class="p-12 text-center">
                     <User class="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
                     <h3 class="text-xl font-semibold mb-2">No photos yet</h3>
-                    <p class="text-muted-foreground mb-4">Start sharing your authentic moments</p>
-                    <Button>Upload Your First Photo</Button>
+                    <p class="text-muted-foreground mb-4">
+                        {#if data.canEdit}
+                            Start sharing your authentic moments
+                        {:else}
+                            This user hasn't shared any photos yet
+                        {/if}
+                    </p>
+                    {#if data.canEdit}
+                        <Button>Upload Your First Photo</Button>
+                    {/if}
                 </Card>
             {/if}
         </main>

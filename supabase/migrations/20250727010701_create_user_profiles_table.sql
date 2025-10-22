@@ -13,7 +13,11 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   is_verified BOOLEAN DEFAULT FALSE,
   is_public BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
-  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW() NOT NULL,
+  -- Ensure username is kebab-case: lowercase alphanumeric with hyphens, min 3 chars
+  CONSTRAINT username_format_check CHECK (
+    username ~ '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$' AND LENGTH(username) >= 3
+  )
 );
 
 -- Create indexes for performance
@@ -25,7 +29,7 @@ CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
 BEGIN
     NEW.updated_at = NOW();
-    
+
     RETURN NEW;
 END;
 $$ language 'plpgsql';

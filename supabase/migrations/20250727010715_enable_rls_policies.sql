@@ -70,8 +70,8 @@ CREATE POLICY "Photo owners can manage metadata" ON photos_metadata
 CREATE POLICY "Anyone can view photo history for visible photos" ON photo_history
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = photo_history.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = photo_history.photo_id
       AND (photos.is_public = true OR photos.user_id = auth.uid())
     )
   );
@@ -87,15 +87,15 @@ CREATE POLICY "Photo owners can insert history" ON photo_history
 
 -- Tags table policies (public read, authenticated users can create)
 CREATE POLICY "Anyone can view tags" ON tags FOR SELECT USING (true);
-CREATE POLICY "Authenticated users can create tags" ON tags 
+CREATE POLICY "Authenticated users can create tags" ON tags
   FOR INSERT WITH CHECK (auth.uid() IS NOT NULL);
 
 -- Photo tags policies
 CREATE POLICY "Anyone can view photo tags for visible photos" ON photo_tags
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = photo_tags.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = photo_tags.photo_id
       AND (photos.is_public = true OR photos.user_id = auth.uid())
     )
   );
@@ -103,8 +103,8 @@ CREATE POLICY "Anyone can view photo tags for visible photos" ON photo_tags
 CREATE POLICY "Photo owners can manage photo tags" ON photo_tags
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = photo_tags.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = photo_tags.photo_id
       AND photos.user_id = auth.uid()
     )
   );
@@ -113,8 +113,8 @@ CREATE POLICY "Photo owners can manage photo tags" ON photo_tags
 CREATE POLICY "Anyone can view likes for visible photos" ON likes
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = likes.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = likes.photo_id
       AND (photos.is_public = true OR photos.user_id = auth.uid())
     )
   );
@@ -126,8 +126,8 @@ CREATE POLICY "Users can manage own likes" ON likes
 CREATE POLICY "Anyone can view comments on visible photos" ON comments
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = comments.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = comments.photo_id
       AND (photos.is_public = true OR photos.user_id = auth.uid())
     )
   );
@@ -136,8 +136,8 @@ CREATE POLICY "Users can create comments on visible photos" ON comments
   FOR INSERT WITH CHECK (
     user_id = auth.uid() AND
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = comments.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = comments.photo_id
       AND photos.is_public = true
     )
   );
@@ -149,8 +149,8 @@ CREATE POLICY "Users and photo owners can delete comments" ON comments
   FOR DELETE USING (
     user_id = auth.uid() OR
     EXISTS (
-      SELECT 1 FROM photos 
-      WHERE photos.id = comments.photo_id 
+      SELECT 1 FROM photos
+      WHERE photos.id = comments.photo_id
       AND photos.user_id = auth.uid()
     )
   );
@@ -171,8 +171,8 @@ CREATE POLICY "Users can manage own collections" ON collections
 CREATE POLICY "Anyone can view photos in public collections" ON collection_photos
   FOR SELECT USING (
     EXISTS (
-      SELECT 1 FROM collections 
-      WHERE collections.id = collection_photos.collection_id 
+      SELECT 1 FROM collections
+      WHERE collections.id = collection_photos.collection_id
       AND (collections.is_public = true OR collections.user_id = auth.uid())
     )
   );
@@ -180,8 +180,8 @@ CREATE POLICY "Anyone can view photos in public collections" ON collection_photo
 CREATE POLICY "Collection owners can manage collection photos" ON collection_photos
   FOR ALL USING (
     EXISTS (
-      SELECT 1 FROM collections 
-      WHERE collections.id = collection_photos.collection_id 
+      SELECT 1 FROM collections
+      WHERE collections.id = collection_photos.collection_id
       AND collections.user_id = auth.uid()
     )
   );
@@ -224,11 +224,32 @@ CREATE POLICY "Anyone can view public user activities" ON activities
 CREATE POLICY "System can create activities" ON activities
   FOR INSERT WITH CHECK (true); -- Allow triggers to insert
 
+-- Create a function to convert strings to kebab-case
+CREATE OR REPLACE FUNCTION to_kebab_case(input_text TEXT) RETURNS TEXT AS $$
+BEGIN
+  RETURN LOWER(
+    REGEXP_REPLACE(
+      REGEXP_REPLACE(
+        REGEXP_REPLACE(
+          REGEXP_REPLACE(
+            TRIM(input_text),
+            '[\s_]+', '-', 'g'  -- Replace spaces and underscores with hyphens
+          ),
+          '[^a-z0-9-]', '', 'g'  -- Remove non-alphanumeric characters except hyphens
+        ),
+        '-+', '-', 'g'  -- Replace multiple consecutive hyphens with single hyphen
+      ),
+      '^-+|-+$', '', 'g'  -- Remove leading and trailing hyphens
+    )
+  );
+END;
+$$ LANGUAGE plpgsql IMMUTABLE;
+
 -- Create a function to handle user creation
 CREATE OR REPLACE FUNCTION handle_new_user() RETURNS trigger AS $$
 BEGIN
-  -- Ensure we're looking in the public schema
-  SET search_path = auth;
+  -- Set search path to include both public and auth schemas
+  SET search_path = public, auth;
   -- Log the attempt (visible in Supabase logs)
   RAISE LOG 'Creating user profile for user_id: %, email: %, username: %, display_name: %',
     NEW.id,
@@ -240,7 +261,8 @@ BEGIN
   VALUES (
     NEW.id,
     NEW.email,
-    COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1)),
+    -- Apply kebab-case transformation to username
+    to_kebab_case(COALESCE(NEW.raw_user_meta_data->>'username', SPLIT_PART(NEW.email, '@', 1))),
     COALESCE(NEW.raw_user_meta_data->>'display_name', SPLIT_PART(NEW.email, '@', 1))
   );
 
