@@ -3,14 +3,17 @@
 	import { Card, CardContent } from '$lib/ui/card/index.js';
 	import { Input } from '$lib/ui/input/index.js';
 	import { Label } from '$lib/ui/label/index.js';
-	import { goto, invalidateAll } from '$app/navigation';
+	import { goto, invalidateAll, invalidate } from '$app/navigation';
 	import { page } from '$app/stores';
+	import { authDialog } from '$lib/stores/auth';
 
 	// Props
-	let { supabase, open = true, onsuccess, onclose } = $props();
+	// The `open` prop is now primarily controlled by the store, but kept for initial rendering or direct control if needed.
+	// `onsuccess` and `onclose` are still useful for external handlers.
+	let { supabase, open = true, onsuccess, onclose, mode = 'login' } = $props();
 
 	// Internal state
-	let email = $state('');
+	let email = $state(''); // Keep email, password, username, display_name as local state
 	let password = $state('');
 	let username = $state('');
 	let display_name = $state('');
@@ -18,6 +21,11 @@
 	let loading = $state(false);
 	let error = $state('');
 	let usernameError = $state('');
+
+	// Sync internal isLogin state with prop/store mode
+	$effect(() => {
+		isLogin = mode === 'login';
+	});
 
 	// Username validation regex: lowercase letters, numbers, hyphens only
 	// Cannot start/end with hyphen, no consecutive hyphens, 3-50 chars
@@ -73,7 +81,7 @@
 				if (authError) {
 					error = authError.message;
 				} else {
-					await invalidateAll();
+					await invalidateAll(); // Invalidate all data to ensure UI updates with new session info
 					onsuccess?.({ detail: { type: 'login' } });
 					goto('/private');
 				}
@@ -92,7 +100,7 @@
 				if (authError) {
 					error = `${authError.message} - Please make sure the database has been reset with the new schema.`;
 				} else {
-					onsuccess?.({ detail: { type: 'signup' } });
+					onsuccess?.({ detail: { type: 'signup' } }); // Call external success handler
 					// For signup, usually redirect to confirmation page or show success message
 					error = 'Check your email for a confirmation link!';
 				}
@@ -128,12 +136,12 @@
 	}
 
 	function toggleMode() {
-		isLogin = !isLogin;
+		authDialog.set({ open: true, mode: isLogin ? 'signup' : 'login' }); // Update store to change mode
 		error = '';
 	}
 
 	function closeDialog() {
-		onclose?.();
+		authDialog.set({ open: false, mode: 'login' }); // Close dialog via store
 	}
 </script>
 

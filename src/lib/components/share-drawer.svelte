@@ -1,7 +1,7 @@
 <script>
     import * as Drawer from "$lib/ui/drawer/index.js";
     import { Button } from "$lib/ui/button/index.js";
-    import { Share, Copy, Twitter, Facebook, Linkedin, Mail, Check, Share2 } from 'lucide-svelte';
+    import { X, Share, Copy, Twitter, Facebook, Linkedin, Mail, Check, Share2 } from 'lucide-svelte';
 
     let { url = "", title = "", description = "" } = $props();
 
@@ -144,7 +144,7 @@
             
             <Drawer.Footer>
                 <Drawer.Close>
-                    <Button variant="outline">Close</Button>
+                    <Button variant="outline">Close<X class="h-4 w-4" /></Button>
                 </Drawer.Close>
             </Drawer.Footer>
         </div>
