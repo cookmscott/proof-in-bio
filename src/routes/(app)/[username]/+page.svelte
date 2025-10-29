@@ -1,52 +1,31 @@
 <script>
-    import { CheckCircle, Share2, Plus, User } from 'lucide-svelte';
-    import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
-    import { Button } from '$lib/ui/button';
-    import { Badge } from '$lib/ui/badge';
-    import { Alert, AlertDescription, AlertTitle } from '$lib/ui/alert';
-    import { Card } from '$lib/ui/card';
-    import { AspectRatio } from '$lib/ui/aspect-ratio';
-    // I've imported the Skeleton component, assuming it's in your project's UI library.
-    import { Skeleton } from '$lib/ui/skeleton';
+	import { CheckCircle, Share2, Plus, User } from 'lucide-svelte';
+	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
+	import { Button } from '$lib/ui/button';
+	import { Badge } from '$lib/ui/badge';
+	import { Card } from '$lib/ui/card';
+	import { AspectRatio } from '$lib/ui/aspect-ratio';
+	import { Skeleton } from '$lib/ui/skeleton';
 
-    // This is a Svelte 5 rune, which is a new feature.
-    // Securely get the authenticated user from the load function
-    let { data } = $props();
-    let user = $derived(data?.user);
+	let { data } = $props();
 
-    // --- Placeholder Data ---
-    // In a real app, this would come from your backend, loaded in +page.server.js
-    // Fallback to placeholder if no user
-    let userProfile = $derived(user ? {
-        username: user.user_metadata?.username || user.email,
-        name: user.user_metadata?.name || user.email,
-        description: user.user_metadata?.description || 'No description provided.',
-        interests: user.user_metadata?.interests || ['Photography', 'Travel', 'Nature', 'Art'],
-        avatarUrl: user.user_metadata?.avatarUrl || `https://i.pravatar.cc/256?u=${user.id}`
-    } : {
-        username: 'janedoe',
-        name: 'Jane Doe',
-        description: 'Capturing moments, one click at a time. Lover of landscapes and candid portraits.',
-        interests: ['Photography', 'Travel', 'Nature', 'Art'],
-        avatarUrl: 'https://i.pravatar.cc/256?img=23'
-    });
+	// Use derived runes to reactively access profile and photos from loaded data
+	let profile = $derived(data.profile);
+	let photos = $derived(data.photos);
+	let canEdit = $derived(data.canEdit);
 
-    const photos = Array.from({ length: 12 }, (_, i) => ({
-        id: i + 1,
-        url: `https://picsum.photos/600/600?random=${i}`,
-        alt: `Portfolio image ${i + 1}`
-    }));
-    // --- End Placeholder Data ---
+	// Extract interests from the nested structure
+	let interests = $derived(profile.interests.map((i) => i.interest));
 
-    // Track loaded state for each image in the gallery
-    let loaded = $state(Array(photos.length).fill(false));
+	// Track loaded state for each image in the gallery
+	let loaded = $state(Array(photos.length).fill(false));
 
-    // Reset loaded state if photos array changes (Svelte 5 runes)
-    $effect(() => {
-        if (photos.length !== loaded.length) {
-            loaded = Array(photos.length).fill(false);
-        }
-    });
+	// Reset loaded state if photos array changes
+	$effect(() => {
+		if (photos.length !== loaded.length) {
+			loaded = Array(photos.length).fill(false);
+		}
+	});
 </script>
 
 <!-- Main wrapper for the entire page -->
@@ -59,7 +38,7 @@
     <div class="relative">
         <!-- Hero Background -->
         <!-- This is now positioned absolutely to the full-width parent, ensuring it spans the screen -->
-        <div class="absolute top-0 left-0 h-[400px] w-full hidden dark:block">
+        <!-- <div class="absolute top-0 left-0 h-[400px] w-full hidden dark:block">
             <img
                 src="https://picsum.photos/1600/900?random=hero"
                 alt="Profile hero background"
@@ -69,6 +48,7 @@
                 class="absolute inset-0 bg-gradient-to-t from-background via-background/70 via-background/30 to-transparent"
             ></div>
         </div>
+        -->
 
         <!-- 
           Main content container. 
@@ -78,22 +58,24 @@
         <main class="relative z-10 container mx-auto max-w-screen-lg px-4 pt-20 pb-8">
             <!-- Profile Header Section -->
             <div class="relative z-10 mb-8 flex flex-col items-center gap-4 text-center md:flex-row md:text-left">
-                <Avatar class="h-24 w-24 md:h-32 md:w-32">
-                    <AvatarImage src={userProfile.avatarUrl} alt={userProfile.name} />
-                    <AvatarFallback>
-                        <User class="h-12 w-12" />
-                    </AvatarFallback>
-                </Avatar>
+				<Avatar class="h-24 w-24 md:h-32 md:w-32">
+					<AvatarImage src={profile.avatar_url} alt={profile.display_name} />
+					<AvatarFallback>
+						<User class="h-12 w-12" />
+					</AvatarFallback>
+				</Avatar>
 
                 <div class="flex-grow">
-                    <h1 class="text-2xl font-bold tracking-tight sm:text-3xl">{userProfile.name}</h1>
-                    <p class="text-muted-foreground">@{userProfile.username}</p>
-                    <p class="mt-2 max-w-xl text-balance">{userProfile.description}</p>
-                    <div class="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
-                        {#each userProfile.interests as interest}
-                            <Badge variant="secondary">{interest}</Badge>
-                        {/each}
-                    </div>
+					<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
+						{profile.display_name || profile.username}
+					</h1>
+					<p class="text-muted-foreground">@{profile.username}</p>
+					<p class="mt-2 max-w-xl text-balance">{profile.bio}</p>
+					<div class="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
+						{#each interests as interest}
+							<Badge variant="secondary">{interest}</Badge>
+						{/each}
+					</div>
                 </div>
 
                 <div class="mt-4 flex gap-2 md:mt-0 md:absolute md:top-0 md:right-0">
@@ -101,7 +83,9 @@
                         <Share2 class="mr-2 h-4 w-4" />
                         Share Profile
                     </Button>
-                    <Button>Edit Profile</Button>
+					{#if canEdit}
+						<Button href="/settings/profile">Edit Profile</Button>
+					{/if}
                 </div>
             </div>
 
@@ -121,16 +105,16 @@
             
             <!-- Photo Gallery Section -->
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">
-                {#each photos as photo, i (photo.id)}
-                    <a href={`/${userProfile.username}/${photo.id}`} class="group">
+				{#each photos as photo, i (photo.id)}
+					<a href={`/${profile.username}/${photo.id}`} class="group">
                         <Card class="overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1">
                             <AspectRatio ratio={1} class="bg-slate-100 dark:bg-slate-800 rounded-sm relative">
                                 {#if !loaded[i]}
                                     <Skeleton class="h-full w-full absolute" />
                                 {/if}
                                 <img
-                                    src={photo.url}
-                                    alt={photo.alt}
+									src={photo.storage_url}
+									alt={photo.title || 'User photo'}
                                     class="h-full w-full object-cover rounded-sm transition-opacity duration-300"
                                     style="opacity: {loaded[i] ? 1 : 0};"
                                     onload={() => loaded[i] = true}
@@ -138,7 +122,7 @@
                             </AspectRatio>
                         </Card>
                     </a>
-                {/each}
+				{/each}
             </div>
         </main>
     </div>
