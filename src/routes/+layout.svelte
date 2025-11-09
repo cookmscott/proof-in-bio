@@ -12,11 +12,15 @@
 	import { authDialog } from '$lib/stores/auth';
 	import AuthDialog from '$lib/components/auth-dialog.svelte';
 	import GlobalAvatar from '$lib/components/global-avatar.svelte';
+	import { page } from '$app/stores';
 
 	let { data, children } = $props();
 	let { session, supabase, user } = $derived(data);
 
+	let isLandingPage = $derived($page.route.id === '/');
+
 	$effect(() => {
+		if (!supabase) return;
 		const { data: authData } = supabase.auth.onAuthStateChange((_, newSession) => {
 			// Invalidate all data to ensure UI updates with new session info
 			if (newSession?.expires_at !== session?.expires_at) {
@@ -54,12 +58,14 @@
 	<ModeWatcher />
 	<Toaster />
 
-	<header class="border-b bg-background/95 backdrop-blur z-40">
-		<div class="container flex h-16 items-center justify-between px-4">
-			<a href="/" class="font-bold tracking-tight"> ProofInBio </a>
-			<GlobalAvatar {session} {user} {supabase} />
-		</div>
-	</header>
+	{#if !isLandingPage}
+		<header class="border-b bg-background/95 backdrop-blur z-40 sticky top-0">
+			<div class="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
+				<a href="/" class="font-bold tracking-tight"> ProofInBio </a>
+				<GlobalAvatar {session} {user} {supabase} />
+			</div>
+		</header>
+	{/if}
 
 	<main class="flex-1">
 		<!--

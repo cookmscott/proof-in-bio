@@ -2,43 +2,65 @@
 
 @import "tw-animate-css";
 
+
+
 @custom-variant dark (&:is(.dark *));
 
-        :root {
-            --font-sans: "Inter", system-ui, -apple-system, sans-serif;  
-            --radius: 0.65rem;
-            --background: oklch(0.981 0.0051 67.76);
-            --foreground: oklch(0.195 0.012 45.2);
-            --card: oklch(0.995 0.003 67.76);
-            --card-foreground: oklch(0.195 0.012 45.2);
-            --popover: oklch(0.995 0.003 67.76);
-            --popover-foreground: oklch(0.195 0.012 45.2);
-            --primary: oklch(0.285 0.08 220.5);
-            --primary-foreground: oklch(0.99 0.002 67.76);
-            --secondary: oklch(0.94 0.008 67.76);
-            --secondary-foreground: oklch(0.285 0.08 220.5);
-            --muted: oklch(0.94 0.008 67.76);
-            --muted-foreground: oklch(0.485 0.018 67.76);
-            --accent: oklch(0.94 0.008 67.76);
-            --accent-foreground: oklch(0.285 0.015 67.76);
-            --destructive: oklch(0.577 0.245 27.325);
-            --border: oklch(0.88 0.012 67.76);
-            --input: oklch(0.88 0.012 67.76);
-            --ring: oklch(0.72 0.14 45.2);
-            --chart-1: oklch(0.646 0.222 41.116);
-            --chart-2: oklch(0.6 0.118 184.704);
-            --chart-3: oklch(0.398 0.07 227.392);
-            --chart-4: oklch(0.828 0.189 84.429);
-            --chart-5: oklch(0.769 0.188 70.08);
-            --sidebar: oklch(0.995 0.003 67.76);
-            --sidebar-foreground: oklch(0.195 0.012 45.2);
-            --sidebar-primary: oklch(0.285 0.08 220.5);
-            --sidebar-primary-foreground: oklch(0.99 0.002 67.76);
-            --sidebar-accent: oklch(0.94 0.008 67.76);
-            --sidebar-accent-foreground: oklch(0.285 0.08 220.5);
-            --sidebar-border: oklch(0.88 0.012 67.76);
-            --sidebar-ring: oklch(0.72 0.14 45.2);
-        }
+:root {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+  --radius: 0.65rem;
+
+  /* Base surfaces */
+  --background: oklch(0.985 0.004 75); /* slightly cooler neutral white */
+  --foreground: oklch(0.22 0.012 45); /* slightly deeper neutral for better legibility */
+
+  --card: oklch(0.99 0.003 75);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.99 0.003 75);
+  --popover-foreground: var(--foreground);
+
+  /* Primary (your existing color, kept intact) */
+  --primary: oklch(0.58 0.11 47);
+  --primary-foreground: oklch(0.99 0.002 67.76);
+
+  /* Secondary — more distinct but still soft, subtle blue-gray */
+  --secondary: oklch(0.9 0.05 240);
+  --secondary-foreground: oklch(0.25 0.05 250);
+
+  /* Muted — neutral supporting tone */
+  --muted: oklch(0.93 0.01 80);
+  --muted-foreground: oklch(0.48 0.018 67);
+
+  /* Accent — warmer complementary to primary */
+  --accent: oklch(0.88 0.09 75);
+  --accent-foreground: oklch(0.32 0.07 45);
+
+  /* Destructive — richer red-orange for alerts */
+  --destructive: oklch(0.6 0.22 28);
+  --destructive-foreground: oklch(0.99 0.002 67.76);
+
+  /* Neutral boundaries */
+  --border: oklch(0.87 0.01 80);
+  --input: var(--border);
+  --ring: oklch(0.7 0.14 47);
+
+  /* Charts — cohesive set tuned to your primary */
+  --chart-1: oklch(0.63 0.18 45);
+  --chart-2: oklch(0.56 0.12 180);
+  --chart-3: oklch(0.42 0.08 250);
+  --chart-4: oklch(0.8 0.16 90);
+  --chart-5: oklch(0.74 0.15 65);
+
+  /* Sidebar */
+  --sidebar: oklch(0.985 0.004 75);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.3 0.07 230);
+  --sidebar-primary-foreground: oklch(0.98 0.002 90);
+  --sidebar-accent: var(--accent);
+  --sidebar-accent-foreground: var(--sidebar-primary);
+  --sidebar-border: var(--border);
+  --sidebar-ring: var(--ring);
+}
 
 .dark {
   --background: oklch(0.145 0 0);
@@ -124,7 +146,11 @@
   }
 }
 
+h1, h2, h3 {
+  font-family: 'Karma' !important;
+}
+
 /* Ensure Alpino font is applied correctly */
 .font-alpino {
-  font-family: 'Karma', sans-serif !important;
+  font-family: 'Inter', sans-serif !important;
 }

@@ -45,6 +45,7 @@
   "dependencies": {
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.51.0",
+    "gsap": "^3.13.0",
     "lucide-svelte": "^0.522.0",
     "mode-watcher": "^1.0.8"
   }
