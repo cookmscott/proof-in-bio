@@ -15,12 +15,12 @@
 		{
 			src: 'https://images.unsplash.com/photo-1532715088550-62f09305f765?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1161&q=80',
 			alt: 'Traces in the snow',
-			caption: 'A scene as it happened...'
+			caption: 'Proven and verified...'
 		},
 		{
 			src: 'https://images.unsplash.com/photo-1571333248844-316a70fb180e?crop=entropy&cs=srgb&fm=jpg&q=85',
 			alt: 'Faded tracks',
-			caption: "Unedited... "
+			caption: "Minimal edits... "
 		},
 		{
 			src: 'https://images.unsplash.com/photo-1516370873344-fb7c61054fa9?crop=entropy&cs=srgb&fm=jpg&q=85',

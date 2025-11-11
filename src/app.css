@@ -10,57 +10,115 @@
   --font-sans: "Inter", system-ui, -apple-system, sans-serif;
   --radius: 0.65rem;
 
-  /* Base surfaces */
-  --background: oklch(0.985 0.004 75); /* slightly cooler neutral white */
-  --foreground: oklch(0.22 0.012 45); /* slightly deeper neutral for better legibility */
+  /* ===== Neutrals (slightly warm to flatter the orange) ===== */
+  --background: oklch(0.985 0.004 80);
+  --foreground: oklch(0.22 0.012 45);
 
-  --card: oklch(0.99 0.003 75);
+  --card: oklch(0.99 0.003 80);
   --card-foreground: var(--foreground);
-  --popover: oklch(0.99 0.003 75);
+  --popover: oklch(0.99 0.003 80);
   --popover-foreground: var(--foreground);
 
-  /* Primary (your existing color, kept intact) */
-  --primary: oklch(0.58 0.11 47);
-  --primary-foreground: oklch(0.99 0.002 67.76);
+  /* ===== Primary (your orange, honed for better punch/contrast) ===== */
+  /* Base sits near L* 60 for UI legibility; ring/hover/active tuned below */
+  --primary: oklch(0.60 0.14 47);
+  --primary-foreground: oklch(0.99 0.002 90);
 
-  /* Secondary — more distinct but still soft, subtle blue-gray */
-  --secondary: oklch(0.9 0.05 240);
-  --secondary-foreground: oklch(0.25 0.05 250);
+  /* States/roles */
+  --primary-weak:  oklch(0.94 0.04 47); /* surfaces/badges */
+  --primary-strong:oklch(0.52 0.17 47); /* hover/pressed */
+  --ring:          oklch(0.72 0.15 47); /* focus ring in brand hue */
 
-  /* Muted — neutral supporting tone */
-  --muted: oklch(0.93 0.01 80);
-  --muted-foreground: oklch(0.48 0.018 67);
+  /* ===== Secondary (cool slate to balance warmth) ===== */
+  --secondary: oklch(0.88 0.04 250);
+  --secondary-foreground: oklch(0.26 0.04 255);
 
-  /* Accent — warmer complementary to primary */
-  --accent: oklch(0.88 0.09 75);
+  /* ===== Accent (amber-sand highlight that plays nice with orange) ===== */
+  --accent: oklch(0.90 0.08 80);
   --accent-foreground: oklch(0.32 0.07 45);
 
-  /* Destructive — richer red-orange for alerts */
-  --destructive: oklch(0.6 0.22 28);
-  --destructive-foreground: oklch(0.99 0.002 67.76);
+  /* ===== Muted/Supporting ===== */
+  --muted: oklch(0.94 0.008 80);
+  --muted-foreground: oklch(0.48 0.018 67);
 
-  /* Neutral boundaries */
-  --border: oklch(0.87 0.01 80);
+  /* ===== Semantic ===== */
+  --success:     oklch(0.72 0.14 150);
+  --success-fg:  oklch(0.14 0.03 150);
+  --warning:     oklch(0.84 0.16 85);
+  --warning-fg:  oklch(0.20 0.04 85);
+  --destructive: oklch(0.58 0.20 28);
+  --destructive-foreground: oklch(0.98 0.002 90);
+
+  /* ===== Boundaries ===== */
+  --border: oklch(0.88 0.01 85);
   --input: var(--border);
-  --ring: oklch(0.7 0.14 47);
 
-  /* Charts — cohesive set tuned to your primary */
-  --chart-1: oklch(0.63 0.18 45);
-  --chart-2: oklch(0.56 0.12 180);
-  --chart-3: oklch(0.42 0.08 250);
-  --chart-4: oklch(0.8 0.16 90);
-  --chart-5: oklch(0.74 0.15 65);
+  /* ===== Charts (brand-cohesive set) ===== */
+  --chart-1: oklch(0.63 0.18 47); /* brand orange */
+  --chart-2: oklch(0.56 0.12 200);/* teal-blue */
+  --chart-3: oklch(0.44 0.09 260);/* indigo */
+  --chart-4: oklch(0.78 0.17 95); /* lime-amber */
+  --chart-5: oklch(0.72 0.15 25); /* warm red */
 
-  /* Sidebar */
-  --sidebar: oklch(0.985 0.004 75);
+  /* ===== Sidebar ===== */
+  --sidebar: oklch(0.985 0.004 80);
   --sidebar-foreground: var(--foreground);
-  --sidebar-primary: oklch(0.3 0.07 230);
+  --sidebar-primary: oklch(0.32 0.07 230);
   --sidebar-primary-foreground: oklch(0.98 0.002 90);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--sidebar-primary);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
+
+  /* ===== Brand Gradients (for your CTA strip) ===== */
+  --brand-grad-from: oklch(0.74 0.19 60); /* tangerine */
+  --brand-grad-to:   oklch(0.64 0.18 40); /* deeper orange */
 }
+
+/* Optional dark theme that preserves the same hue story */
+:root.dark {
+  --background: oklch(0.16 0.008 45);
+  --foreground: oklch(0.97 0.003 95);
+
+  --card: oklch(0.18 0.008 45);
+  --card-foreground: var(--foreground);
+  --popover: oklch(0.18 0.008 45);
+  --popover-foreground: var(--foreground);
+
+  --primary: oklch(0.68 0.16 47);             /* slightly brighter for dark */
+  --primary-foreground: oklch(0.12 0.02 45);
+  --primary-weak:  oklch(0.28 0.04 47);
+  --primary-strong:oklch(0.78 0.18 47);
+  --ring:          oklch(0.72 0.15 47);
+
+  --secondary: oklch(0.34 0.04 255);
+  --secondary-foreground: oklch(0.94 0.02 255);
+
+  --accent: oklch(0.30 0.06 80);
+  --accent-foreground: oklch(0.94 0.02 95);
+
+  --muted: oklch(0.24 0.01 80);
+  --muted-foreground: oklch(0.80 0.02 85);
+
+  --success:     oklch(0.70 0.14 150);
+  --success-fg:  oklch(0.12 0.02 150);
+  --warning:     oklch(0.78 0.16 85);
+  --warning-fg:  oklch(0.14 0.02 85);
+  --destructive: oklch(0.64 0.20 28);
+  --destructive-foreground: oklch(0.10 0.02 28);
+
+  --border: oklch(0.30 0.01 80);
+  --input: var(--border);
+
+  --sidebar: oklch(0.14 0.006 45);
+  --sidebar-foreground: var(--foreground);
+  --sidebar-primary: oklch(0.80 0.16 47);
+  --sidebar-primary-foreground: oklch(0.12 0.02 45);
+
+  --brand-grad-from: oklch(0.70 0.19 60);
+  --brand-grad-to:   oklch(0.60 0.18 40);
+}
+
 
 .dark {
   --background: oklch(0.145 0 0);

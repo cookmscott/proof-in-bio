@@ -9,6 +9,7 @@
 	import { Badge } from '$lib/ui/badge/index.js';
 	import AuthDialog from '$lib/components/auth-dialog.svelte';
 	import PolaroidScroll from '$lib/components/polaroid-scroll.svelte';
+	import EssentialVerification from '$lib/components/essential-verification.svelte';	
 	import {
 		CheckCircle2,
 		ShieldCheck,
@@ -20,6 +21,7 @@
 		Link2,
 		Zap
 	} from 'lucide-svelte';
+	
 
 	// Get data from layout (includes supabase client)
 	let { data } = $props();
@@ -65,36 +67,31 @@
 	<main class="overflow-hidden">
 		<!-- Hero Section -->
 		<div class="container mx-auto max-w-7xl px-6">
-			<section
-				class="relative my-8 rounded-2xl overflow-hidden shadow-lg md:h-[450px]"
-			>
-				<img
-				src="https://images.pexels.com/photos/9909233/pexels-photo-9909233.jpeg"
-				alt="Person standing on a rock looking out over a misty mountain range"
-					class="w-full h-[600px] md:h-full object-cover object-center block filter brightness-90"
-				/>
-				<div class="absolute inset-0 
-				bg-gradient-to-t from-black/70 via-black/50 to-transparent 
-				md:bg-gradient-to-r md:from-black/60 md:to-transparent">
-		   		</div>
-				<div
-					class="absolute top-0 left-0 right-0 p-8 text-center md:text-left md:top-1/2 md:left-12 md:right-auto md:-translate-y-1/2 text-white space-y-5 md:max-w-xl"
-					style="text-shadow: 0 2px 4px rgba(0,0,0,0.3);"
-				>
-					<p class="text-lg font-medium tracking-widest uppercase text-orange-400">
-						For Human Creators
-					</p>
-					<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-balance">
-						Made by people, not prompts.
-					</h1>
-					<p class="text-lg text-white/90 text-balance">
-						Upload real work. We verify it’s human, then we give you a link to prove it anywhere.
-					</p>
-					<div class="flex justify-center md:justify-start gap-4 pt-4">
-						<Button size="lg" class="group" onclick={() => (showAuthDialog = true)}>
-							Create Your Gallery
-							<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-						</Button>
+			<section class="my-8 rounded-2xl overflow-hidden shadow-lg bg-white">
+				<div class="md:grid md:grid-cols-2 md:h-[450px]">
+					<!-- Text content on the left -->
+					<div class="p-8 md:p-12 flex flex-col justify-center text-center md:text-left bg-gradient-to-br from-yellow-50 via-amber-50 to-orange-50">
+						<div class="space-y-5 max-w-md mx-auto md:mx-0">
+							<p class="text-lg font-medium tracking-widest uppercase text-stone-600">
+								For Human Creators
+							</p>
+							<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-balance text-gray-900">
+								Made by people, not prompts.
+							</h1>
+							<p class="text-lg text-gray-600 text-balance">
+								Upload real work. We verify it’s human, then we give you a link to prove it anywhere.
+							</p>
+							<div class="flex justify-center md:justify-start gap-4 pt-4">
+								<Button size="lg" class="group text-white" onclick={() => (showAuthDialog = true)}>
+									Create Your Gallery
+									<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+								</Button>
+							</div>
+						</div>
+					</div>
+					<!-- Image on the right -->
+					<div class="h-[300px] md:h-full">
+						<img src="https://images.pexels.com/photos/9909233/pexels-photo-9909233.jpeg" alt="Person standing on a rock looking out over a misty mountain range" class="w-full h-full object-cover object-center" />
 					</div>
 				</div>
 			</section>
@@ -103,6 +100,11 @@
 		<!-- Polaroid Scroll Section -->
 		<section class="bg-background p-0">
 			<PolaroidScroll/>
+		</section>
+
+		<!-- Essential Verification Section -->
+		<section class="bg-blue p-0">
+			<EssentialVerification/>
 		</section>
 
 		<!-- The Problem/Solution Section -->
@@ -385,3 +387,6 @@
 		onsuccess={handleAuthSuccess}
 	/>
 </div>
+
+<style>
+</style>
