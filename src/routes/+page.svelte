@@ -10,6 +10,9 @@
 	import AuthDialog from '$lib/components/auth-dialog.svelte';
 	import PolaroidScroll from '$lib/components/polaroid-scroll.svelte';
 	import EssentialVerification from '$lib/components/essential-verification.svelte';	
+	import ProblemSolution from '$lib/components/ProblemSolution.svelte';
+	import HowItWorks from '$lib/components/HowItWorks.svelte';
+
 	import {
 		CheckCircle2,
 		ShieldCheck,
@@ -53,7 +56,7 @@
 					<Camera class="h-7 w-7 transition-transform group-hover:scale-110" />
 					<CheckCircle2 class="h-3 w-3 absolute -bottom-1 -right-1 text-green-500" />
 				</div>
-					<span class="font-bold text-lg  text-white">Proof in Bio</span>					
+					<span class="font-bold text-lg  text-white">ProofInBio</span>					
 			</a>
 				<div class="flex items-center gap-3">
 					<Button variant="ghost" size="sm" href="#how-it-works">How it Works</Button>
@@ -98,9 +101,8 @@
 		</div>
 
 		<!-- Polaroid Scroll Section -->
-		<section class="bg-background p-0">
-			<PolaroidScroll/>
-		</section>
+		<PolaroidScroll/>
+		
 
 		<!-- Essential Verification Section -->
 		<section class="bg-blue p-0">
@@ -108,118 +110,12 @@
 		</section>
 
 		<!-- The Problem/Solution Section -->
-		<section class="py-20 md:py-28">
-			<div class="container mx-auto max-w-6xl px-6">
-				<div class="grid md:grid-cols-2 gap-16 items-center">
-					<!-- The Problem -->
-					<div class="space-y-6">
-						<div class="inline-flex items-center gap-2 text-destructive">
-							<XCircle class="h-5 w-5" />
-							<span class="font-semibold">The Problem</span>
-						</div>
-						<h2 class="text-3xl md:text-4xl font-bold ">
-							Nobody knows what's real anymore
-						</h2>
-						<div class="space-y-4 text-muted-foreground">
-							<div class="flex gap-3">
-								<Sparkles class="h-5 w-5 mt-0.5 text-destructive/50" />
-								<p>AI-generated images flooding every platform</p>
-							</div>
-							<div class="flex gap-3">
-								<Sparkles class="h-5 w-5 mt-0.5 text-destructive/50" />
-								<p>Heavy filters and edits destroying authenticity</p>
-							</div>
-							<div class="flex gap-3">
-								<Sparkles class="h-5 w-5 mt-0.5 text-destructive/50" />
-								<p>No way to verify if a photo is genuinely human-made</p>
-							</div>
-						</div>
-					</div>
+		<ProblemSolution />
 
-					<!-- The Solution -->
-					<div class="space-y-6">
-						<div class="inline-flex items-center gap-2 text-primary">
-							<ShieldCheck class="h-5 w-5" />
-							<span class="font-semibold">The Solution</span>
-						</div>
-						<h2 class="text-3xl md:text-4xl font-bold ">One link that proves it all</h2>
-						<div class="space-y-4">
-							<div class="flex gap-3">
-								<CheckCircle2 class="h-5 w-5 mt-0.5 text-green-500" />
-								<div>
-									<p class="font-medium">C2PA verification on every upload</p>
-									<p class="text-sm text-muted-foreground">Industry-standard cryptographic proof</p>
-								</div>
-							</div>
-							<div class="flex gap-3">
-								<CheckCircle2 class="h-5 w-5 mt-0.5 text-green-500" />
-								<div>
-									<p class="font-medium">Beautiful gallery you control</p>
-									<p class="text-sm text-muted-foreground">Your verified work, your way</p>
-								</div>
-							</div>
-							<div class="flex gap-3">
-								<CheckCircle2 class="h-5 w-5 mt-0.5 text-green-500" />
-								<div>
-									<p class="font-medium">Drop it in your bio anywhere</p>
-									<p class="text-sm text-muted-foreground">
-										Instagram, Twitter, LinkedIn - prove it everywhere
-									</p>
-								</div>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
-		</section>
-
-		<!-- How It Works -->
-		<section id="how-it-works" class="container mx-auto max-w-6xl px-6 py-20 md:py-28">
-			<div class="text-center space-y-4 mb-16">
-				<h2 class="text-4xl md:text-5xl font-bold ">Dead simple. Crazy powerful.</h2>
-				<p class="text-xl text-muted-foreground max-w-2xl mx-auto">
-					Get your verified gallery up in 60 seconds
-				</p>
-			</div>
-
-			<div class="grid md:grid-cols-3 gap-8">
-				<div class="text-center space-y-4">
-					<div
-						class="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center"
-					>
-						<Upload class="h-8 w-8 text-primary" />
-					</div>
-					<h3 class="text-xl font-semibold ">1. Upload with C2PA</h3>
-					<p class="text-muted-foreground">
-						Drag and drop photos straight from your camera or verified editing tools
-					</p>
-				</div>
-
-				<div class="text-center space-y-4">
-					<div
-						class="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center"
-					>
-						<ShieldCheck class="h-8 w-8 text-primary" />
-					</div>
-					<h3 class="text-xl font-semibold ">2. Instant Verification</h3>
-					<p class="text-muted-foreground">
-						We check the cryptographic proof - if it's not real, it doesn't get in
-					</p>
-				</div>
-
-				<div class="text-center space-y-4">
-					<div
-						class="mx-auto w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center"
-					>
-						<Link2 class="h-8 w-8 text-primary" />
-					</div>
-					<h3 class="text-xl font-semibold ">3. Share Your Link</h3>
-					<p class="text-muted-foreground">
-						Get your unique gallery URL to drop in any bio - instant credibility
-					</p>
-				</div>
-			</div>
-		</section>
+		<!-- How It Works Section -->
+		<HowItWorks />
+		
+		
 
 		<!-- Social Proof -->
 		<section class="bg-muted/50 py-20">
@@ -389,4 +285,7 @@
 </div>
 
 <style>
+	h1, h2, h3 {
+		font-family: 'Karma' !important;
+	}
 </style>

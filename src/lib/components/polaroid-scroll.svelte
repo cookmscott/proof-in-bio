@@ -70,21 +70,46 @@
 				opacity: 1
 			});
 
+			const existing = ScrollTrigger.getById('polaroidScroll');
+			if (existing) existing.kill();
+
 			// Build scroll-driven timeline
 			const tl = gsap.timeline({
 				defaults: { ease: 'power1.out' },
 				scrollTrigger: {
+					id: 'polaroidScroll',
 					trigger: mainContainer,
 					start: 'top top', // when this section hits the top
 					end: '+=300%', // how long the stacking lasts; tweak 100–180%
 					scrub: true,
 					pin: true,
-					anticipatePin: 1,
-					pinSpacing: true // allow normal page flow; remove blank jumps
+					anticipatePin: 1, // allow normal page flow; remove blank jumps
+					pinSpacing: 'bottom'
 				}
 			});
 
-			// Animate card #2 into place
+			// --- START OF FIX ---
+
+			// 1. SET initial state for background words
+			// We do this *before* adding them to the timeline
+			backgroundWords.forEach((word) => {
+				gsap.set(word, { y: '40vh' });
+			});
+
+			// 2. ADD background word animations TO THE MAIN TIMELINE
+			// Remove their independent scrollTriggers
+			backgroundWords.forEach((word, i) => {
+				tl.to(
+					word,
+					{
+						y: `-${20 + i * 15}vh`,
+						ease: 'none' // 'none' ease is best for a linear scrub
+					},
+					0 // Add this animation at the very start (0) of the timeline
+				);
+			});
+
+			// 3. ADD your card animations TO THE SAME TIMELINE
 			if (rest[0]) {
 				tl.to(
 					rest[0],
@@ -93,7 +118,7 @@
 						opacity: 1,
 						rotation: 3
 					},
-					0
+					0 // Also starts at the beginning
 				); // starts at the beginning of the scroll range
 			}
 
@@ -106,25 +131,11 @@
 						opacity: 1,
 						rotation: -7
 					},
-					0.5
+					0.5 // Starts halfway through the timeline
 				); // halfway through; adjust to change spacing
 			}
 
-			// Animate background words
-			backgroundWords.forEach((word, i) => {
-				gsap.fromTo(
-					word,
-					{ y: '40vh' },
-					{
-						y: `-${20 + i * 15}vh`, // Move up at different speeds
-						ease: 'none',
-						scrollTrigger: {
-							trigger: mainContainer,
-							scrub: 1.5 + i // Different scrub values for different speeds
-						}
-					}
-				);
-			});
+			// --- END OF FIX ---
 
 			// Recalculate on resize / font swap
 			ScrollTrigger.refresh();
@@ -134,6 +145,7 @@
 	});
 </script>
 
+<section id="polaroidScroll" class="bg-background p-0">
 <div class="polaroid-container" bind:this={mainContainer}>
 	<div class="background-text-container">
 		<div class="background-word" bind:this={backgroundWords[0]}>TRUSTWORTHY</div>
@@ -153,6 +165,7 @@
 		{/each}
 	</div>
 </div>
+</section>
 
 <style>
 	.polaroid-container {
@@ -162,7 +175,7 @@
 		display: flex;
 		justify-content: center;
 		align-items: center;
-		overflow: visible;
+		overflow: hidden !important;
 		font-family: 'Caveat', sans-serif;
 	}
 	.background-text-container {
