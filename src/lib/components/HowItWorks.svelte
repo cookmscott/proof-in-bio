@@ -5,7 +5,6 @@
 	import { ShieldCheck, Upload, Link2 } from 'lucide-svelte';
 	import DetectiveRobot from './DetectiveRobot.svelte';
 
-	gsap.registerPlugin(ScrollTrigger);
 
 	const steps = [
 		{
@@ -33,6 +32,8 @@
 	let visualElements = [];
 
 	onMount(() => {
+		gsap.registerPlugin(ScrollTrigger);
+
 		const ctx = gsap.context(() => {
 			// First step visible by default
 			if (textElements[0] && visualElements[0]) {
@@ -55,7 +56,7 @@
 					start: 'top top',
 					end: '+=180%',
 					pin: true,
-					pinSpacing: true,
+					pinSpacing: false,
 					scrub: true,
 					// --- START OF FIX ---
 					snap: {

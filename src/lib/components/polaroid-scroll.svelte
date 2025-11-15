@@ -84,7 +84,7 @@
 					scrub: true,
 					pin: true,
 					anticipatePin: 1, // allow normal page flow; remove blank jumps
-					pinSpacing: 'bottom'
+					pinSpacing: false
 				}
 			});
 

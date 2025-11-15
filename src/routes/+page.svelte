@@ -101,8 +101,10 @@
 		</div>
 
 		<!-- Polaroid Scroll Section -->
-		<PolaroidScroll/>
-		
+		<!-- Wrapper with manual spacing to prevent pin overlap -->
+		<div style="margin-bottom: 300vh;">
+			<PolaroidScroll />
+		</div>
 
 		<!-- Essential Verification Section -->
 		<section class="bg-blue p-0">
@@ -113,7 +115,10 @@
 		<ProblemSolution />
 
 		<!-- How It Works Section -->
-		<HowItWorks />
+		<!-- Wrapper with manual spacing to prevent pin overlap -->
+		<div style="margin-bottom: 180vh;">
+			<HowItWorks />
+		</div>
 		
 		
 
@@ -285,7 +290,7 @@
 </div>
 
 <style>
-	h1, h2, h3 {
+	h1, h2 {
 		font-family: 'Karma' !important;
 	}
 </style>
