@@ -1,0 +1,9 @@
+{
+    "mcpServers": {
+      "svelte": {
+        "command": "npx",
+        "args": ["@sveltejs/mcp"],
+        "trust": false
+      }
+    }
+  }

@@ -7,8 +7,9 @@ export default {
     theme: {
       extend: {
         fontFamily: {
-          sans: ['Satoshi', 'system-ui', '-apple-system', 'sans-serif'],
+          sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
           alpino: ['Alpino', 'sans-serif'],
+          karma: ['Karma', 'serif'],
         },
       },
     },

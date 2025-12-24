@@ -1,17 +1,14 @@
 <script>
     import * as Drawer from "$lib/ui/drawer/index.js";
     import { Button } from "$lib/ui/button/index.js";
-    import { Share, Copy, Twitter, Facebook, Linkedin, Mail, Check, Share2 } from 'lucide-svelte';
-    import { onMount } from 'svelte';
+    import { X, Share, Copy, Twitter, Facebook, Linkedin, Mail, Check, Share2 } from 'lucide-svelte';
 
-    export let url = "";
-    export let title = "";
-    export let description = "";
+    let { url = "", title = "", description = "" } = $props();
 
-    let copied = false;
-    let currentUrl = "";
+    let copied = $state(false);
+    let currentUrl = $state("");
 
-    onMount(() => {
+    $effect(() => {
         if (typeof window !== 'undefined') {
             currentUrl = url || window.location.href;
         }
@@ -88,7 +85,7 @@
                             <Button
                                 variant="outline"
                                 size="sm"
-                                on:click={copyToClipboard}
+                                onclick={copyToClipboard}
                                 class="flex-shrink-0 h-10 px-3"
                             >
                                 {#if copied}
@@ -107,7 +104,7 @@
                             <Button
                                 variant="outline"
                                 size="sm"
-                                on:click={shareToTwitter}
+                                onclick={shareToTwitter}
                                 class="flex items-center justify-center gap-2"
                             >
                                 <Twitter class="h-4 w-4" />
@@ -116,7 +113,7 @@
                             <Button
                                 variant="outline"
                                 size="sm"
-                                on:click={shareToFacebook}
+                                onclick={shareToFacebook}
                                 class="flex items-center justify-center gap-2"
                             >
                                 <Facebook class="h-4 w-4" />
@@ -125,7 +122,7 @@
                             <Button
                                 variant="outline"
                                 size="sm"
-                                on:click={shareToLinkedIn}
+                                onclick={shareToLinkedIn}
                                 class="flex items-center justify-center gap-2"
                             >
                                 <Linkedin class="h-4 w-4" />
@@ -134,7 +131,7 @@
                             <Button
                                 variant="outline"
                                 size="sm"
-                                on:click={shareToEmail}
+                                onclick={shareToEmail}
                                 class="flex items-center justify-center gap-2"
                             >
                                 <Mail class="h-4 w-4" />
@@ -147,7 +144,7 @@
             
             <Drawer.Footer>
                 <Drawer.Close>
-                    <Button variant="outline">Close</Button>
+                    <Button variant="outline">Close<X class="h-4 w-4" /></Button>
                 </Drawer.Close>
             </Drawer.Footer>
         </div>

@@ -15,9 +15,12 @@ export function createSupabaseServer(cookies) {
 }
 
 export async function safeGetSession(supabase) {
-  const {
-    data: { session }
-  } = await supabase.auth.getSession();
+  let session;
+
+  const {data} = await supabase.auth.getSession();
+  
+  session = data.session;
+
   if (!session) return { session: null, user: null };
 
   const {

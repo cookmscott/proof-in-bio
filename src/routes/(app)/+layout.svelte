@@ -3,3 +3,6 @@
 </script>
 
 {@render children?.()}
+
+<style>
+</style>
