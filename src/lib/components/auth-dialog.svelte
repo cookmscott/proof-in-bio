@@ -3,14 +3,13 @@
 	import { Card, CardContent } from '$lib/ui/card/index.js';
 	import { Input } from '$lib/ui/input/index.js';
 	import { Label } from '$lib/ui/label/index.js';
-	import { goto, invalidateAll, invalidate } from '$app/navigation';
+	import { goto, invalidateAll } from '$app/navigation';
 	import { page } from '$app/stores';
 	import { authDialog } from '$lib/stores/auth';
 
 	// Props
-	// The `open` prop is now primarily controlled by the store, but kept for initial rendering or direct control if needed.
 	// `onsuccess` and `onclose` are still useful for external handlers.
-	let { supabase, open = true, onsuccess, onclose, mode = 'login' } = $props();
+	let { supabase, onsuccess, onclose } = $props();
 
 	// Internal state
 	let email = $state(''); // Keep email, password, username, display_name as local state
@@ -24,7 +23,7 @@
 
 	// Sync internal isLogin state with prop/store mode
 	$effect(() => {
-		isLogin = mode === 'login';
+		isLogin = $authDialog.mode === 'login';
 	});
 
 	// Username validation regex: lowercase letters, numbers, hyphens only
@@ -83,6 +82,7 @@
 				} else {
 					await invalidateAll(); // Invalidate all data to ensure UI updates with new session info
 					onsuccess?.({ detail: { type: 'login' } });
+					authDialog.set({ open: false, mode: 'login' });
 					goto('/private');
 				}
 			} else {
@@ -101,6 +101,7 @@
 					error = `${authError.message} - Please make sure the database has been reset with the new schema.`;
 				} else {
 					onsuccess?.({ detail: { type: 'signup' } }); // Call external success handler
+					authDialog.set({ open: false, mode: 'login' });
 					// For signup, usually redirect to confirmation page or show success message
 					error = 'Check your email for a confirmation link!';
 				}
@@ -142,10 +143,11 @@
 
 	function closeDialog() {
 		authDialog.set({ open: false, mode: 'login' }); // Close dialog via store
+		onclose?.();
 	}
 </script>
 
-{#if open}
+{#if $authDialog.open}
 	<div class="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
 		<Card class="overflow-hidden p-0 w-full max-w-sm md:max-w-3xl">
 			<CardContent class="grid p-0 md:grid-cols-2">

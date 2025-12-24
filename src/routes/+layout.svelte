@@ -31,18 +31,6 @@
 		return () => authData.subscription.unsubscribe();
 	});
 
-	// Auth dialog state from store
-	let showAuthDialog = $state(false);
-	let authMode = $state('login');
-
-	$effect(() => {
-		const unsubscribe = authDialog.subscribe(value => {
-			showAuthDialog = value.open;
-			authMode = value.mode;
-		});
-		return unsubscribe;
-	});
-
 	function handleAuthSuccess(event) {
 		console.log('User authenticated:', event.detail);
 		authDialog.set({ open: false, mode: 'login' }); // Close dialog and reset mode
@@ -78,7 +66,6 @@
 	<!-- Auth Dialog - Rendered at the root level to ensure proper fixed positioning -->
 	<AuthDialog
 		{supabase}
-		open={showAuthDialog}
 		onclose={handleAuthClose}
 		onsuccess={handleAuthSuccess}
 	/>

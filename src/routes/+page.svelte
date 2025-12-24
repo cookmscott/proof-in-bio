@@ -8,6 +8,7 @@
 	import { Card } from '$lib/ui/card/index.js';
 	import { Badge } from '$lib/ui/badge/index.js';
 	import AuthDialog from '$lib/components/auth-dialog.svelte';
+	import { authDialog } from '$lib/stores/auth';
 	import PolaroidScroll from '$lib/components/polaroid-scroll.svelte';
 	import EssentialVerification from '$lib/components/essential-verification.svelte';	
 	import ProblemSolution from '$lib/components/ProblemSolution.svelte';
@@ -29,17 +30,14 @@
 	// Get data from layout (includes supabase client)
 	let { data } = $props();
 
-	// Auth dialog state
-	let showAuthDialog = $state(false);
-
 	function handleAuthSuccess(event) {
 		console.log('User authenticated:', event.detail);
-		showAuthDialog = false;
+		authDialog.set({ open: false, mode: 'login' });
 		// User will be automatically redirected by the dialog
 	}
 
 	function handleAuthClose() {
-		showAuthDialog = false;
+		authDialog.set({ open: false, mode: 'login' });
 	}
 
 </script>
@@ -60,7 +58,9 @@
 			</a>
 				<div class="flex items-center gap-3">
 					<Button variant="ghost" size="sm" href="#how-it-works">How it Works</Button>
-					<Button size="sm" onclick={() => (showAuthDialog = true)}>Get Started</Button>
+					<Button size="sm" onclick={() => authDialog.set({ open: true, mode: 'login' })}>
+						Get Started
+					</Button>
 				</div>
 			</nav>
 			</div>
@@ -85,7 +85,11 @@
 								Upload real work. We verify it’s human, then we give you a link to prove it anywhere.
 							</p>
 							<div class="flex justify-center md:justify-start gap-4 pt-4">
-								<Button size="lg" class="group text-white" onclick={() => (showAuthDialog = true)}>
+								<Button
+									size="lg"
+									class="group text-white"
+									onclick={() => authDialog.set({ open: true, mode: 'signup' })}
+								>
 									Create Your Gallery
 									<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
 								</Button>
@@ -213,7 +217,11 @@
 						forever.
 					</p>
 					<div class="flex flex-col sm:flex-row gap-4 justify-center pt-4 ">
-						<Button size="lg" class="group" onclick={() => (showAuthDialog = true)}>
+						<Button
+							size="lg"
+							class="group"
+							onclick={() => authDialog.set({ open: true, mode: 'signup' })}
+						>
 							Create Your Gallery
 							<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
 						</Button>
@@ -283,7 +291,6 @@
 	<!-- Auth Dialog -->
 	<AuthDialog
 		supabase={data.supabase}
-		open={showAuthDialog}
 		onclose={handleAuthClose}
 		onsuccess={handleAuthSuccess}
 	/>

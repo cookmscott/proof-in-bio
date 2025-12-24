@@ -1,33 +1,36 @@
 <script>
-import AuthDialog from '$lib/components/auth-dialog.svelte';
+	import AuthDialog from '$lib/components/auth-dialog.svelte';
+	import { authDialog } from '$lib/stores/auth';
 
-let { data } = $props();
-let showDialog = $state(true);
+	let { data } = $props();
 
-function handleClose() {
-	showDialog = false;
-}
+	$effect(() => {
+		authDialog.set({ open: true, mode: 'login' });
+	});
 
-function handleSuccess(event) {
-	console.log('Auth success:', event.detail);
-	showDialog = false;
-}
+	function handleClose() {
+		authDialog.set({ open: false, mode: 'login' });
+	}
+
+	function handleSuccess(event) {
+		console.log('Auth success:', event.detail);
+		authDialog.set({ open: false, mode: 'login' });
+	}
 </script>
 
 <div class="bg-muted flex min-h-svh flex-col items-center justify-center p-6 md:p-10">
 	<AuthDialog 
-		supabase={data.supabase} 
-		open={showDialog}
+		supabase={data.supabase}
 		onclose={handleClose}
 		onsuccess={handleSuccess}
 	/>
 	
-	{#if !showDialog}
+	{#if !$authDialog.open}
 		<div class="text-center">
 			<p class="text-muted-foreground mb-4">Dialog closed</p>
 			<button 
 				class="underline text-primary" 
-				onclick={() => showDialog = true}
+				onclick={() => authDialog.set({ open: true, mode: 'login' })}
 			>
 				Reopen Auth Dialog
 			</button>
