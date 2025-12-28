@@ -84,7 +84,7 @@
                         Share Profile
                     </Button>
 					{#if canEdit}
-						<Button href="/settings/profile">Edit Profile</Button>
+						<Button href="/{data.profile.username}/edit">Edit Profile</Button>
 					{/if}
                 </div>
             </div>
@@ -128,13 +128,31 @@
     </div>
 
     <!-- Fixed "Add Images" Button -->
-    <Button class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden">
+    <Button style="z-index: 999" class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn">
         <span class="flex items-center">
-            <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2" />
-            <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem]">
-            Add Images
+            <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon" />
+            <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text">
+                Add Images
             </span>
         </span>
         <span class="sr-only">Add Images</span>
     </Button>
 </div>
+
+<style>
+    @keyframes expand-btn {
+        0%, 80% { padding-right: 1.5rem; padding-left: 1rem; }
+        100% { padding-right: 0; padding-left: 0; }
+    }
+    @keyframes expand-icon {
+        0%, 80% { margin-right: 0.5rem; }
+        100% { margin-right: 0; }
+    }
+    @keyframes expand-text {
+        0%, 80% { max-width: 6rem; }
+        100% { max-width: 0; }
+    }
+    :global(.init-expand-btn) { animation: expand-btn 3s ease-out; }
+    :global(.init-expand-icon) { animation: expand-icon 3s ease-out; }
+    :global(.init-expand-text) { animation: expand-text 3s ease-out; }
+</style>

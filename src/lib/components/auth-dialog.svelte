@@ -83,7 +83,7 @@
 				} else {
 					await invalidateAll(); // Invalidate all data to ensure UI updates with new session info
 					onsuccess?.({ detail: { type: 'login' } });
-					goto('/private');
+					goto('/profile');
 				}
 			} else {
 				const { error: authError } = await supabase.auth.signUp({

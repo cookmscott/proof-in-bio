@@ -11,7 +11,8 @@ export async function load({ params, locals: { supabase } }) {
 				username,
 				display_name,
 				avatar_url
-			)
+			),
+			metadata:photos_metadata (*)
 		`
 		)
 		.eq('id', params.id)

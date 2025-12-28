@@ -67,7 +67,7 @@ export const actions = {
 		// Local dev bypass
 		if (env.USE_LOCAL_AUTH === 'true') {
 			cookies.set('local-auth-email', email, { path: '/' });
-			redirect(303, '/private');
+			redirect(303, '/profile');
 		}
 
 		const { error } = await supabase.auth.signInWithPassword({ email, password });
@@ -75,7 +75,7 @@ export const actions = {
 			console.error(error);
 			redirect(303, '/auth/error');
 		} else {
-			redirect(303, '/private');
+			redirect(303, '/profile');
 		}
 	}
 };

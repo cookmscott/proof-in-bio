@@ -8,6 +8,7 @@
 	import LandingHeader from '$lib/components/landing/LandingHeader.svelte';
 	import LandingHero from '$lib/components/landing/LandingHero.svelte';
 	import LandingPolaroidScroll from '$lib/components/landing/LandingPolaroidScroll.svelte';
+	import LandingInstaCompare from '$lib/components/landing/LandingInstaCompare.svelte';
 	import LandingEssentialVerification from '$lib/components/landing/LandingEssentialVerification.svelte';
 	import LandingProblemSolution from '$lib/components/landing/LandingProblemSolution.svelte';
 	import LandingHowItWorks from '$lib/components/landing/LandingHowItWorks.svelte';
@@ -43,6 +44,9 @@
 
 		<!-- Polaroid Scroll Section -->
 		<LandingPolaroidScroll />
+
+		<!-- Instagram Comparison Real vs Fake -->
+		<LandingInstaCompare />
 
 		<!-- Essential Verification Section -->
 		<LandingEssentialVerification />
