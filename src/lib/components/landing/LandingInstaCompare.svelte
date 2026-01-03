@@ -229,6 +229,7 @@
 
 						<!-- Content Area (Scrollable) -->
 						<div class="flex-1 overflow-hidden">
+                            <span class="font-bold pt-6 pl-5 text-lg text-white">ProofInBio</span>
 							<!-- Hero/Header area -->
 							<div class="px-6 pt-8 pb-6">
 								<div class="flex flex-col items-center text-center gap-4">
@@ -323,72 +324,252 @@
 		animation: bounce-subtle 2s infinite ease-in-out;
 	}
 
-	/* Swap Animation Implementation */
-	:root {
-		--dur: 400ms;
-		--ease: cubic-bezier(0.79,0.14,0.15,0.86);
-		--x-offset: 40px;
-		--scaleTop: 1.02;
-		--scaleBot: 0.96;
-		--y-top: -6px;
-		--y-bot: 6px;
-		--x-static: -18px;
-		--midOpacity: 0.5;
-	}
+/* Swap Animation Implementation */
+:root {
+  --dur: 500ms;
+  --ease: cubic-bezier(0.4, 0.0, 0.2, 1);
+  --x-offset: 10px;
+  --scaleTop: 1.02;
+  --scaleBot: 0.96;
+  --y-top: -6px;
+  --y-bot: 6px;
+  --x-static: -18px;
 
-	.swap-card {
-		will-change: transform, opacity;
-	}
+  /* How see-through the cards get at the exact crossover */
+  --midOpacity: 0.2;
+}
 
-	.swap-card.top {
-		z-index: 20;
-		animation: toTop var(--dur) var(--ease) forwards;
-	}
+.swap-card {
+  will-change: transform, opacity;
+}
 
-	.swap-card.bottom {
-		z-index: 10;
-		animation: toBottom var(--dur) var(--ease) forwards;
-	}
+.swap-card.top {
+  z-index: 20;
+  animation: toTop var(--dur) var(--ease) forwards;
+}
 
-	@keyframes toBottom {
-		0% {
-			transform: translate3d(var(--x-static), var(--y-top), 0) scale(var(--scaleTop));
-			opacity: 1;
-			z-index: 20;
-		}
-		50% {
-			transform: translate3d(calc(var(--x-static) + var(--x-offset)), var(--y-top), 0) scale(1);
-			opacity: var(--midOpacity);
-			z-index: 20;
-		}
-		50.1% {
-			z-index: 10;
-		}
-		100% {
-			transform: translate3d(calc(var(--x-static) * -1), var(--y-bot), 0) scale(var(--scaleBot));
-			opacity: 0.8;
-			z-index: 10;
-		}
-	}
+.swap-card.bottom {
+  z-index: 10;
+  animation: toBottom var(--dur) var(--ease) forwards;
+}
 
-	@keyframes toTop {
-		0% {
-			transform: translate3d(calc(var(--x-static) * -1), var(--y-bot), 0) scale(var(--scaleBot));
-			opacity: 0.8;
-			z-index: 10;
-		}
-		50% {
-			transform: translate3d(calc((var(--x-static) * -1) - var(--x-offset)), var(--y-bot), 0) scale(1);
-			opacity: var(--midOpacity);
-			z-index: 10;
-		}
-		50.1% {
-			z-index: 20;
-		}
-		100% {
-			transform: translate3d(var(--x-static), var(--y-top), 0) scale(var(--scaleTop));
-			opacity: 1;
-			z-index: 20;
-		}
-	}
+/* Smooth arc with smoother, wider opacity dip in the middle */
+@keyframes toBottom {
+  0% {
+    transform: translate3d(var(--x-static), var(--y-top), 0) scale(var(--scaleTop));
+    opacity: 1;
+    z-index: 20;
+  }
+
+  15% {
+    transform: translate3d(
+      calc(var(--x-static) + (var(--x-offset) * 0.35)),
+      calc(var(--y-top) * 0.85),
+      0
+    ) scale(1.015);
+    opacity: 0.92;
+    z-index: 20;
+  }
+
+  30% {
+    transform: translate3d(
+      calc(var(--x-static) + (var(--x-offset) * 0.7)),
+      calc(var(--y-top) * 0.5),
+      0
+    ) scale(1.005);
+    opacity: 0.78;
+    z-index: 20;
+  }
+
+  45% {
+    transform: translate3d(
+      calc(var(--x-static) + (var(--x-offset) * 0.95)),
+      0px,
+      0
+    ) scale(1.0);
+    opacity: 0.28;
+    z-index: 20;
+  }
+
+  48% {
+    transform: translate3d(
+      calc(var(--x-static) + (var(--x-offset) * 0.985)),
+      calc(var(--y-bot) * 0.07),
+      0
+    ) scale(0.997);
+    opacity: 0.16;
+    z-index: 20;
+  }
+
+  50% {
+    transform: translate3d(
+      calc(var(--x-static) + var(--x-offset)),
+      calc(var(--y-bot) * 0.15),
+      0
+    ) scale(0.995);
+    opacity: var(--midOpacity); /* Minimum opacity at crossover */
+    z-index: 20;
+  }
+
+  50.1% {
+    z-index: 10; /* z-flip while nearly invisible */
+    opacity: var(--midOpacity);
+  }
+
+  52% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) + (var(--x-offset) * 0.985)),
+      calc(var(--y-bot) * 0.22),
+      0
+    ) scale(0.992);
+    opacity: 0.16;
+    z-index: 10;
+  }
+
+  55% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) + (var(--x-offset) * 0.95)),
+      calc(var(--y-bot) * 0.3),
+      0
+    ) scale(0.99);
+    opacity: 0.28;
+    z-index: 10;
+  }
+
+  70% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) + (var(--x-offset) * 0.6)),
+      calc(var(--y-bot) * 0.65),
+      0
+    ) scale(0.98);
+    opacity: 0.62;
+    z-index: 10;
+  }
+
+  85% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) + (var(--x-offset) * 0.25)),
+      calc(var(--y-bot) * 0.9),
+      0
+    ) scale(0.97);
+    opacity: 0.78;
+    z-index: 10;
+  }
+
+  100% {
+    transform: translate3d(calc(var(--x-static) * -1), var(--y-bot), 0) scale(var(--scaleBot));
+    opacity: 0.8;
+    z-index: 10;
+  }
+}
+
+@keyframes toTop {
+  0% {
+    transform: translate3d(calc(var(--x-static) * -1), var(--y-bot), 0) scale(var(--scaleBot));
+    opacity: 0.8;
+    z-index: 10;
+  }
+
+  15% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) - (var(--x-offset) * 0.35)),
+      calc(var(--y-bot) * 0.85),
+      0
+    ) scale(0.975);
+    opacity: 0.76;
+    z-index: 10;
+  }
+
+  30% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) - (var(--x-offset) * 0.7)),
+      calc(var(--y-bot) * 0.5),
+      0
+    ) scale(0.995);
+    opacity: 0.62;
+    z-index: 10;
+  }
+
+  45% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) - (var(--x-offset) * 0.95)),
+      0px,
+      0
+    ) scale(1.0);
+    opacity: 0.28;
+    z-index: 10;
+  }
+
+  48% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) - (var(--x-offset) * 0.985)),
+      calc(var(--y-top) * 0.07),
+      0
+    ) scale(1.003);
+    opacity: 0.16;
+    z-index: 10;
+  }
+
+  50% {
+    transform: translate3d(
+      calc((var(--x-static) * -1) - var(--x-offset)),
+      calc(var(--y-top) * 0.15),
+      0
+    ) scale(1.005);
+    opacity: var(--midOpacity); /* Minimum opacity at crossover */
+    z-index: 10;
+  }
+
+  50.1% {
+    z-index: 20; /* z-flip while nearly invisible */
+    opacity: var(--midOpacity);
+  }
+
+  52% {
+    transform: translate3d(
+      calc(var(--x-static) - (var(--x-offset) * 0.985)),
+      calc(var(--y-top) * 0.22),
+      0
+    ) scale(1.008);
+    opacity: 0.16;
+    z-index: 20;
+  }
+
+  55% {
+    transform: translate3d(
+      calc(var(--x-static) - (var(--x-offset) * 0.95)),
+      calc(var(--y-top) * 0.3),
+      0
+    ) scale(1.01);
+    opacity: 0.28;
+    z-index: 20;
+  }
+
+  70% {
+    transform: translate3d(
+      calc(var(--x-static) - (var(--x-offset) * 0.6)),
+      calc(var(--y-top) * 0.65),
+      0
+    ) scale(1.015);
+    opacity: 0.70;
+    z-index: 20;
+  }
+
+  85% {
+    transform: translate3d(
+      calc(var(--x-static) - (var(--x-offset) * 0.25)),
+      calc(var(--y-top) * 0.9),
+      0
+    ) scale(1.018);
+    opacity: 0.90;
+    z-index: 20;
+  }
+
+  100% {
+    transform: translate3d(var(--x-static), var(--y-top), 0) scale(var(--scaleTop));
+    opacity: 1;
+    z-index: 20;
+  }
+}
+
 </style>
