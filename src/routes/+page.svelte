@@ -42,17 +42,18 @@
 		<!-- Hero Section -->
 		<LandingHero onAuthRequest={() => (showAuthDialog = true)} />
 
-		<!-- Polaroid Scroll Section -->
-		<LandingPolaroidScroll />
+		<!-- Polaroid Scroll Section 
+		<LandingPolaroidScroll /> -->
 
 		<!-- Instagram Comparison Real vs Fake -->
 		<LandingInstaCompare />
 
-		<!-- Essential Verification Section -->
-		<LandingEssentialVerification />
 
 		<!-- The Problem/Solution Section -->
-		<LandingProblemSolution />
+		<LandingProblemSolution />		
+
+		<!-- Essential Verification Section -->
+		<LandingEssentialVerification />
 
 		<!-- How It Works Section -->
 		<LandingHowItWorks />

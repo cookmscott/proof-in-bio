@@ -9,21 +9,24 @@
 	const steps = [
 		{
 			icon: Upload,
-			title: '1. Upload with C2PA',
-			description: 'Drop in photos straight from your camera or any C2PA-enabled editing tool.',
-			image: 'https://images.pexels.com/photos/3762375/pexels-photo-3762375.jpeg?w=800'
+			title: 'Upload signed image',
+			description: 'Upload a photo containing C2PA Content Credentials from a supported camera or editing tool.',
+			image: 'https://images.pexels.com/photos/3762375/pexels-photo-3762375.jpeg?w=800',
+			color: '#E9ECED'
 		},
 		{
 			icon: ShieldCheck,
-			title: '2. Instant verification',
-			description: "We verify the cryptographic proof. If it’s not authentic, it doesn’t go live.",
-			image: 'https://images.pexels.com/photos/8090132/pexels-photo-8090132.jpeg?w=800'
+			title: 'Verify authenticity',
+			description: "We validate the digital signature to ensure the image hasn't been manipulated.",
+			image: 'https://images.pexels.com/photos/8090132/pexels-photo-8090132.jpeg?w=800',
+			color: '#FFFCEB'
 		},
 		{
 			icon: Link2,
-			title: '3. Share your link',
-			description: 'Get a clean, verified gallery URL you can drop in any bio or portfolio.',
-			image: 'https://images.pexels.com/photos/1540338/pexels-photo-1540338.jpeg?w=800'
+			title: 'Share verified link',
+			description: 'Receive a trusted URL for your bio or portfolio that proves your content is authentic.',
+			image: 'https://images.pexels.com/photos/1540338/pexels-photo-1540338.jpeg?w=800',
+			color: '#ECF9FD'
 		}
 	];
 
@@ -39,6 +42,7 @@
 			if (textElements[0] && visualElements[0]) {
 				gsap.set(textElements[0], { opacity: 1, y: 0 });
 				gsap.set(visualElements[0], { opacity: 1, y: 0, scale: 1 });
+				gsap.set(mainContainer, { backgroundColor: steps[0].color });
 			}
 
 			// Remaining steps start hidden
@@ -88,11 +92,12 @@
 					[textElements[i - 1], visualElements[i - 1]],
 					{ opacity: 0, y: -24, scale: 0.96, stagger: 0.04 }
 				)
+					.to(mainContainer, { backgroundColor: steps[i].color, duration: 0.8 }, '<')
 					.fromTo(
 						[textElements[i], visualElements[i]],
 						{ opacity: 0, y: 24, scale: 0.97 },
 						{ opacity: 1, y: 0, scale: 1, stagger: 0.04 },
-						'>-0.1'
+						'-=0.45'
 					)
 					.addLabel(`step${i}`);
 			}
@@ -103,23 +108,14 @@
 </script>
 
 <section id="how-it-works" class="relative">
-	<div class="container mx-auto max-w-5xl px-6 pt-20 md:pt-28 text-center">
-		<h2 class="text-4xl md:text-5xl font-semibold tracking-tight">
-			Dead simple. Seriously powerful.
-		</h2>
-		<p class="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto mt-4">
-			Go from raw photos to a verified, shareable gallery link in under a minute.
-		</p>
-	</div>
-
 	<div class="how-it-works-container" bind:this={mainContainer}>
 		<div class="grid-container">
 			<!-- Left Column: Text Content -->
 			<div class="text-stack" aria-live="polite">
 				{#each steps as step, i (step.title)}
 					<div class="step-text" bind:this={textElements[i]}>
-						<p class="text-sm uppercase tracking-[0.18em] text-muted-foreground mb-3">
-							How it works
+						<p class="text-sm font-mono uppercase tracking-widest text-primary mb-4">
+							Step 0{i + 1}
 						</p>
 						<h3 class="text-2xl md:text-3xl font-semibold leading-tight">
 							{step.title}
@@ -158,7 +154,7 @@
 
 							<div class="icon-badge">
 								<div
-									class="flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-2xl bg-background/90 border border-border/60"
+									class="flex h-14 w-14 md:h-16 md:w-16 items-center justify-center rounded-2xl bg-background/80 border border-white/20 backdrop-blur-md shadow-lg"
 								>
 									<svelte:component
 										this={step.icon}
@@ -235,6 +231,16 @@
 		background: radial-gradient(circle at top left, rgba(255, 255, 255, 0.1), transparent),
 			color-mix(in oklab, var(--background, #020617) 90%, #000 10%);
 		border: 1px solid rgba(148, 163, 184, 0.16);
+		box-shadow: 0 20px 40px -12px rgba(0, 0, 0, 0.25);
+	}
+
+	.visual-card::after {
+		content: '';
+		position: absolute;
+		inset: 0;
+		background: linear-gradient(120deg, transparent 30%, rgba(255, 255, 255, 0.05) 45%, transparent 50%);
+		background-size: 200% 100%;
+		animation: shine 8s infinite linear;
 	}
 
 	.visual-image {
@@ -280,6 +286,16 @@
 		border-radius: 999px;
 		background: radial-gradient(circle, var(--primary, #f97316), transparent);
 		box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.25);
+		position: relative;
+	}
+
+	.pill-dot::after {
+		content: '';
+		position: absolute;
+		inset: -4px;
+		border-radius: inherit;
+		background: inherit;
+		animation: pulse 2s cubic-bezier(0, 0, 0.2, 1) infinite;
 	}
 
 	.pill-text {
@@ -294,6 +310,7 @@
 		position: absolute;
 		right: 1.5rem;
 		top: 1.5rem;
+		animation: float 6s ease-in-out infinite;
 	}
 
 	.icon-badge::before {
@@ -301,8 +318,27 @@
 		position: absolute;
 		inset: -18px;
 		border-radius: 999px;
-		border: 1px dashed color-mix(in oklab, currentColor 10%, transparent);
+		border: 1px dashed rgba(255, 255, 255, 0.2);
 		opacity: 0.5;
+		animation: spin 20s linear infinite;
+	}
+
+	@keyframes float {
+		0%, 100% { transform: translateY(0); }
+		50% { transform: translateY(-8px); }
+	}
+
+	@keyframes pulse {
+		75%, 100% { transform: scale(1.5); opacity: 0; }
+	}
+
+	@keyframes spin {
+		to { transform: rotate(360deg); }
+	}
+
+	@keyframes shine {
+		0% { background-position: 200% 0; }
+		100% { background-position: -200% 0; }
 	}
 
 	@media (max-width: 900px) {
