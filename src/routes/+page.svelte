@@ -10,6 +10,7 @@
 	import LandingPolaroidScroll from '$lib/components/landing/LandingPolaroidScroll.svelte';
 	import LandingInstaCompare from '$lib/components/landing/LandingInstaCompare.svelte';
 	import LandingEssentialVerification from '$lib/components/landing/LandingEssentialVerification.svelte';
+	import C2PASupportedDevices from '$lib/components/landing/C2PASupportedDevices.svelte';
 	import LandingProblemSolution from '$lib/components/landing/LandingProblemSolution.svelte';
 	import LandingHowItWorks from '$lib/components/landing/LandingHowItWorks.svelte';
 	import SocialProof from '$lib/components/landing/SocialProof.svelte';
@@ -54,6 +55,9 @@
 
 		<!-- Essential Verification Section -->
 		<LandingEssentialVerification />
+
+		<!-- Supported Devices Section -->
+		<C2PASupportedDevices />
 
 		<!-- How It Works Section -->
 		<LandingHowItWorks />
