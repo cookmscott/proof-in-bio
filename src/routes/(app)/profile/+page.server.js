@@ -17,7 +17,7 @@ export async function load({ locals }) {
 		.single();
 
 	if (profile?.username) {
-		throw redirect(302, `/profile/${profile.username}`);
+		throw redirect(302, `/${profile.username}`);
 	}
 
 	// Fallback if no username found

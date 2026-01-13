@@ -21,11 +21,12 @@
         Content as AccordionContent
     } from '$lib/ui/accordion';
     import { 
-        Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser, CheckCircle2, ArrowLeft,
-        MapPin, Calendar, HardDrive, FileImage, Aperture, Maximize, Focus, Timer, Zap, Fingerprint, Globe
+        Download, Camera, Paintbrush, Crop, SlidersHorizontal, Eraser, ArrowLeft,
+        MapPin, Calendar, HardDrive, FileImage, Aperture, Maximize, Focus, Timer, Zap, Fingerprint, Globe, CheckCircle2
     } from 'lucide-svelte';
     import ShareDrawer from '$lib/components/share-drawer.svelte';
 	import ImageCarousel from '$lib/components/image-carousel.svelte';
+    import AuthenticatedPhotosAlert from '$lib/components/authenticated-photos-alert.svelte';
 
 	let { data } = $props();
 	const { photo } = data;
@@ -42,9 +43,37 @@
 
 	// TODO: Replace with real data
 	const photoDetails = {
-		history: [],
-		tags: [],
-		likes: { users: [], count: 0 }
+		history: [
+			{
+				id: 1,
+				title: 'Original Capture',
+				date: 'Oct 24, 2023',
+				icon: 'camera',
+				description: 'Original photo captured with Sony A7R IV.'
+			},
+			{
+				id: 2,
+				title: 'Color Adjustment',
+				date: 'Oct 25, 2023',
+				icon: 'adjust',
+				description: 'Applied color grading and exposure correction.'
+			},
+			{
+				id: 3,
+				title: 'Crop',
+				date: 'Oct 25, 2023',
+				icon: 'crop',
+				description: 'Cropped to 16:9 aspect ratio.'
+			}
+		],
+		tags: ['Nature', 'Landscape', 'Photography'],
+		likes: {
+			users: [
+				{ name: 'Alex', avatar: 'https://i.pravatar.cc/150?u=alex' },
+				{ name: 'Sam', avatar: 'https://i.pravatar.cc/150?u=sam' }
+			],
+			count: 24
+		}
 	};
 
 	// Array of 20 image URLs for the carousel
@@ -114,7 +143,7 @@
                     
                     <div class="flex gap-2">
                         <ShareDrawer 
-                            title={photo.user.display_name}
+                            title={`photo by ${photo.user.display_name}`}
                             description={photo.description ?? 'Check out this amazing photo'}
                         />
                         <Button>
@@ -133,13 +162,29 @@
                                 <div>
                                     <h3 class="font-semibold text-base leading-tight">C2PA Verified History</h3>
                                     <p class="text-sm text-slate-500 dark:text-slate-400">This photo is authentic and its history is securely tracked.</p>
-                                    {#if metadata.c2pa_verified_at}
-                                        <p class="text-xs text-slate-400 mt-1">Verified on {new Date(metadata.c2pa_verified_at).toLocaleDateString()}</p>
-                                    {/if}
                                 </div>
                             </div>
+                            <Accordion class="w-full" type="single" collapsible>
+                                {#each photoDetails.history as item (item.id)}
+                                    <AccordionItem value="item-{item.id}">
+                                        <AccordionTrigger>
+                                            <div class="flex items-center w-full gap-3">
+                                                <svelte:component
+                                                    this={iconComponents[item.icon]}
+                                                    class="h-5 w-5 text-slate-700 dark:text-slate-600"
+                                                />
+                                                <span class="text-sm">{item.title}</span>
+                                                <div class="flex-grow"></div>
+                                                <span class="text-xs text-slate-500 dark:text-slate-400 font-normal">{item.date}</span>
+                                            </div>
+                                        </AccordionTrigger>
+                                        <AccordionContent>
+                                            {item.description}
+                                        </AccordionContent>
+                                    </AccordionItem>
+                                {/each}
+                            </Accordion>
                         </div>
-                        <Separator />
                     {/if}
 
                     <div class="grid gap-2">

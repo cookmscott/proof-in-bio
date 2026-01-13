@@ -1,11 +1,13 @@
 <script>
-	import { CheckCircle, Share2, Plus, User } from 'lucide-svelte';
+	import { Share2, Plus, User } from 'lucide-svelte';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
 	import { Button } from '$lib/ui/button';
 	import { Badge } from '$lib/ui/badge';
 	import { Card } from '$lib/ui/card';
 	import { AspectRatio } from '$lib/ui/aspect-ratio';
 	import { Skeleton } from '$lib/ui/skeleton';
+	import ShareDrawer from '$lib/components/share-drawer.svelte';
+	import AuthenticatedPhotosAlert from '$lib/components/authenticated-photos-alert.svelte';
 
 	let { data } = $props();
 
@@ -55,53 +57,46 @@
           'relative' and 'z-10' ensure it stacks on top of the absolute background.
           'container', 'mx-auto', and 'max-w-screen-lg' center and constrain the content.
         -->
-        <main class="relative z-10 container mx-auto max-w-screen-lg px-4 pt-20 pb-8">
+        <main class="relative z-10 container mx-auto max-w-screen-lg px-4 sm:pt-20 pt-8 pb-8">
             <!-- Profile Header Section -->
-            <div class="relative z-10 mb-8 flex flex-col items-center gap-4 text-center md:flex-row md:text-left">
-				<Avatar class="h-24 w-24 md:h-32 md:w-32">
-					<AvatarImage src={profile.avatar_url} alt={profile.display_name} />
-					<AvatarFallback>
-						<User class="h-12 w-12" />
-					</AvatarFallback>
-				</Avatar>
+            <div class="relative z-10 mb-8">
+                <div class="flex flex-row items-start gap-4">
+                    <Avatar class="h-20 w-20 shrink-0 md:h-32 md:w-32">
+                        <AvatarImage src={profile.avatar_url} alt={profile.display_name} />
+                        <AvatarFallback>
+                            <User class="h-12 w-12" />
+                        </AvatarFallback>
+                    </Avatar>
 
-                <div class="flex-grow">
-					<h1 class="text-2xl font-bold tracking-tight sm:text-3xl">
-						{profile.display_name || profile.username}
-					</h1>
-					<p class="text-muted-foreground">@{profile.username}</p>
-					<p class="mt-2 max-w-xl text-balance">{profile.bio}</p>
-					<div class="mt-4 flex flex-wrap justify-center gap-2 md:justify-start">
-						{#each interests as interest}
-							<Badge variant="secondary">{interest}</Badge>
-						{/each}
-					</div>
+                    <div class="flex-grow min-w-0">
+                        <h1 class="text-xl font-bold tracking-tight leading-tight sm:text-3xl">
+                            {profile.display_name || profile.username}
+                        </h1>
+                        <p class="text-muted-foreground text-sm sm:text-base">@{profile.username}</p>
+                        <p class="mt-2 max-w-xl text-balance text-sm sm:text-base">{profile.bio}</p>
+                        <div class="mt-3 flex flex-wrap gap-2">
+                            {#each interests as interest}
+                                <Badge variant="secondary">{interest}</Badge>
+                            {/each}
+                        </div>
+                    </div>
                 </div>
 
-                <div class="mt-4 flex gap-2 md:mt-0 md:absolute md:top-0 md:right-0">
-                    <Button variant="secondary">
-                        <Share2 class="mr-2 h-4 w-4" />
-                        Share Profile
-                    </Button>
-					{#if canEdit}
-						<Button href="/{data.profile.username}/edit">Edit Profile</Button>
-					{/if}
+                <div class="mt-4 flex gap-2 md:absolute md:top-0 md:right-0 md:mt-0">
+                    <ShareDrawer 
+                        title={profile.display_name || profile.username}
+                        description={profile.bio || `Check out ${profile.display_name}'s profile on Proof in Bio`}
+                        label="Share Profile"
+                        class="flex-1 md:flex-none"
+                    />
+                    {#if canEdit}
+                        <Button href="/{data.profile.username}/edit" class="flex-1 md:flex-none">Edit Profile</Button>
+                    {/if}
                 </div>
             </div>
 
             <!-- Authenticated Photos Alert -->     
-            <div class="relative backdrop-blur-md bg-white/10 flex w-full items-center rounded-lg border border-gray/60 py-3 px-4 mb-8">
-                <CheckCircle class="h-5 w-5 mt-1 shrink-0" />                         
-                <div class="ml-4 flex-grow">
-                    <h5 class="font-semibold text-sm">Made by Humans.</h5>
-                    <div class="text-xs sm:text-sm">
-                        No heavy editing or AI generation is allowed on this platform. What you see is what was captured.
-                    </div>
-                </div>        
-                <Button variant="ghost" size="sm" class="ml-4 shrink-0 text-xs sm:text-sm px-4 py-6">
-                    Learn More
-                </Button>
-            </div>
+            <AuthenticatedPhotosAlert />
             
             <!-- Photo Gallery Section -->
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">

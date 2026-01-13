@@ -89,7 +89,7 @@
 					<DropdownMenu.Label>My Account</DropdownMenu.Label>
 					<DropdownMenu.Separator />
 					<DropdownMenu.Item asChild>
-						<a href={username ? `/profile/${username}` : '/profile'} class="flex items-center">
+						<a href={username ? `/${username}` : '/profile'} class="flex items-center">
 							<User class="w-4 h-4 mr-2" />
 							Profile
 						</a>
