@@ -1,3 +1,11 @@
+// THIS DOES NOT INCLUDE Cert chain validation - only extraction of actions and digitalSourceType from C2PA manifests
+// basically we are only checking the JUMBF box and CBOR payloads for this edge function
+
+// https://github.com/TrustNXT/c2pa-ts
+
+// ✅ Reading manifests
+// 🚧 Validating manifests (mostly implemented except chain of trust validation)
+
 // supabase/functions/hello-world/index.ts
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 

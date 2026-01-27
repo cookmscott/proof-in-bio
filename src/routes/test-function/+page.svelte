@@ -29,11 +29,15 @@
         error = null;
 
         try {
-            const formData = new FormData();
-            formData.append('image', selectedFile);
+            const dataUrl = await new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(selectedFile);
+            });
 
             const { data, error: functionError } = await supabase.functions.invoke('hello-world', {
-                body: formData,
+                body: { dataUrl },
             });
 
             if (functionError) throw functionError;
