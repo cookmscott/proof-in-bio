@@ -14,8 +14,9 @@
     let error = $state(null);
     let selectedUpload = $state(null);
 
-    let verifiedCount = $derived(uploads.filter(u => u.c2pa?.valid).length);
-    let unverifiedCount = $derived(uploads.filter(u => u.c2pa && !u.c2pa.valid).length);
+    let verifiedCount = $derived(uploads.filter(u => u.c2pa?.hasCaptureProvenance && u.c2pa?.activeSignatureValidated).length);
+    let softwareSignedCount = $derived(uploads.filter(u => u.c2pa?.hasC2pa && !u.c2pa?.activeSignatureValidated && u.c2pa?.signatureValidated).length);
+    let unverifiedCount = $derived(uploads.filter(u => !u.c2pa?.hasC2pa || !u.c2pa?.activeSignatureValidated).length);
 
     // Using a stable version for c2pa-web
     const C2PA_VERSION = '0.5.6';
@@ -93,10 +94,15 @@
             store?.validationStatus ??
             [];
 
+        const validation_results = store?.validation_results ?? store?.validationResults ?? null;
+        const validation_state = store?.validation_state ?? store?.validationState ?? null;
+
         return {
             active_manifest: active,
             manifests,
-            validation_status
+            validation_status,
+            validation_results,
+            validation_state
         };
     }
 
@@ -105,34 +111,253 @@
      * Spec: Assertion label is 'c2pa.actions'.
      * Spec: Data structure is a map containing an 'actions' key (array of Action objects).
      */
-    function extractActions(assertions = []) {
-        if (!assertions || assertions.length === 0) return { actionsLabel: null, actions: [] };
+    function parseActionsOrder(label = '') {
+      // c2pa.actions.v2, c2pa.actions.v2__1, c2pa.actions__2, etc.
+      const m = label.match(/__(\d+)$/);
+      return m ? Number(m[1]) : 0;
+    }
 
-        // Per Spec: The standard label for the Actions Assertion is 'c2pa.actions'.
-        // We prioritize an exact match. 
-        let actionAssertion = assertions.find(a => a.label === 'c2pa.actions');
+    function isActionsLabel(label = '') {
+      return /^c2pa\.actions(\.v2)?(__\d+)?$/.test(label);
+    }
 
-        // Fallback: If strict 'c2pa.actions' is not found, look for namespaced versions (e.g., c2pa.actions.v2)
-        // only if strictly necessary. Ideally, valid C2PA 2.0+ content still uses 'c2pa.actions' 
-        // or a clearly defined versioned label.
-        if (!actionAssertion) {
-            actionAssertion = assertions.find(a => a.label && a.label.startsWith('c2pa.actions'));
+    function applyActionTemplates(data) {
+      const actions = Array.isArray(data?.actions) ? data.actions : [];
+      const templates = data?.templates && typeof data.templates === 'object' ? data.templates : null;
+
+      if (!templates) return actions;
+
+      const star = templates['*'] && typeof templates['*'] === 'object' ? templates['*'] : {};
+
+      return actions.map((a) => {
+        const perAction = templates[a?.action] && typeof templates[a.action] === 'object'
+          ? templates[a.action]
+          : {};
+
+        // Shallow merge + merge parameters (most important)
+        const merged = {
+          ...star,
+          ...perAction,
+          ...a,
+          parameters: {
+            ...(star.parameters || {}),
+            ...(perAction.parameters || {}),
+            ...(a?.parameters || {})
+          }
+        };
+
+        return merged;
+      });
+    }
+
+    function extractActionsAll(assertions = []) {
+      if (!Array.isArray(assertions) || assertions.length === 0) {
+        return { actionsLabels: [], actions: [] };
+      }
+
+      const actionAssertions = assertions
+        .filter(a => isActionsLabel(a?.label || ''))
+        .sort((a, b) => parseActionsOrder(a.label) - parseActionsOrder(b.label));
+
+      const all = [];
+      const labels = [];
+
+      for (const asrt of actionAssertions) {
+        labels.push(asrt.label);
+        const data = asrt?.data || null;
+        const normalized = applyActionTemplates(data);
+        for (const act of normalized) all.push(act);
+      }
+
+      // Sort by `when` if present, otherwise preserve original order
+      const hasWhen = all.some(a => a?.when);
+      if (hasWhen) {
+        all.sort((a, b) => {
+          const ta = a?.when ? Date.parse(a.when) : NaN;
+          const tb = b?.when ? Date.parse(b.when) : NaN;
+          if (!Number.isNaN(ta) && !Number.isNaN(tb)) return ta - tb;
+          if (!Number.isNaN(ta)) return -1;
+          if (!Number.isNaN(tb)) return 1;
+          return 0;
+        });
+      }
+
+      return { actionsLabels: labels, actions: all };
+    }
+
+    function getManifestCaptureStatus(manifest) {
+        const { actions } = extractActionsAll(manifest?.assertions || []);
+        if (!actions.length) return false;
+
+        const created = actions.find(a => a?.action === 'c2pa.created');
+        if (!created) return false;
+
+        // Requirement B: Read digitalSourceType from correct places
+        const iptcUri = 'http://cv.iptc.org/newscodes/digitalsourcetype/';
+        const rawType = 
+            created.digitalSourceType ||
+            created.parameters?.digitalSourceType ||
+            created.parameters?.[iptcUri];
+
+        if (!rawType) return false;
+
+        // Requirement C: Recognize capture source types
+        const t = String(rawType);
+        // accept full URIs; match by suffix
+        return t.endsWith('/digitalCapture') || t.endsWith('/computationalCapture');
+    }
+
+    function parseIngredientLabelFromUrl(url) {
+      // Example: self#jumbf=c2pa.assertions/c2pa.ingredient.v3__1
+      // or:     self#jumbf=/c2pa/urn:.../c2pa.assertions/c2pa.ingredient.v3
+      if (!url || typeof url !== 'string') return null;
+
+      const idx = url.lastIndexOf('c2pa.assertions/');
+      if (idx === -1) return null;
+
+      return url.substring(idx + 'c2pa.assertions/'.length);
+    }
+
+    function buildIngredientLabelIndex(manifest) {
+      // Map ingredient assertion label -> ingredient entry (from manifest.ingredients array)
+      const map = new Map();
+      for (const ing of (manifest?.ingredients || [])) {
+        const label = ing?.label;
+        if (label) map.set(label, ing);
+      }
+      return map;
+    }
+
+    function extractParentManifestIdsFromActions(manifest) {
+      const { actions } = extractActionsAll(manifest?.assertions || []);
+      if (!actions.length) return [];
+
+      const ingredientIndex = buildIngredientLabelIndex(manifest);
+      const out = new Set();
+
+      for (const act of actions) {
+        const ings = act?.parameters?.ingredients;
+        if (!Array.isArray(ings)) continue;
+
+        for (const ingRef of ings) {
+          const label = parseIngredientLabelFromUrl(ingRef?.url);
+          if (!label) continue;
+
+          // ingredient entries often use same label (including __1, __2)
+          const entry = ingredientIndex.get(label) || ingredientIndex.get(label.replace(/__(\d+)$/, ''));
+          const parentId =
+            entry?.active_manifest ||
+            entry?.activeManifest ||
+            entry?.manifest_id ||
+            entry?.manifestId ||
+            null;
+
+          if (parentId) out.add(parentId);
         }
+      }
 
-        if (actionAssertion) {
-            // Per Spec: The payload of the Actions assertion contains an 'actions' field.
-            const data = actionAssertion.data;
-            
-            // Strict check: data must be an object and have an 'actions' array.
-            if (data && Array.isArray(data.actions)) {
-                return { 
-                    actionsLabel: actionAssertion.label, 
-                    actions: data.actions 
-                };
+      return [...out];
+    }
+
+    function extractParentManifestIds(manifest) {
+      // Combine “easy” top-level ingredient list + spec-aligned action ingredient refs
+      const out = new Set();
+
+      // 1) direct ingredient list (good fallback)
+      for (const ing of (manifest?.ingredients || [])) {
+        const parentId =
+          ing?.active_manifest ||
+          ing?.activeManifest ||
+          ing?.manifest_id ||
+          ing?.manifestId ||
+          null;
+        if (parentId) out.add(parentId);
+      }
+
+      // 2) hashed-uri references from actions (spec-aligned)
+      for (const parentId of extractParentManifestIdsFromActions(manifest)) out.add(parentId);
+
+      return [...out];
+    }
+
+    function analyzeProvenance(store) {
+        if (!store || !store.manifests) return { hasC2pa: false };
+
+        const activeId = store.active_manifest;
+        const activeManifest = store.manifests?.[activeId];
+        if (!activeManifest) return { hasC2pa: false };
+
+        // IMPORTANT: require actions assertions to call it “hasC2pa” for your UX
+        const { actions: activeActions } = extractActionsAll(activeManifest.assertions || []);
+        const hasC2pa = activeActions.length > 0;
+
+        const activeIsCapture = getManifestCaptureStatus(activeManifest);
+        let hasCaptureProvenance = activeIsCapture;
+        let captureManifest = activeIsCapture ? activeManifest : null;
+
+        if (!hasCaptureProvenance) {
+            const queue = extractParentManifestIds(activeManifest);
+            const visited = new Set([activeId]);
+
+            while (queue.length) {
+              const parentId = queue.shift();
+              if (!parentId || visited.has(parentId)) continue;
+
+              const parent = store.manifests?.[parentId];
+              if (!parent) continue;
+
+              visited.add(parentId);
+
+              if (getManifestCaptureStatus(parent)) {
+                hasCaptureProvenance = true;
+                captureManifest = parent;
+                break;
+              }
+
+              // keep walking up
+              for (const nextId of extractParentManifestIds(parent)) {
+                if (nextId && !visited.has(nextId)) queue.push(nextId);
+              }
             }
         }
 
-        return { actionsLabel: null, actions: [] };
+        const getSigner = (m) =>
+            m?.signature_info?.common_name ||
+            m?.signature_info?.issuer ||
+            'Unknown';
+
+        // Validation (active manifest only, unless your lib exposes per-manifest results)
+        const vr = store.validation_results?.activeManifest;
+        const failures = vr?.failure || [];
+        const successes = vr?.success || [];
+
+        const hasCryptoFailure = failures.some(f =>
+            (f.code || '').startsWith('claimSignature.') ||
+            (f.code || '').startsWith('assertion.dataHash.') ||
+            (f.code || '').startsWith('assertion.hashedURI.')
+        );
+
+        const activeSignatureValidated =
+            !!successes.find(s => (s.code || '') === 'claimSignature.validated') && !hasCryptoFailure;
+
+        const signingCredentialTrusted =
+            !failures.some(f => (f.code || '') === 'signingCredential.untrusted');
+
+        return {
+            hasC2pa,
+            hasCaptureProvenance,
+            activeIsCapture,
+            activeSigner: getSigner(activeManifest),
+            captureSigner: captureManifest ? getSigner(captureManifest) : null,
+
+            // keep your existing flag name, but make it explicit too
+            signatureValidated: activeSignatureValidated,
+            activeSignatureValidated,
+            signingCredentialTrusted,
+
+            // UI: show actions from active (edits) chain
+            actions: activeActions
+        };
     }
 
     async function loadC2pa() {
@@ -201,7 +426,7 @@
             
             let hasManifest = false;
             let manifestData = null;
-            let extractedActions = [];
+            let analysis = null;
 
             if (result) {
                 // Get the raw manifest store
@@ -223,29 +448,17 @@
                 if (hasManifest) {
                     manifestData = manifestStore;
 
-                    // Get the specific Active Manifest object
-                    const activeManifest = normalized.manifests[activeId];
-                    
-                    // Extract actions conforming to Spec
-                    const { actionsLabel, actions } = extractActions(activeManifest?.assertions || []);
-                    extractedActions = actions;
+                    // Run the full provenance analysis
+                    analysis = analyzeProvenance(normalized);
 
                     // --- LOGGING ---
                     // Log strict C2PA data to console as requested
                     console.group(`C2PA Analysis: ${uploadItem.file.name}`);
+                    console.log('Analysis Result:', analysis);
                     console.log('Manifest Store (Raw):', manifestStore);
                     console.log('Active Manifest ID:', activeId);
-                    console.log('Active Manifest Data:', activeManifest);
+                    console.log('Active Manifest Data:', normalized.manifests[activeId]);
                     
-                    if (actionsLabel) {
-                        console.log(`Actions Assertion Found (${actionsLabel}):`, actions);
-                        // Log specific details often requested in specs (action, software agent, etc)
-                        actions.forEach((action, i) => {
-                            console.log(`[Action ${i}] ${action.action}`, action);
-                        });
-                    } else {
-                        console.warn('No "c2pa.actions" assertion found in active manifest.');
-                    }
                     console.groupEnd();
                     // --- END LOGGING ---
                 }
@@ -253,7 +466,10 @@
 
             const index = uploads.findIndex(u => u.id === uploadItem.id);
             if (index !== -1) {
-                uploads[index].c2pa = { valid: hasManifest, data: manifestData, actions: extractedActions };
+                uploads[index].c2pa = { 
+                    ...analysis,
+                    data: manifestData 
+                };
                 uploads[index].processing = false;
             }
         } catch (err) {
@@ -362,9 +578,13 @@
                                 </div>
                             {:else if upload.c2pa}
                                 <div class="absolute top-2 right-2">
-                                    {#if upload.c2pa.valid}
-                                        <div class="bg-green-500 text-white p-1.5 rounded-full shadow-sm" title="Verified C2PA">
+                                    {#if upload.c2pa.hasCaptureProvenance && upload.c2pa.activeSignatureValidated}
+                                        <div class="bg-green-500 text-white p-1.5 rounded-full shadow-sm" title="Verified Capture (Device Signed)">
                                             <CheckCircle class="h-5 w-5" />
+                                        </div>
+                                    {:else if upload.c2pa.hasC2pa && upload.c2pa.signatureValidated}
+                                        <div class="bg-blue-500 text-white p-1.5 rounded-full shadow-sm" title="Signed by Software (Not Capture)">
+                                            <FileImage class="h-5 w-5" />
                                         </div>
                                     {:else}
                                         <div class="bg-amber-500 text-white p-1.5 rounded-full shadow-sm" title="No C2PA">
@@ -388,10 +608,10 @@
                     {/each}
                 </div>
 
-                {#if selectedUpload && selectedUpload.c2pa?.valid}
+                {#if selectedUpload && selectedUpload.c2pa?.hasC2pa}
                     {@const groupedActions = (() => {
                         const groups = {};
-                        for (const action of selectedUpload.c2pa.actions) {
+                        for (const action of (selectedUpload.c2pa.actions || [])) {
                             const category = getActionCategory(action.action);
                             const key = category.label;
                             if (!groups[key]) groups[key] = { category, actions: [] };
@@ -441,26 +661,30 @@
                     <div class="flex-1 space-y-1.5">
                         <div class="flex gap-4 text-sm font-medium">
                             <span class="flex items-center gap-1.5">
-                                <CheckCircle class="h-4 w-4 text-green-500" /> {verifiedCount} Verified
+                                <CheckCircle class="h-4 w-4 text-green-500" /> {verifiedCount} Captured
                             </span>
+                            {#if softwareSignedCount > 0}
+                                <span class="flex items-center gap-1.5">
+                                    <FileImage class="h-4 w-4 text-blue-500" /> {softwareSignedCount} Edited/Software
+                                </span>
+                            {/if}
                             {#if unverifiedCount > 0}
                                 <span class="flex items-center gap-1.5">
-                                    <XCircle class="h-4 w-4 text-amber-500" /> {unverifiedCount} No C2PA
+                                    <XCircle class="h-4 w-4 text-amber-500" /> {unverifiedCount} Unsigned
                                 </span>
                             {/if}
                         </div>
-                        {#if unverifiedCount > 0}
+                        {#if unverifiedCount > 0 || softwareSignedCount > 0}
                             <p class="text-xs text-muted-foreground">
-                                Some of your images may not have C2PA and will not be uploaded.
+                                Only images signed at the point of capture are marked as Verified.
                             </p>
                         {/if}
                     </div>
                     {#if verifiedCount > 0}
-                        <Button>Upload {verifiedCount} {verifiedCount === 1 ? 'Image' : 'Images'}</Button>
+                        <Button>Upload {verifiedCount} Verified {verifiedCount === 1 ? 'Image' : 'Images'}</Button>
                     {/if}
                 </div>
             {/if}
-
         </CardContent>
     </Card>
 </div>
