@@ -1,5 +1,5 @@
 <script>
-	import { Share2, Plus, User } from 'lucide-svelte';
+	import { Share2, Plus, User, Upload } from 'lucide-svelte';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
 	import { Button } from '$lib/ui/button';
 	import { Badge } from '$lib/ui/badge';
@@ -8,8 +8,52 @@
 	import { Skeleton } from '$lib/ui/skeleton';
 	import ShareDrawer from '$lib/components/share-drawer.svelte';
 	import AuthenticatedPhotosAlert from '$lib/components/authenticated-photos-alert.svelte';
+    import C2paUploadDialog from '$lib/components/c2pa-upload-dialog.svelte';
 
 	let { data } = $props();
+
+    let uploadDialogOpen = $state(false);
+    let uploadDialogComponent = $state(null);
+    let isDragging = $state(false);
+    let dragCounter = 0; // Use a counter to prevent flickering on child elements
+
+    function handleWindowDrop(e) {
+        e.preventDefault();
+        isDragging = false;
+        dragCounter = 0;
+        if (e.dataTransfer?.files?.length) {
+            uploadDialogComponent?.processFiles(e.dataTransfer.files);
+        }
+    }
+
+    function handleWindowDragOver(e) {
+        e.preventDefault();
+    }
+
+    function handleWindowDragEnter(e) {
+        e.preventDefault();
+        dragCounter++;
+        if (e.dataTransfer?.items?.length > 0) {
+            isDragging = true;
+        }
+    }
+
+    function handleWindowDragLeave(e) {
+        e.preventDefault();
+        dragCounter--;
+        if (dragCounter === 0) {
+            isDragging = false;
+        }
+    }
+
+    function openUploadDialog(e) {
+        // Prevent default behavior if any
+        if (e && typeof e.preventDefault === 'function') {
+            e.preventDefault();
+        }
+        console.log('Add Photos clicked, opening dialog...');
+        uploadDialogOpen = true;
+    }
 
 	// Use derived runes to reactively access profile and photos from loaded data
 	let profile = $derived(data.profile);
@@ -29,6 +73,30 @@
 		}
 	});
 </script>
+
+<svelte:window 
+    ondrop={handleWindowDrop} 
+    ondragover={handleWindowDragOver} 
+    ondragenter={handleWindowDragEnter}
+    ondragleave={handleWindowDragLeave}
+/>
+
+{#if isDragging}
+    <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-background/20 backdrop-blur-sm pointer-events-none">
+        
+        <div class="bg-background/40 backdrop-blur-xl border-2 border-dashed border-primary/50 p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-4 animate-in zoom-in-95 duration-200 ring-1 ring-white/10">
+            
+            <div class="p-5 rounded-full bg-primary/10 shadow-inner">
+                <Upload class="h-12 w-12 text-primary animate-pulse" />
+            </div>
+            
+            <div class="space-y-1 text-center">
+                <p class="text-3xl font-bold text-primary tracking-tight">Drop to Add Photos</p>
+                <p class="text-muted-foreground font-medium">Import and verify your images instantly</p>
+            </div>
+        </div>
+    </div>
+{/if}
 
 <!-- Main wrapper for the entire page -->
 <div class="bg-background text-foreground min-h-screen">
@@ -123,7 +191,11 @@
     </div>
 
     <!-- Fixed "Add Images" Button -->
-    <Button style="z-index: 999" class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn">
+    <Button 
+        style="z-index: 999" 
+        class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn"
+        onclick={openUploadDialog}
+    >
         <span class="flex items-center">
             <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon" />
             <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text">
@@ -133,6 +205,8 @@
         <span class="sr-only">Add Images</span>
     </Button>
 </div>
+
+<C2paUploadDialog bind:this={uploadDialogComponent} bind:open={uploadDialogOpen} />
 
 <style>
     @keyframes expand-btn {
