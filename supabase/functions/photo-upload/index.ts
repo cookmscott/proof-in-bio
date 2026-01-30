@@ -8,30 +8,76 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
+function decodeJwtPayload(token: string) {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = atob(payload);
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
   }
 
   try {
+    console.log("hit", req.method, req.headers.get("content-type"), req.headers.get("content-length"));
+
     const supabaseUrl = Deno.env.get('SUPABASE_URL')
     const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
 
-    if (!supabaseUrl || !serviceRoleKey) {
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
       throw new Error('Missing Supabase configuration')
     }
 
-    const supabase = createClient(supabaseUrl, serviceRoleKey)
+    // Service role client for privileged operations (Storage/DB)
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      global: {
+        fetch: (input, init) =>
+          fetch(input, { ...init, signal: AbortSignal.timeout(20_000) }),
+      },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
+    const authHeader = req.headers.get('Authorization') ?? ''
+    console.log("authHeader starts:", authHeader.slice(0, 30));
+
+    const m = authHeader.match(/^Bearer\s+(.+)$/i)
+    
+    if (!m) {
       return new Response(
-        JSON.stringify({ error: 'Missing Authorization header' }),
+        JSON.stringify({ error: 'Missing Bearer token' }),
         { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
+    const token = m[1]
+    console.log("token dot count:", token.split(".").length - 1);
+
+    const payload = decodeJwtPayload(token);
+    console.log("token payload keys:", payload ? Object.keys(payload) : "not a JWT");
+    console.log("token sub:", payload?.sub);
+    console.log("token iss:", payload?.iss);
+
+    // Anon client for user validation
+    const supabaseAuth = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+        auth: { persistSession: false, autoRefreshToken: false },
+    })
+
+    console.log("before getUser", { tokenLen: token.length });
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+    console.log("after getUser", {
+        hasUser: !!user,
+        authError: authError?.message,
+    });
+
     if (authError || !user) {
       return new Response(
         JSON.stringify({ error: 'Unauthorized' }),
@@ -39,7 +85,9 @@ serve(async (req) => {
       )
     }
 
+    console.log("before formData");
     const formData = await req.formData()
+    console.log("after formData");
     const file = formData.get('file')
     const metadataEntry = formData.get('metadata')
     
@@ -59,15 +107,16 @@ serve(async (req) => {
     // Upload to Storage
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const fileName = `${user.id}/${crypto.randomUUID()}.${fileExt}`
-    const fileBuffer = new Uint8Array(await file.arrayBuffer())
     
+    console.log("before upload", file.size, file.type);
     const { data: storageData, error: storageError } = await supabase.storage
       .from('photos')
-      .upload(fileName, fileBuffer, {
+      .upload(fileName, file, {
         contentType: file.type || 'application/octet-stream',
         upsert: false
       })
 
+    console.log("after upload");
     if (storageError) throw storageError
 
     const { data: { publicUrl } } = supabase.storage
@@ -78,6 +127,7 @@ serve(async (req) => {
     const height = Number(metadata.height) || 0
 
     // Insert Photo
+    console.log("before photos insert");
     const { data: photo, error: photoError } = await supabase
       .from('photos')
       .insert({
@@ -97,6 +147,7 @@ serve(async (req) => {
       .select()
       .single()
 
+    console.log("after photos insert", photo?.id);
     if (photoError) {
         // Cleanup storage if db fails
         await supabase.storage.from('photos').remove([fileName])
@@ -104,6 +155,7 @@ serve(async (req) => {
     }
 
     // Insert Metadata
+    console.log("before metadata insert");
     const { error: metaError } = await supabase
       .from('photos_metadata')
       .insert({
@@ -153,6 +205,7 @@ serve(async (req) => {
         focus_mode: metadata.focus_mode
       })
 
+    console.log("after metadata insert");
     if (metaError) {
         console.error('Metadata insert failed', metaError)
         // Optionally delete photo or ignore? For now we just log and return error
