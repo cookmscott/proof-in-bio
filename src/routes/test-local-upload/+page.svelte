@@ -19,7 +19,7 @@
     analyzeProvenance,
     loadC2pa
   } from '$lib/c2pa';
-  import { supabase } from '$lib/supabase';
+  import { supabase } from '$lib/supabaseClient';
 
   let dragOver = $state(false);
   let uploads = $state([]);

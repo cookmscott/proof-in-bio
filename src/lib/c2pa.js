@@ -455,7 +455,8 @@ export async function loadC2pa() {
     if (c2paInstance) return c2paInstance;
 
     try {
-        const module = await import(`https://cdn.jsdelivr.net/npm/@contentauth/c2pa-web@${C2PA_VERSION}/+esm`);
+        const url = `https://cdn.jsdelivr.net/npm/@contentauth/c2pa-web@${C2PA_VERSION}/+esm`;
+        const module = await import(/* @vite-ignore */ url);
         const createC2pa = module.createC2pa;
         
         c2paInstance = await createC2pa({

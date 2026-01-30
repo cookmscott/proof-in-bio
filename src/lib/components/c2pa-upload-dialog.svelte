@@ -494,7 +494,8 @@
 
                 {#if unverifiedCount > 0 || softwareSignedCount > 0 || captureUnknownCount > 0}
                   <p class="text-xs text-muted-foreground pr-8">
-                    “Verified Capture” requires a capture-origin record <em>and</em> validated signatures. “Capture (Unverified)” means capture provenance is present but this viewer can’t confirm capture-manifest validation separately.
+                    “Verified Capture” requires a capture-origin record <em>and</em> validated signatures. 
+                    <br/>Capture (Unverified) means capture data exists, but this viewer can’t independently verify the capture signature.
                   </p>
                 {/if}
               </div>
