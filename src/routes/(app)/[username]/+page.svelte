@@ -1,5 +1,6 @@
 <script>
 	import { Share2, Plus, User, Upload } from 'lucide-svelte';
+    import { invalidateAll } from '$app/navigation';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
 	import { Button } from '$lib/ui/button';
 	import { Badge } from '$lib/ui/badge';
@@ -53,6 +54,10 @@
         }
         console.log('Add Photos clicked, opening dialog...');
         uploadDialogOpen = true;
+    }
+
+    function handleUploadComplete() {
+        invalidateAll();
     }
 
 	// Use derived runes to reactively access profile and photos from loaded data
@@ -166,6 +171,28 @@
             <!-- Authenticated Photos Alert -->     
             <AuthenticatedPhotosAlert />
             
+            {#if photos.length === 0}
+                {#if canEdit}
+                    <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg border-muted mt-4">
+                        <div class="bg-muted/30 p-4 rounded-full mb-4">
+                            <Upload class="h-10 w-10 text-muted-foreground/60" />
+                        </div>
+                        <h3 class="text-xl font-semibold tracking-tight">Upload your first photo</h3>
+                        <p class="text-muted-foreground max-w-sm mt-2 mb-6 text-sm">
+                            Your gallery is empty. Upload a photo to get started with C2PA verification.
+                        </p>
+                        <Button onclick={openUploadDialog} variant="outline">
+                            <Plus class="mr-2 h-4 w-4" />
+                            Add Photos
+                        </Button>
+                    </div>
+                {:else}
+                    <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg border-muted mt-4">
+                        <p class="text-muted-foreground">No photos yet.</p>
+                    </div>
+                {/if}
+            {/if}
+
             <!-- Photo Gallery Section -->
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">
 				{#each photos as photo, i (photo.id)}
@@ -206,7 +233,12 @@
     </Button>
 </div>
 
-<C2paUploadDialog bind:this={uploadDialogComponent} bind:open={uploadDialogOpen} supabase={data.supabase} />
+<C2paUploadDialog 
+    bind:this={uploadDialogComponent} 
+    bind:open={uploadDialogOpen} 
+    supabase={data.supabase} 
+    onUploadComplete={handleUploadComplete}
+/>
 
 <style>
     @keyframes expand-btn {

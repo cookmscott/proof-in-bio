@@ -12,17 +12,19 @@
 
 	// Fetch username for profile link
 	let username = $state(null);
+	let profileAvatar = $state(null);
 
 	$effect(() => {
 		if (user && supabase) {
 			// Fetch the username from user_profiles
 			supabase
 				.from('user_profiles')
-				.select('username')
+				.select('username, avatar_url')
 				.eq('id', user.id)
 				.single()
 				.then(({ data }) => {
 					username = data?.username;
+					profileAvatar = data?.avatar_url;
 				});
 		}
 	});
@@ -31,7 +33,7 @@
 	let isAuthPage = $derived($page.route.id?.includes('/auth'));
 
 	// Get user data from Supabase user object
-	let avatarUrl = $derived(user?.user_metadata?.avatar_url || user?.avatar_url || '');
+	let avatarUrl = $derived(profileAvatar || user?.user_metadata?.avatar_url || user?.avatar_url || '');
 	let displayName = $derived(
 		user?.user_metadata?.full_name || user?.user_metadata?.name || user?.email || 'User'
 	);
@@ -88,35 +90,35 @@
 				<DropdownMenu.Group>
 					<DropdownMenu.Label>My Account</DropdownMenu.Label>
 					<DropdownMenu.Separator />
-					<DropdownMenu.Item asChild>
-						<a href={username ? `/${username}` : '/profile'} class="flex w-full items-center">
+					<DropdownMenu.Item asChild class="p-0">
+						<a href={username ? `/${username}` : '/profile'} class="flex w-full items-center px-2 py-1.5">
 							<User class="w-4 h-4 mr-2" />
 							Profile
 						</a>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
-						<a href="/billing" class="flex w-full items-center">
+					<DropdownMenu.Item asChild class="p-0">
+						<a href="/billing" class="flex w-full items-center px-2 py-1.5">
 							<CreditCard class="w-4 h-4 mr-2" />
 							Billing
 						</a>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
-						<a href="/team" class="flex w-full items-center">
+					<DropdownMenu.Item asChild class="p-0">
+						<a href="/team" class="flex w-full items-center px-2 py-1.5">
 							<Users class="w-4 h-4 mr-2" />
 							Team
 						</a>
 					</DropdownMenu.Item>
-					<DropdownMenu.Item asChild>
-						<a href="/subscription" class="flex w-full items-center">
+					<DropdownMenu.Item asChild class="p-0">
+						<a href="/subscription" class="flex w-full items-center px-2 py-1.5">
 							<Package class="w-4 h-4 mr-2" />
 							Subscription
 						</a>
 					</DropdownMenu.Item>
 					<DropdownMenu.Separator />
-					<DropdownMenu.Item asChild>
+					<DropdownMenu.Item asChild class="p-0">
 						<button
 							type="button"
-							class="cursor-pointer w-full text-left flex items-center"
+							class="cursor-pointer w-full text-left flex items-center px-2 py-1.5"
 							onclick={handleLogout}
 						>
 							<LogOut class="w-4 h-4 mr-2" />

@@ -25,7 +25,7 @@
   } from '$lib/c2pa';
 
   // Props
-  let { open = $bindable(false), supabase } = $props();
+  let { open = $bindable(false), supabase, onUploadComplete } = $props();
 
   let dragOver = $state(false);
   let uploads = $state([]);
@@ -156,6 +156,7 @@
         uploads = uploads.filter(u => (!isVerifiedCapture(u) && !isCaptureUnknown(u)) || u.error);
         if (uploads.length === 0) {
             closeDialog();
+            if (onUploadComplete) onUploadComplete();
         }
     } else {
         error = `Successfully uploaded ${successCount} of ${uploadsToProcess.length} images. Check errors.`;
