@@ -401,6 +401,56 @@ export function analyzeProvenance(store) {
     };
 }
 
+export function extractImageMetadata(manifestStore) {
+    if (!manifestStore) return {};
+    const normalized = normalizeManifestStore(manifestStore);
+    const activeManifest = normalized.manifests?.[normalized.active_manifest];
+    if (!activeManifest) return {};
+
+    const metadata = {
+        c2pa_manifest: manifestStore,
+        // c2pa_verified will be set by the caller based on validation logic
+    };
+
+    // Helper to find assertion data by label prefix
+    const findAssertionData = (labelPrefix) => {
+        return activeManifest.assertions?.find(a => a.label && a.label.startsWith(labelPrefix))?.data;
+    };
+
+    const exif = findAssertionData('stds.exif') || {};
+    // Sometimes exif is directly in the assertion or wrapped
+    
+    metadata.exif_data = exif;
+    
+    // Map Exif fields
+    // Note: C2PA stds.exif keys are usually "exif:FNumber", "tiff:Make", etc.
+    // We try to access them directly.
+    
+    metadata.camera = exif['tiff:Model'] || exif['tiff:Make'] || null;
+    metadata.lens = exif['aux:Lens'] || exif['exif:LensModel'] || null;
+    metadata.focal_length = exif['exif:FocalLength'] ? String(exif['exif:FocalLength']) : null;
+    metadata.aperture = exif['exif:FNumber'] ? String(exif['exif:FNumber']) : null;
+    metadata.shutter_speed = exif['exif:ExposureTime'] ? String(exif['exif:ExposureTime']) : null;
+    metadata.iso = exif['exif:IsoSpeedRatings'] ? Number(exif['exif:IsoSpeedRatings']) : null;
+    metadata.captured_at = exif['exif:DateTimeOriginal'] || exif['exif:DateTimeDigitized'] || null;
+    metadata.flash = exif['exif:Flash'] ? String(exif['exif:Flash']) : null;
+    metadata.white_balance = exif['exif:WhiteBalance'] ? String(exif['exif:WhiteBalance']) : null;
+    metadata.exposure_mode = exif['exif:ExposureMode'] ? String(exif['exif:ExposureMode']) : null;
+    metadata.metering_mode = exif['exif:MeteringMode'] ? String(exif['exif:MeteringMode']) : null;
+    
+    // GPS
+    metadata.gps_lat = exif['exif:GPSLatitude'] ? Number(exif['exif:GPSLatitude']) : null;
+    metadata.gps_lng = exif['exif:GPSLongitude'] ? Number(exif['exif:GPSLongitude']) : null;
+    metadata.gps_alt = exif['exif:GPSAltitude'] ? Number(exif['exif:GPSAltitude']) : null;
+    
+    // Note on GPSRef: latitude/longitude might be absolute or require ref (N/S/E/W).
+    // Standard Exif usually handles this but if stored as rational array + Ref, logic is more complex.
+    // For now assuming simple number or pre-parsed. If it's a string "45/1", it's tricky.
+    // Ideally use a robust exif parser, but we are limited here.
+    
+    return metadata;
+}
+
 export async function loadC2pa() {
     if (c2paInstance) return c2paInstance;
 

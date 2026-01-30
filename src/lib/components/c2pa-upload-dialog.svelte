@@ -18,8 +18,10 @@
     formatActionParameter,
     normalizeManifestStore,
     analyzeProvenance,
-    loadC2pa
+    loadC2pa,
+    extractImageMetadata
   } from '$lib/c2pa';
+  import { supabase } from '$lib/supabaseClient';
 
   // Props
   let { open = $bindable(false) } = $props();
@@ -29,6 +31,7 @@
   let fileInput = $state(null);
   let error = $state(null);
   let selectedUpload = $state(null);
+  let isUploading = $state(false);
 
   // --- Tri-state capture + signature helpers ---
   const hasC2pa = (u) => !!u?.c2pa;
@@ -61,6 +64,86 @@
   let captureUnknownCount = $derived(uploads.filter(isCaptureUnknown).length);
   let softwareSignedCount = $derived(uploads.filter(isSoftwareSignedOnly).length);
   let unverifiedCount = $derived(uploads.filter(isUnverified).length);
+
+  function getImageDimensions(url) {
+    return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.onload = () => resolve({ width: img.naturalWidth, height: img.naturalHeight });
+        img.onerror = reject;
+        img.src = url;
+    });
+  }
+
+  async function handleUpload() {
+    if (isUploading || verifiedCount === 0) return;
+    
+    isUploading = true;
+    error = null;
+    
+    const verifiedUploads = uploads.filter(isVerifiedCapture);
+    let successCount = 0;
+
+    for (const upload of verifiedUploads) {
+        try {
+            upload.processing = true; // Show spinner per item
+            
+            // Get basic dimensions
+            const { width, height } = await getImageDimensions(upload.previewUrl);
+            
+            // Extract detailed metadata
+            const c2paMeta = extractImageMetadata(upload.c2pa?.data);
+            
+            const metadata = {
+                width,
+                height,
+                title: upload.file.name,
+                description: 'Uploaded via Web Interface',
+                
+                // C2PA specific
+                c2pa_manifest: upload.c2pa?.data,
+                c2pa_verified: isVerifiedCapture(upload),
+                
+                // Extracted technical metadata
+                ...c2paMeta
+            };
+
+            const formData = new FormData();
+            formData.append('file', upload.file);
+            formData.append('metadata', JSON.stringify(metadata));
+
+            const { data, error: uploadError } = await supabase.functions.invoke('photo-upload', {
+                body: formData
+            });
+
+            if (uploadError) throw uploadError;
+            
+            // Mark as done or remove from list? 
+            // For now, maybe just show success state.
+            // Let's remove from list to indicate it's processed.
+            // uploads = uploads.filter(u => u.id !== upload.id);
+            // Or keep it but mark as uploaded.
+            successCount++;
+
+        } catch (err) {
+            console.error('Upload failed for', upload.file.name, err);
+            upload.error = 'Upload failed';
+        } finally {
+            upload.processing = false;
+        }
+    }
+
+    isUploading = false;
+    if (successCount === verifiedUploads.length) {
+        // All good, close dialog or clear list?
+        // Let's clear the uploaded ones
+        uploads = uploads.filter(u => !isVerifiedCapture(u) || u.error);
+        if (uploads.length === 0) {
+            closeDialog();
+        }
+    } else {
+        error = `Successfully uploaded ${successCount} of ${verifiedUploads.length} images. Check errors.`;
+    }
+  }
 
   export async function processFiles(fileList) {
     // Open the dialog when external files are processed
@@ -403,7 +486,14 @@
               </div>
 
               {#if verifiedCount > 0}
-                <Button>Upload {verifiedCount} Verified {verifiedCount === 1 ? 'Image' : 'Images'}</Button>
+                <Button onclick={handleUpload} disabled={isUploading}>
+                    {#if isUploading}
+                        <Loader2 class="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                    {:else}
+                        Upload {verifiedCount} Verified {verifiedCount === 1 ? 'Image' : 'Images'}
+                    {/if}
+                </Button>
               {/if}
             </div>
           {/if}
