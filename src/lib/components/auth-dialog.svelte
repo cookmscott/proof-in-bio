@@ -13,49 +13,15 @@
 	let { supabase, open = true, onsuccess, onclose, mode = 'login' } = $props();
 
 	// Internal state
-	let email = $state(''); // Keep email, password, username, display_name as local state
-	let password = $state('');
-	let username = $state('');
-	let display_name = $state('');
-	let isLogin = $state(true);
+	let email = $state('');
 	let loading = $state(false);
 	let error = $state('');
-	let usernameError = $state('');
-
-	// Sync internal isLogin state with prop/store mode
-	$effect(() => {
-		isLogin = mode === 'login';
-	});
-
-	// Username validation regex: lowercase letters, numbers, hyphens only
-	// Cannot start/end with hyphen, no consecutive hyphens, 3-50 chars
-	const usernameRegex = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?$/;
-
-	function validateUsername(value) {
-		if (!value) {
-			usernameError = '';
-			return false;
-		}
-		if (value.length < 3) {
-			usernameError = 'Username must be at least 3 characters';
-			return false;
-		}
-		if (value.length > 50) {
-			usernameError = 'Username must be 50 characters or less';
-			return false;
-		}
-		if (!usernameRegex.test(value)) {
-			usernameError =
-				'Username must be lowercase letters, numbers, and hyphens only (e.g., john-doe-123)';
-			return false;
-		}
-		usernameError = '';
-		return true;
-	}
+	let success = $state(false);
 
 	$effect(() => {
-		if (!isLogin && username) {
-			validateUsername(username);
+		if (!open) {
+			success = false;
+			error = '';
 		}
 	});
 
@@ -63,47 +29,21 @@
 		e.preventDefault();
 		loading = true;
 		error = '';
-
-		// Validate username for signup
-		if (!isLogin && !validateUsername(username)) {
-			loading = false;
-			error = usernameError;
-			return;
-		}
+		success = false;
 
 		try {
-			if (isLogin) {
-				const { error: authError } = await supabase.auth.signInWithPassword({
-					email,
-					password
-				});
-
-				if (authError) {
-					error = authError.message;
-				} else {
-					await invalidateAll(); // Invalidate all data to ensure UI updates with new session info
-					onsuccess?.({ detail: { type: 'login' } });
-					goto('/private');
+			const { error: authError } = await supabase.auth.signInWithOtp({
+				email,
+				options: {
+					emailRedirectTo: `${$page.url.origin}/auth/callback`
 				}
+			});
+
+			if (authError) {
+				error = authError.message;
 			} else {
-				const { error: authError } = await supabase.auth.signUp({
-					email,
-					password,
-					options: {
-						data: {
-							username,
-							display_name
-						}
-					}
-				});
-
-				if (authError) {
-					error = `${authError.message} - Please make sure the database has been reset with the new schema.`;
-				} else {
-					onsuccess?.({ detail: { type: 'signup' } }); // Call external success handler
-					// For signup, usually redirect to confirmation page or show success message
-					error = 'Check your email for a confirmation link!';
-				}
+				success = true;
+				onsuccess?.({ detail: { type: 'magic-link', email } });
 			}
 		} catch {
 			error = 'An unexpected error occurred';
@@ -135,12 +75,9 @@
 		}
 	}
 
-	function toggleMode() {
-		authDialog.set({ open: true, mode: isLogin ? 'signup' : 'login' }); // Update store to change mode
-		error = '';
-	}
-
 	function closeDialog() {
+		success = false;
+		error = '';
 		authDialog.set({ open: false, mode: 'login' }); // Close dialog via store
 	}
 </script>
@@ -170,9 +107,9 @@
 							</button>
 						</div>
 						<div class="flex flex-col items-center text-center">
-							<h1 class="text-2xl font-bold">{isLogin ? 'Welcome back' : 'Create account'}</h1>
+							<h1 class="text-2xl font-bold">Welcome to Proof in Bio</h1>
 							<p class="text-muted-foreground text-balance">
-								{isLogin ? 'Login to your Proof in Bio account' : 'Sign up for Proof in Bio'}
+								{success ? 'Check your email for a magic link!' : 'Enter your email to sign in or create an account'}
 							</p>
 						</div>
 
@@ -182,59 +119,31 @@
 							</div>
 						{/if}
 
-						{#if !isLogin}
-							<div class="grid gap-2">
-								<Label for="username">Username</Label>
-								<Input
-									id="username"
-									name="username"
-									type="text"
-									placeholder="john-doe"
-									bind:value={username}
-									required
-									class={usernameError ? 'border-red-500' : ''}
-								/>
-								{#if usernameError}
-									<p class="text-xs text-red-600">{usernameError}</p>
-								{:else}
-									<p class="text-xs text-muted-foreground">
-										Lowercase letters, numbers, and hyphens only
-									</p>
-								{/if}
+						{#if success}
+							<div class="p-3 text-sm text-green-600 bg-green-50 border border-green-200 rounded-md text-center">
+								We've sent a magic link to <strong>{email}</strong>. 
+								Please check your inbox and click the link to continue.
 							</div>
+							<Button type="button" variant="outline" class="w-full" onclick={() => success = false}>
+								Use a different email
+							</Button>
+						{:else}
 							<div class="grid gap-3">
-								<Label for="display_name">Display Name</Label>
+								<Label for="email">Email</Label>
 								<Input
-									id="display_name"
-									name="display_name"
-									type="text"
-									placeholder="John Doe"
-									bind:value={display_name}
+									id="email"
+									name="email"
+									type="email"
+									placeholder="m@example.com"
+									bind:value={email}
 									required
 								/>
 							</div>
+							<Button type="submit" class="w-full" disabled={loading}>
+								{loading ? 'Sending link...' : 'Send Magic Link'}
+							</Button>
 						{/if}
 
-						<div class="grid gap-3">
-							<Label for="email">Email</Label>
-							<Input
-								id="email"
-								name="email"
-								type="email"
-								placeholder="m@example.com"
-								bind:value={email}
-								required
-							/>
-						</div>
-						<div class="grid gap-3">
-							<div class="flex items-center">
-								<Label for="password">Password</Label>
-							</div>
-							<Input id="password" name="password" type="password" bind:value={password} required />
-						</div>
-						<Button type="submit" class="w-full" disabled={loading}>
-							{loading ? 'Please wait...' : isLogin ? 'Login' : 'Sign Up'}
-						</Button>
 						<div
 							class="after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t"
 						>
@@ -250,7 +159,7 @@
 										fill="currentColor"
 									/>
 								</svg>
-								<span class="sr-only">Login with Apple</span>
+								<span class="sr-only">Continue with Apple</span>
 							</Button>
 							<Button
 								variant="outline"
@@ -265,8 +174,7 @@
 										fill="currentColor"
 									/>
 								</svg>
-								<span class="sr-only">{isLogin ? 'Login with Google' : 'Continue with Google'}</span
-								>
+								<span class="sr-only">Continue with Google</span>
 							</Button>
 							<Button variant="outline" type="button" class="w-full" disabled>
 								<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" class="size-5">
@@ -275,18 +183,8 @@
 										fill="currentColor"
 									/>
 								</svg>
-								<span class="sr-only">Login with Meta</span>
+								<span class="sr-only">Continue with Meta</span>
 							</Button>
-						</div>
-						<div class="text-center text-sm">
-							{isLogin ? "Don't have an account?" : 'Already have an account?'}
-							<button
-								type="button"
-								class="underline underline-offset-4 text-primary"
-								onclick={toggleMode}
-							>
-								{isLogin ? 'Sign up' : 'Login'}
-							</button>
 						</div>
 					</div>
 				</form>

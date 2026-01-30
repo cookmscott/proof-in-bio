@@ -1,8 +1,10 @@
 <script>
 	import { Button } from '$lib/ui/button/index.js';
 	import { Camera, CheckCircle2 } from 'lucide-svelte';
+	import GlobalAvatar from '$lib/components/global-avatar.svelte';
+	import { authDialog } from '$lib/stores/auth';
 
-	export let onAuthRequest = () => {};
+	let { session = null, user = null, supabase = null } = $props();
 </script>
 
 <header class="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-md transition-all">
@@ -19,7 +21,11 @@
 			</a>
 			<div class="flex items-center gap-3">
 				<Button variant="ghost" size="sm" href="#how-it-works">How it Works</Button>
-				<Button size="sm" onclick={onAuthRequest}>Get Started</Button>
+				{#if session}
+					<GlobalAvatar {session} {user} {supabase} />
+				{:else}
+					<Button size="sm" onclick={() => authDialog.set({ open: true, mode: 'login' })}>Login or Sign Up</Button>
+				{/if}
 			</div>
 		</nav>
 	</div>

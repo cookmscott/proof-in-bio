@@ -1,9 +1,16 @@
 <script>
     import * as Drawer from "$lib/ui/drawer/index.js";
-    import { Button } from "$lib/ui/button/index.js";
+    import { Button, buttonVariants } from "$lib/ui/button/index.js";
+    import { cn } from "$lib/utils.js";
     import { X, Share, Copy, Twitter, Facebook, Linkedin, Mail, Check, Share2 } from 'lucide-svelte';
 
-    let { url = "", title = "", description = "" } = $props();
+    let { 
+        url = "", 
+        title = "", 
+        description = "", 
+        label = "Share",
+        class: className = ""
+    } = $props();
 
     let copied = $state(false);
     let currentUrl = $state("");
@@ -27,7 +34,7 @@
     }
 
     function shareToTwitter() {
-        const text = encodeURIComponent(`Check out this photo: ${title}`);
+        const text = encodeURIComponent(`Check out ${title}`);
         const shareUrl = encodeURIComponent(currentUrl);
         window.open(`https://twitter.com/intent/tweet?text=${text}&url=${shareUrl}`, '_blank');
     }
@@ -45,25 +52,23 @@
     }
 
     function shareToEmail() {
-        const subject = encodeURIComponent(`Check out this photo: ${title}`);
-        const body = encodeURIComponent(`I thought you might like this photo:\n\n${currentUrl}`);
+        const subject = encodeURIComponent(`Check out ${title}`);
+        const body = encodeURIComponent(`I thought you might like this:\n\n${currentUrl}`);
         window.open(`mailto:?subject=${subject}&body=${body}`);
     }
 </script>
 
 <Drawer.Root>
-    <Drawer.Trigger>
-        <Button variant="secondary">
-            <Share2 class="mr-2 h-4 w-4" />
-            Share
-        </Button>
+    <Drawer.Trigger class={cn(buttonVariants({ variant: "secondary" }), className)}>
+        <Share2 class="mr-2 h-4 w-4" />
+        {label}
     </Drawer.Trigger>
     <Drawer.Content>
         <div class="mx-auto w-full max-w-sm">
             <Drawer.Header>
-                <Drawer.Title>Share this photo</Drawer.Title>
+                <Drawer.Title>Share {title || 'this content'}</Drawer.Title>
                 <Drawer.Description>
-                    Choose how you'd like to share this amazing photo
+                    {description || "Choose how you'd like to share this"}
                 </Drawer.Description>
             </Drawer.Header>
             
