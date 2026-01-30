@@ -165,6 +165,7 @@ serve(async (req) => {
         c2pa_manifest: metadata.c2pa_manifest,
         c2pa_verified: metadata.c2pa_verified || false,
         c2pa_verified_at: metadata.c2pa_verified ? new Date().toISOString() : null,
+        has_ai: metadata.has_ai || false,
         exif_data: metadata.exif_data,
         camera: metadata.camera,
         lens: metadata.lens,

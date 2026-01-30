@@ -10,7 +10,8 @@
     AlertCircle,
     Image as ImageIcon,
     ChevronDown,
-    X
+    X,
+    Sparkles
   } from 'lucide-svelte';
 
   import {
@@ -19,7 +20,8 @@
     normalizeManifestStore,
     analyzeProvenance,
     loadC2pa,
-    extractImageMetadata
+    extractImageMetadata,
+    isAiAction
   } from '$lib/c2pa';
 
   // Props
@@ -81,7 +83,9 @@
   }
 
   async function handleUpload() {
-    if (isUploading || verifiedCount === 0) return;
+    // Allow upload if we have any Verified OR Capture Unknown images
+    const canUploadCount = verifiedCount + captureUnknownCount;
+    if (isUploading || canUploadCount === 0) return;
     
     // Check if we have a valid session before starting
     const { data: { session } } = await supabase.auth.getSession();
@@ -94,10 +98,11 @@
     isUploading = true;
     error = null;
     
-    const verifiedUploads = uploads.filter(isVerifiedCapture);
+    // Filter for EITHER verified OR capture unknown
+    const uploadsToProcess = uploads.filter(u => isVerifiedCapture(u) || isCaptureUnknown(u));
     let successCount = 0;
 
-    for (const upload of verifiedUploads) {
+    for (const upload of uploadsToProcess) {
         try {
             upload.processing = true; // Show spinner per item
             
@@ -115,6 +120,10 @@
                 
                 // C2PA specific
                 c2pa_manifest: upload.c2pa?.data,
+                // Consider it "verified" if it is fully verified capture, 
+                // but we might want to store 'captureUnknown' state too?
+                // For now, let's keep boolean c2pa_verified as strict (isVerifiedCapture),
+                // but we are allowing the upload.
                 c2pa_verified: isVerifiedCapture(upload),
                 
                 // Extracted technical metadata
@@ -131,11 +140,6 @@
 
             if (uploadError) throw uploadError;
             
-            // Mark as done or remove from list? 
-            // For now, maybe just show success state.
-            // Let's remove from list to indicate it's processed.
-            // uploads = uploads.filter(u => u.id !== upload.id);
-            // Or keep it but mark as uploaded.
             successCount++;
 
         } catch (err) {
@@ -147,15 +151,14 @@
     }
 
     isUploading = false;
-    if (successCount === verifiedUploads.length) {
-        // All good, close dialog or clear list?
-        // Let's clear the uploaded ones
-        uploads = uploads.filter(u => !isVerifiedCapture(u) || u.error);
+    if (successCount === uploadsToProcess.length) {
+        // All good, clear the successfully uploaded ones
+        uploads = uploads.filter(u => (!isVerifiedCapture(u) && !isCaptureUnknown(u)) || u.error);
         if (uploads.length === 0) {
             closeDialog();
         }
     } else {
-        error = `Successfully uploaded ${successCount} of ${verifiedUploads.length} images. Check errors.`;
+        error = `Successfully uploaded ${successCount} of ${uploadsToProcess.length} images. Check errors.`;
     }
   }
 
@@ -417,7 +420,13 @@
               {@const groupedActions = (() => {
                 const groups = {};
                 for (const action of selectedUpload.c2pa.actions || []) {
-                  const category = getActionCategory(action.action);
+                  let category;
+                  if (isAiAction(action)) {
+                     category = { order: 0, label: 'AI Edits', icon: Sparkles };
+                  } else {
+                     category = getActionCategory(action.action);
+                  }
+
                   const key = category.label;
                   if (!groups[key]) groups[key] = { category, actions: [] };
                   groups[key].actions.push(action);
@@ -500,13 +509,14 @@
                 {/if}
               </div>
 
-              {#if verifiedCount > 0}
+              {#if verifiedCount > 0 || captureUnknownCount > 0}
+                {@const totalUploadable = verifiedCount + captureUnknownCount}
                 <Button onclick={handleUpload} disabled={isUploading}>
                     {#if isUploading}
                         <Loader2 class="mr-2 h-4 w-4 animate-spin" />
                         Uploading...
                     {:else}
-                        Upload {verifiedCount} Verified {verifiedCount === 1 ? 'Image' : 'Images'}
+                        Upload {totalUploadable} {totalUploadable === 1 ? 'Image' : 'Images'}
                     {/if}
                 </Button>
               {/if}
