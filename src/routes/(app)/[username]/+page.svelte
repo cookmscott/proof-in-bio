@@ -206,7 +206,7 @@
     </Button>
 </div>
 
-<C2paUploadDialog bind:this={uploadDialogComponent} bind:open={uploadDialogOpen} />
+<C2paUploadDialog bind:this={uploadDialogComponent} bind:open={uploadDialogOpen} supabase={data.supabase} />
 
 <style>
     @keyframes expand-btn {

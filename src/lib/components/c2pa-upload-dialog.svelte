@@ -21,10 +21,9 @@
     loadC2pa,
     extractImageMetadata
   } from '$lib/c2pa';
-  import { supabase } from '$lib/supabaseClient';
 
   // Props
-  let { open = $bindable(false) } = $props();
+  let { open = $bindable(false), supabase } = $props();
 
   let dragOver = $state(false);
   let uploads = $state([]);
@@ -65,6 +64,13 @@
   let softwareSignedCount = $derived(uploads.filter(isSoftwareSignedOnly).length);
   let unverifiedCount = $derived(uploads.filter(isUnverified).length);
 
+  $effect(() => {
+    supabase.auth.getSession().then(({ data }) => {
+        console.log("Current Session:", data.session); 
+        // If this is null, your UI needs to force a login first.
+    });
+  });
+
   function getImageDimensions(url) {
     return new Promise((resolve, reject) => {
         const img = new Image();
@@ -77,6 +83,14 @@
   async function handleUpload() {
     if (isUploading || verifiedCount === 0) return;
     
+    // Check if we have a valid session before starting
+    const { data: { session } } = await supabase.auth.getSession();
+    
+    if (!session) {
+      error = "You must be logged in to upload photos.";
+      return;
+    }
+
     isUploading = true;
     error = null;
     

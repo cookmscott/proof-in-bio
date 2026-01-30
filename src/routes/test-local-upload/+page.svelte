@@ -19,6 +19,7 @@
     analyzeProvenance,
     loadC2pa
   } from '$lib/c2pa';
+  import { supabase } from '$lib/supabase';
 
   let dragOver = $state(false);
   let uploads = $state([]);
@@ -177,6 +178,45 @@
 
   function triggerFileInput() {
     fileInput?.click();
+  }
+
+  async function handleUpload() {
+    const verifiedUploads = uploads.filter(isVerifiedCapture);
+    if (verifiedUploads.length === 0) return;
+
+    const { data: { session }, error: sessErr } = await supabase.auth.getSession();
+    if (sessErr) {
+      error = sessErr.message;
+      return;
+    }
+    if (!session?.access_token) {
+      error = "Not logged in / no access token";
+      return;
+    }
+
+    console.log("access token (first 20 chars):", session.access_token.slice(0, 20));
+    console.log("looks like JWT:", session.access_token.split(".").length === 3);
+
+    for (const upload of verifiedUploads) {
+      const formData = new FormData();
+      formData.append('file', upload.file);
+      // Minimal metadata for now
+      formData.append('metadata', JSON.stringify({ title: upload.file.name }));
+
+      try {
+        const { data, error: uploadError } = await supabase.functions.invoke("photo-upload", {
+          body: formData,
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        });
+
+        if (uploadError) throw uploadError;
+      } catch (err) {
+        console.error("Upload failed", err);
+        upload.error = err.message;
+      }
+    }
   }
 </script>
 
@@ -382,7 +422,7 @@
           </div>
 
           {#if verifiedCount > 0}
-            <Button>Upload {verifiedCount} Verified {verifiedCount === 1 ? 'Image' : 'Images'}</Button>
+            <Button onclick={handleUpload}>Upload {verifiedCount} Verified {verifiedCount === 1 ? 'Image' : 'Images'}</Button>
           {/if}
         </div>
       {/if}

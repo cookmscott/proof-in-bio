@@ -5,6 +5,19 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
+}
+
+function decodeJwtPayload(token: string) {
+  const parts = token.split(".");
+  if (parts.length !== 3) return null;
+  try {
+    const payload = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+    const json = atob(payload);
+    return JSON.parse(json);
+  } catch (e) {
+    return null;
+  }
 }
 
 serve(async (req) => {
@@ -13,51 +26,116 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    console.log("hit", req.method, req.headers.get("content-type"), req.headers.get("content-length"));
 
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) throw new Error('Missing Authorization header')
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+    const anonKey = Deno.env.get('SUPABASE_ANON_KEY')
 
-    const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
-    if (authError || !user) throw new Error('Unauthorized')
+    if (!supabaseUrl || !serviceRoleKey || !anonKey) {
+      throw new Error('Missing Supabase configuration')
+    }
 
+    // Service role client for privileged operations (Storage/DB)
+    const supabase = createClient(supabaseUrl, serviceRoleKey, {
+      global: {
+        fetch: (input, init) =>
+          fetch(input, { ...init, signal: AbortSignal.timeout(20_000) }),
+      },
+      auth: { persistSession: false, autoRefreshToken: false },
+    })
+
+    const authHeader = req.headers.get('Authorization') ?? ''
+    console.log("authHeader starts:", authHeader.slice(0, 30));
+
+    const m = authHeader.match(/^Bearer\s+(.+)$/i)
+    
+    if (!m) {
+      return new Response(
+        JSON.stringify({ error: 'Missing Bearer token' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    const token = m[1]
+    console.log("token dot count:", token.split(".").length - 1);
+
+    const payload = decodeJwtPayload(token);
+    console.log("token payload keys:", payload ? Object.keys(payload) : "not a JWT");
+    console.log("token sub:", payload?.sub);
+    console.log("token iss:", payload?.iss);
+
+    // Anon client for user validation
+    const supabaseAuth = createClient(supabaseUrl, anonKey, {
+        global: { headers: { Authorization: `Bearer ${token}` } },
+        auth: { persistSession: false, autoRefreshToken: false },
+    })
+
+    console.log("before getUser", { tokenLen: token.length });
+    const { data: { user }, error: authError } = await supabaseAuth.auth.getUser()
+    console.log("after getUser", {
+        hasUser: !!user,
+        authError: authError?.message,
+    });
+
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
+
+    console.log("before formData");
     const formData = await req.formData()
-    const file = formData.get('file') as File
-    const metadataStr = formData.get('metadata') as string
+    console.log("after formData");
+    const file = formData.get('file')
+    const metadataEntry = formData.get('metadata')
     
-    if (!file) throw new Error('No file uploaded')
+    if (!file || !(file instanceof File)) {
+      throw new Error('No file uploaded')
+    }
     
-    const metadata = metadataStr ? JSON.parse(metadataStr) : {}
+    let metadata = {}
+    if (typeof metadataEntry === 'string' && metadataEntry.length > 0) {
+      try {
+        metadata = JSON.parse(metadataEntry)
+      } catch (parseError) {
+        throw new Error('Invalid metadata JSON')
+      }
+    }
 
     // Upload to Storage
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const fileName = `${user.id}/${crypto.randomUUID()}.${fileExt}`
     
+    console.log("before upload", file.size, file.type);
     const { data: storageData, error: storageError } = await supabase.storage
       .from('photos')
       .upload(fileName, file, {
-        contentType: file.type,
+        contentType: file.type || 'application/octet-stream',
         upsert: false
       })
 
+    console.log("after upload");
     if (storageError) throw storageError
 
     const { data: { publicUrl } } = supabase.storage
       .from('photos')
       .getPublicUrl(fileName)
 
+    const width = Number(metadata.width) || 0
+    const height = Number(metadata.height) || 0
+
     // Insert Photo
+    console.log("before photos insert");
     const { data: photo, error: photoError } = await supabase
       .from('photos')
       .insert({
         user_id: user.id,
         storage_url: publicUrl,
-        storage_key: fileName,
-        width: metadata.width || 0,
-        height: metadata.height || 0,
+        storage_key: storageData?.path ?? fileName,
+        width,
+        height,
         title: metadata.title || file.name,
         description: metadata.description,
         is_public: true,
@@ -69,6 +147,7 @@ serve(async (req) => {
       .select()
       .single()
 
+    console.log("after photos insert", photo?.id);
     if (photoError) {
         // Cleanup storage if db fails
         await supabase.storage.from('photos').remove([fileName])
@@ -76,6 +155,7 @@ serve(async (req) => {
     }
 
     // Insert Metadata
+    console.log("before metadata insert");
     const { error: metaError } = await supabase
       .from('photos_metadata')
       .insert({
@@ -125,6 +205,7 @@ serve(async (req) => {
         focus_mode: metadata.focus_mode
       })
 
+    console.log("after metadata insert");
     if (metaError) {
         console.error('Metadata insert failed', metaError)
         // Optionally delete photo or ignore? For now we just log and return error
