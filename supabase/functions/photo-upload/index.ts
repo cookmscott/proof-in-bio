@@ -5,6 +5,7 @@ import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'Access-Control-Allow-Methods': 'POST, OPTIONS',
 }
 
 serve(async (req) => {
@@ -13,33 +14,57 @@ serve(async (req) => {
   }
 
   try {
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')
+    const serviceRoleKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')
+
+    if (!supabaseUrl || !serviceRoleKey) {
+      throw new Error('Missing Supabase configuration')
+    }
+
+    const supabase = createClient(supabaseUrl, serviceRoleKey)
 
     const authHeader = req.headers.get('Authorization')
-    if (!authHeader) throw new Error('Missing Authorization header')
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Missing Authorization header' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const { data: { user }, error: authError } = await supabase.auth.getUser(authHeader.replace('Bearer ', ''))
-    if (authError || !user) throw new Error('Unauthorized')
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      )
+    }
 
     const formData = await req.formData()
-    const file = formData.get('file') as File
-    const metadataStr = formData.get('metadata') as string
+    const file = formData.get('file')
+    const metadataEntry = formData.get('metadata')
     
-    if (!file) throw new Error('No file uploaded')
+    if (!file || !(file instanceof File)) {
+      throw new Error('No file uploaded')
+    }
     
-    const metadata = metadataStr ? JSON.parse(metadataStr) : {}
+    let metadata = {}
+    if (typeof metadataEntry === 'string' && metadataEntry.length > 0) {
+      try {
+        metadata = JSON.parse(metadataEntry)
+      } catch (parseError) {
+        throw new Error('Invalid metadata JSON')
+      }
+    }
 
     // Upload to Storage
     const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
     const fileName = `${user.id}/${crypto.randomUUID()}.${fileExt}`
+    const fileBuffer = new Uint8Array(await file.arrayBuffer())
     
     const { data: storageData, error: storageError } = await supabase.storage
       .from('photos')
-      .upload(fileName, file, {
-        contentType: file.type,
+      .upload(fileName, fileBuffer, {
+        contentType: file.type || 'application/octet-stream',
         upsert: false
       })
 
@@ -49,15 +74,18 @@ serve(async (req) => {
       .from('photos')
       .getPublicUrl(fileName)
 
+    const width = Number(metadata.width) || 0
+    const height = Number(metadata.height) || 0
+
     // Insert Photo
     const { data: photo, error: photoError } = await supabase
       .from('photos')
       .insert({
         user_id: user.id,
         storage_url: publicUrl,
-        storage_key: fileName,
-        width: metadata.width || 0,
-        height: metadata.height || 0,
+        storage_key: storageData?.path ?? fileName,
+        width,
+        height,
         title: metadata.title || file.name,
         description: metadata.description,
         is_public: true,
