@@ -77,6 +77,16 @@
 			loaded = Array(photos.length).fill(false);
 		}
 	});
+
+    function getPhotoUrl(photo) {
+        if (photo.storage_key) {
+            const { data: urlData } = data.supabase.storage
+                .from('photos')
+                .getPublicUrl(photo.storage_key);
+            return urlData.publicUrl;
+        }
+        return photo.storage_url;
+    }
 </script>
 
 <svelte:window 
@@ -203,7 +213,7 @@
                                     <Skeleton class="h-full w-full absolute" />
                                 {/if}
                                 <img
-									src={photo.storage_url}
+									src={getPhotoUrl(photo)}
 									alt={photo.title || 'User photo'}
                                     class="h-full w-full object-cover rounded-sm transition-opacity duration-300"
                                     style="opacity: {loaded[i] ? 1 : 0};"

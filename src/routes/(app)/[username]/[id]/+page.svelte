@@ -97,6 +97,16 @@
         const i = Math.floor(Math.log(bytes) / Math.log(k));
         return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
     }
+
+    function getPhotoUrl(photo) {
+        if (photo.storage_key) {
+            const { data: urlData } = data.supabase.storage
+                .from('photos')
+                .getPublicUrl(photo.storage_key);
+            return urlData.publicUrl;
+        }
+        return photo.storage_url;
+    }
 </script>
 
 <div class="container mx-auto my-6 px-4 md:px-6">
@@ -110,7 +120,7 @@
         <div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">
             <div class="flex-1 min-w-0">
                 <img
-                    src={photo.storage_url}
+                    src={getPhotoUrl(photo)}
                     alt={photo.title ?? `Photo by ${photo.user.display_name}`}
                     class="w-full rounded-lg"                    
                 />

@@ -34,7 +34,7 @@ export async function load({ params, locals: { supabase } }) {
 	// Fetch the user's photos
 	const { data: photos, error: photosError } = await supabase
 		.from('photos')
-		.select('id, storage_url, title, description, width, height')
+		.select('id, storage_url, storage_key, title, description, width, height')
 		.eq('user_id', profile.id)
 		.eq('is_public', true)
 		.eq('is_archived', false)
