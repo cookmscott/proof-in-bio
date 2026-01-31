@@ -1,4 +1,5 @@
 <script>
+	import { goto } from '$app/navigation';
 	import { Button } from '$lib/ui/button/index.js';
 	import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '$lib/ui/card/index.js';
 	import { LogOut, Shield } from 'lucide-svelte';
@@ -7,6 +8,7 @@
 
 	async function signOut() {
 		await data.supabase.auth.signOut();
+		goto('/');
 	}
 </script>
 

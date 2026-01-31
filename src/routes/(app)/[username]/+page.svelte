@@ -68,15 +68,11 @@
 	// Extract interests from the nested structure
 	let interests = $derived(profile.interests.map((i) => i.interest));
 
-	// Track loaded state for each image in the gallery
-	let loaded = $state(Array(photos.length).fill(false));
+	// Track loaded state for each image in the gallery using an object map
+	let loaded = $state({});
 
-	// Reset loaded state if photos array changes
-	$effect(() => {
-		if (photos.length !== loaded.length) {
-			loaded = Array(photos.length).fill(false);
-		}
-	});
+    // No need to reset loaded state on length change anymore, as we key by ID.
+    // New photos will simply not be in the map yet (undefined -> falsy).
 
     function getPhotoUrl(photo) {
         if (photo.storage_key) {
@@ -87,6 +83,18 @@
         }
         return photo.storage_url;
     }
+
+    let showCopiedTooltip = $state(false);
+    let copyTimeout;
+
+    function copyUsername() {
+        navigator.clipboard.writeText(`@${profile.username}`);
+        showCopiedTooltip = true;
+        if (copyTimeout) clearTimeout(copyTimeout);
+        copyTimeout = setTimeout(() => {
+            showCopiedTooltip = false;
+        }, 2000);
+    }
 </script>
 
 <svelte:window 
@@ -96,7 +104,7 @@
     ondragleave={handleWindowDragLeave}
 />
 
-{#if isDragging}
+{#if isDragging && !uploadDialogOpen}
     <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-background/20 backdrop-blur-sm pointer-events-none">
         
         <div class="bg-background/40 backdrop-blur-xl border-2 border-dashed border-primary/50 p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-4 animate-in zoom-in-95 duration-200 ring-1 ring-white/10">
@@ -155,7 +163,19 @@
                         <h1 class="text-xl font-bold tracking-tight leading-tight sm:text-3xl">
                             {profile.display_name || profile.username}
                         </h1>
-                        <p class="text-muted-foreground text-sm sm:text-base">@{profile.username}</p>
+                        <button 
+                            class="text-muted-foreground text-sm sm:text-base hover:text-foreground transition-colors relative cursor-pointer"
+                            onclick={copyUsername}
+                            type="button"
+                            title="Click to copy username"
+                        >
+                            @{profile.username}
+                            {#if showCopiedTooltip}
+                                <span class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-md whitespace-nowrap z-50 animate-in fade-in zoom-in-95 duration-200 shadow-md">
+                                    Copied to clipboard
+                                </span>
+                            {/if}
+                        </button>
                         <p class="mt-2 max-w-xl text-balance text-sm sm:text-base">{profile.bio}</p>
                         <div class="mt-3 flex flex-wrap gap-2">
                             {#each interests as interest}
@@ -209,15 +229,15 @@
 					<a href={`/${profile.username}/${photo.id}`} class="group">
                         <Card class="overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1">
                             <AspectRatio ratio={1} class="bg-slate-100 dark:bg-slate-800 rounded-sm relative">
-                                {#if !loaded[i]}
+                                {#if !loaded[photo.id]}
                                     <Skeleton class="h-full w-full absolute" />
                                 {/if}
                                 <img
 									src={getPhotoUrl(photo)}
 									alt={photo.title || 'User photo'}
                                     class="h-full w-full object-cover rounded-sm transition-opacity duration-300"
-                                    style="opacity: {loaded[i] ? 1 : 0};"
-                                    onload={() => loaded[i] = true}
+                                    style="opacity: {loaded[photo.id] ? 1 : 0};"
+                                    onload={() => loaded[photo.id] = true}
                                 />
                             </AspectRatio>
                         </Card>
@@ -228,19 +248,21 @@
     </div>
 
     <!-- Fixed "Add Images" Button -->
-    <Button 
-        style="z-index: 999" 
-        class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn"
-        onclick={openUploadDialog}
-    >
-        <span class="flex items-center">
-            <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon" />
-            <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text">
-                Add Images
+    {#if canEdit}
+        <Button 
+            style="z-index: 999" 
+            class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn"
+            onclick={openUploadDialog}
+        >
+            <span class="flex items-center">
+                <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon" />
+                <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text">
+                    Add Images
+                </span>
             </span>
-        </span>
-        <span class="sr-only">Add Images</span>
-    </Button>
+            <span class="sr-only">Add Images</span>
+        </Button>
+    {/if}
 </div>
 
 <C2paUploadDialog 

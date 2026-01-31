@@ -362,7 +362,7 @@
                   <img src={upload.previewUrl} alt={upload.file.name} class="w-full h-full object-cover" />
 
                   {#if upload.processing}
-                    <div class="absolute inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm">
+                    <div class="absolute rounded-lg inset-0 flex items-center justify-center bg-background/50 backdrop-blur-sm">
                       <Loader2 class="h-8 w-8 animate-spin text-primary" />
                     </div>
 
@@ -476,7 +476,7 @@
               </div>
             {/if}
 
-            <div class="flex items-center justify-between pt-6 border-t">
+            <div class="flex flex-col-reverse items-stretch gap-4 pt-6 border-t md:flex-row md:items-center md:justify-between">
               <div class="flex-1 space-y-1.5">
                 <div class="flex gap-4 text-sm font-medium flex-wrap">
                   <span class="flex items-center gap-1.5">
@@ -512,7 +512,7 @@
 
               {#if verifiedCount > 0 || captureUnknownCount > 0}
                 {@const totalUploadable = verifiedCount + captureUnknownCount}
-                <Button onclick={handleUpload} disabled={isUploading}>
+                <Button onclick={handleUpload} disabled={isUploading} class="w-full md:w-auto">
                     {#if isUploading}
                         <Loader2 class="mr-2 h-4 w-4 animate-spin" />
                         Uploading...

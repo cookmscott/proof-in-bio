@@ -1,8 +1,19 @@
 <script>
 	import { Button } from '$lib/ui/button/index.js';
 	import { ArrowRight } from 'lucide-svelte';
+	import { page } from '$app/stores';
+	import { goto } from '$app/navigation';
 
 	export let onAuthRequest = () => {};
+
+	function handleCtaClick() {
+		if ($page.data.session) {
+			const username = $page.data.session.user?.user_metadata?.username;
+			goto(username ? `/${username}` : '/profile');
+		} else {
+			onAuthRequest();
+		}
+	}
 </script>
 
 <div class="container mx-auto max-w-7xl px-6">
@@ -24,7 +35,7 @@
 						anywhere.
 					</p>
 					<div class="flex justify-center md:justify-start gap-4 pt-4">
-						<Button size="lg" class="group text-white" onclick={onAuthRequest}>
+						<Button size="lg" class="group text-white" onclick={handleCtaClick}>
 							Create Your Gallery
 							<ArrowRight
 								class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1"
