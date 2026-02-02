@@ -1,0 +1,237 @@
+import React, { useState } from 'react';
+import { Camera, CheckCircle2, ArrowRight, Eye, Heart, Share2, Grid3X3, Aperture, Layers, Image as ImageIcon, User, ShieldCheck } from 'lucide-react';
+
+const App = () => {
+  return (
+    <div className="min-h-screen bg-[#0a0a0a] text-zinc-100 font-sans selection:bg-orange-500 selection:text-white pb-20">
+      {/* Navigation */}
+      <nav className="flex items-center justify-between px-6 py-6 max-w-7xl mx-auto">
+        <div className="flex items-center gap-2">
+          <Camera className="w-6 h-6 text-white" />
+          <span className="font-bold text-lg tracking-tight">ProofInBio</span>
+        </div>
+        <div className="flex items-center gap-6">
+          <a href="#" className="text-sm font-medium hover:text-white text-zinc-400 transition-colors">How it Works</a>
+          <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-orange-400 to-red-500 border border-zinc-800"></div>
+        </div>
+      </nav>
+
+      <main className="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        {/* Hero Concept - The "Anchor" Design */}
+        <section className="mb-20">
+          <div className="w-full rounded-[2.5rem] overflow-hidden flex flex-col lg:flex-row min-h-[500px]">
+            {/* Left Content */}
+            <div className="bg-[#FFF9EE] text-zinc-900 p-10 lg:p-16 lg:w-1/2 flex flex-col justify-center">
+              <span className="text-xs font-bold tracking-widest text-zinc-500 uppercase mb-6">For Human Creators</span>
+              <h1 className="text-5xl lg:text-7xl font-bold leading-[0.95] tracking-tight mb-8">
+                Made by people, <br />
+                not prompts.
+              </h1>
+              <p className="text-lg text-zinc-600 mb-10 max-w-md leading-relaxed">
+                Upload real work. We verify its origin and create a verified gallery you can share anywhere.
+              </p>
+              <button className="bg-[#FF5D00] hover:bg-[#ff7b2e] transition-colors text-white font-bold py-4 px-8 rounded-xl w-fit flex items-center gap-2">
+                Create Your Verified Gallery
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Right Image */}
+            <div className="lg:w-1/2 relative bg-zinc-800">
+               <img 
+                src="https://images.unsplash.com/photo-1520529986990-2725fa40d6bc?q=80&w=2146&auto=format&fit=crop" 
+                alt="Photographers" 
+                className="w-full h-full object-cover opacity-90"
+              />
+              <div className="absolute top-8 right-8">
+                <div className="bg-[#00D165] text-white p-2 rounded-full shadow-lg">
+                  <CheckCircle2 className="w-8 h-8" />
+                </div>
+              </div>
+              <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-10 pt-32">
+                 <div className="border-l-2 border-[#00D165] pl-4">
+                    <span className="text-[#00D165] text-xs font-bold tracking-widest uppercase block mb-1">Verified</span>
+                    <h3 className="text-2xl font-bold text-white">Mathias Reding</h3>
+                    <p className="text-zinc-400 text-sm">Photographer</p>
+                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Section Header */}
+        <div className="mb-12 flex items-end justify-between">
+          <div>
+            <h2 className="text-3xl font-bold mb-2">Tile Permutations</h2>
+            <p className="text-zinc-400">Exploring multi-box layouts within soft containers.</p>
+          </div>
+          <div className="hidden md:flex gap-2">
+            <button className="p-2 rounded-full border border-zinc-800 hover:bg-zinc-800 transition"><Grid3X3 className="w-5 h-5" /></button>
+            <button className="p-2 rounded-full border border-zinc-800 hover:bg-zinc-800 transition"><Layers className="w-5 h-5" /></button>
+          </div>
+        </div>
+
+        {/* The Grid of Permutations */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+          {/* Card 1: The "Vertical Stack" (3 segments) */}
+          {/* Inspired by the color blocks in your second image */}
+          <div className="bg-zinc-900 rounded-[2rem] overflow-hidden aspect-[4/5] flex flex-col group cursor-pointer hover:ring-2 hover:ring-zinc-700 transition-all">
+            {/* Top: Image */}
+            <div className="h-[45%] bg-zinc-800 relative">
+               <img src="https://images.unsplash.com/photo-1616401784845-180882ba9ba8?q=80&w=2070&auto=format&fit=crop" className="w-full h-full object-cover" alt="Art" />
+               <div className="absolute top-4 left-4 bg-black/50 backdrop-blur-md px-3 py-1 rounded-full text-xs font-medium">Recent Work</div>
+            </div>
+            {/* Middle: Color Block Info */}
+            <div className="h-[20%] bg-[#78444E] flex items-center justify-between px-6 text-white/90">
+               <span className="text-sm font-medium tracking-wide">Analogue Series</span>
+               <ArrowRight className="w-5 h-5 opacity-50 group-hover:translate-x-1 transition-transform" />
+            </div>
+            {/* Bottom: Description */}
+            <div className="flex-1 bg-[#FFF9EE] p-6 text-zinc-900 flex flex-col justify-between">
+               <p className="font-medium text-lg leading-snug">Shot on 35mm film in Tokyo, capturing the neon silence.</p>
+               <div className="flex gap-2 text-xs font-bold uppercase tracking-wider text-zinc-400">
+                  <span>24 Photos</span> • <span>Fujifilm</span>
+               </div>
+            </div>
+          </div>
+
+          {/* Card 2: The "Asymmetric Split" (Left Vertical, Right Stacked) */}
+          <div className="bg-zinc-900 rounded-[2rem] overflow-hidden aspect-[4/5] grid grid-cols-2">
+            {/* Left Column */}
+            <div className="bg-[#4E7A52] p-6 flex flex-col justify-between text-[#E8F3E9]">
+               <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center mb-4">
+                 <ShieldCheck className="w-5 h-5" />
+               </div>
+               <div>
+                  <h3 className="text-2xl font-bold mb-2">Verified Human</h3>
+                  <p className="text-sm opacity-80 leading-relaxed">This portfolio has been cryptographically signed to prove human origin.</p>
+               </div>
+               <div className="mt-4 pt-4 border-t border-white/10">
+                  <span className="text-xs uppercase opacity-60">ID: 8829-AF</span>
+               </div>
+            </div>
+            {/* Right Column Stack */}
+            <div className="flex flex-col">
+               <div className="h-1/2 bg-[#FCD378] p-5 flex flex-col justify-center text-zinc-900">
+                  <span className="text-3xl font-bold">98%</span>
+                  <span className="text-xs font-bold uppercase opacity-60">Trust Score</span>
+               </div>
+               <div className="h-1/2 bg-[#2A2A2A] p-5 flex flex-col justify-center relative overflow-hidden">
+                  <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')]"></div>
+                  <span className="text-white relative z-10 font-medium">View Certificate</span>
+               </div>
+            </div>
+          </div>
+
+          {/* Card 3: The "Banner Stack" (Horizontal Strips) */}
+          <div className="bg-zinc-900 rounded-[2rem] overflow-hidden aspect-[4/5] flex flex-col">
+            {/* Strip 1 */}
+            <div className="h-1/3 bg-[#FFF9EE] flex items-center p-6 gap-4">
+               <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?q=80&w=1000&auto=format&fit=crop" className="w-14 h-14 rounded-full object-cover border-2 border-white shadow-sm" alt="Avatar" />
+               <div>
+                  <h4 className="font-bold text-zinc-900">Sarah Jenks</h4>
+                  <p className="text-xs text-zinc-500 font-medium uppercase tracking-wide">Visual Artist</p>
+               </div>
+            </div>
+            {/* Strip 2 */}
+            <div className="h-1/3 bg-[#7A6E4E] flex items-center justify-center p-6 text-[#FFF9EE]">
+               <div className="flex gap-8 text-center">
+                  <div>
+                    <div className="text-xl font-bold">12k</div>
+                    <div className="text-[10px] uppercase opacity-60">Views</div>
+                  </div>
+                  <div className="w-px bg-white/20"></div>
+                  <div>
+                    <div className="text-xl font-bold">842</div>
+                    <div className="text-[10px] uppercase opacity-60">Sales</div>
+                  </div>
+               </div>
+            </div>
+            {/* Strip 3 */}
+            <div className="h-1/3 bg-zinc-800 p-6 flex items-center justify-between group cursor-pointer hover:bg-zinc-750 transition-colors">
+               <span className="font-medium text-zinc-300">Contact Me</span>
+               <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-[#FF5D00] group-hover:text-white transition-all">
+                  <ArrowRight className="w-5 h-5" />
+               </div>
+            </div>
+          </div>
+
+          {/* Card 4: The "Mosaic" (4 quadrants) */}
+          <div className="bg-zinc-900 rounded-[2rem] overflow-hidden aspect-[4/5] grid grid-cols-2 grid-rows-2 gap-[1px] bg-zinc-900 border border-zinc-900">
+             <div className="bg-[#FFF9EE] p-5 flex flex-col justify-end">
+                <ImageIcon className="w-6 h-6 text-orange-500 mb-2" />
+                <span className="text-zinc-900 font-bold text-sm">Gallery</span>
+             </div>
+             <div className="bg-[#FFF9EE] relative">
+                <img src="https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" />
+             </div>
+             <div className="bg-[#FFF9EE] relative">
+                <img src="https://images.unsplash.com/photo-1550684848-fac1c5b4e853?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" />
+             </div>
+             <div className="bg-[#78444E] p-5 flex flex-col justify-center items-center text-center">
+                <span className="text-white font-bold text-2xl">+42</span>
+                <span className="text-white/60 text-xs uppercase mt-1">More Shots</span>
+             </div>
+          </div>
+
+          {/* Card 5: The "Portrait Main" (Right split horizontal) */}
+          <div className="bg-zinc-900 rounded-[2rem] overflow-hidden aspect-[4/5] grid grid-cols-[1.5fr_1fr]">
+             {/* Left Main */}
+             <div className="relative">
+                <img src="https://images.unsplash.com/photo-1542038784456-1ea0e93ca64b?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 w-full bg-gradient-to-t from-black/80 to-transparent p-6">
+                   <h3 className="text-white font-bold">Nature <br/> Collection</h3>
+                </div>
+             </div>
+             {/* Right Split */}
+             <div className="flex flex-col">
+                <div className="flex-1 bg-[#FCD378] p-4 flex items-center justify-center">
+                   <Heart className="w-6 h-6 text-[#7A6E4E]" />
+                </div>
+                <div className="flex-1 bg-[#FFF9EE] p-4 flex items-center justify-center">
+                   <Share2 className="w-6 h-6 text-zinc-800" />
+                </div>
+                <div className="flex-[2] bg-[#7A6E4E] p-4 flex flex-col items-center justify-center text-[#FFF9EE] text-center">
+                   <span className="text-xs font-bold uppercase mb-1">Price</span>
+                   <span className="text-xl font-bold">$299</span>
+                </div>
+             </div>
+          </div>
+
+           {/* Card 6: The "Soft Stack" (3 floating pills inside) */}
+           {/* Closest to your reference image #2 style */}
+           <div className="bg-[#1A1A1A] rounded-[2rem] p-4 aspect-[4/5] flex flex-col gap-4">
+              <div className="flex-1 bg-[#4E7A52] rounded-[1.5rem] flex items-center px-6 relative overflow-hidden">
+                 <div className="relative z-10">
+                   <h3 className="text-[#E8F3E9] font-bold text-xl">Workshops</h3>
+                   <p className="text-[#E8F3E9]/70 text-sm mt-1">Join the masterclass</p>
+                 </div>
+                 <div className="absolute right-[-20px] top-1/2 -translate-y-1/2 w-24 h-24 rounded-full bg-white/10 blur-xl"></div>
+              </div>
+              
+              <div className="flex-[2] flex gap-4">
+                 <div className="flex-1 bg-[#78444E] rounded-[1.5rem] flex flex-col items-center justify-center text-[#FFD1DA]">
+                    <User className="w-8 h-8 mb-2" />
+                    <span className="font-bold">About</span>
+                 </div>
+                 <div className="flex-1 bg-[#FFF9EE] rounded-[1.5rem] overflow-hidden relative group">
+                    <img src="https://images.unsplash.com/photo-1515405295579-ba7b45403062?q=80&w=1000&auto=format&fit=crop" className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
+                 </div>
+              </div>
+
+               <div className="h-16 bg-[#FF5D00] rounded-[1.5rem] flex items-center justify-between px-6 text-white cursor-pointer hover:bg-[#ff7b2e] transition-colors">
+                  <span className="font-bold">Book Now</span>
+                  <ArrowRight className="w-5 h-5" />
+               </div>
+           </div>
+
+        </div>
+
+      </main>
+    </div>
+  );
+};
+
+export default App;

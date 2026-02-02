@@ -80,92 +80,85 @@
 	});
 </script>
 
-<section class="py-24 bg-muted/30 overflow-hidden">
+<section class="py-24 bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 overflow-hidden font-sans selection:bg-orange-500 selection:text-white">
 	<div class="container mx-auto px-4 md:px-6">
-		<div class="flex flex-col items-center text-center mb-16 space-y-4">
-			<h2 class="mt-4 text-3xl md:text-4xl font-bold text-foreground">
-				Reality Check
+		<div class="flex flex-col items-center text-center mb-20 space-y-6">
+			<span class="text-xs font-bold tracking-widest text-zinc-500 uppercase">Reality Check</span>
+			<h2 class="text-4xl md:text-6xl font-bold leading-[0.95] tracking-tight">
+				Real vs. <span class="text-red-500">Fake</span>
 			</h2>
-			<p class="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-				In a world of filters and AI, knowing what's real matters more than ever.
+			<p class="mx-auto max-w-[600px] text-zinc-500 dark:text-zinc-400 text-lg leading-relaxed">
+				In a world of prompts, knowing the origin matters.
 			</p>
 		</div>
 
 		<div class="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start max-w-5xl mx-auto justify-items-center">
 			
 			<!-- The "Other" App (Instagram Style) -->
-			<div class="relative group w-full max-w-[340px]">
+			<div class="relative group w-full max-w-[360px]">
+				<div class="text-center mb-8">
+					<h3 class="text-xl font-bold mb-2 text-red-500">Unverified</h3>
+					<p class="text-sm text-zinc-500 dark:text-zinc-400">Is it real? Is it AI? Who knows.</p>
+				</div>
 				<!-- Thinking Cat (Always suspicious) -->
 				<div class="absolute -top-24 -left-4 z-30 animate-bounce-subtle pointer-events-none">
 					<img src="/landing/cat_think.gif" alt="Thinking Cat" class="w-28 h-28 object-contain drop-shadow-xl" />
-					<div class="absolute right-0 -top-2 bg-white dark:bg-black text-foreground text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 transform rotate-12">
+					<div class="absolute right-0 -top-2 bg-[#FFF9EE] dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform rotate-12">
 						Is this real? 🤔
 					</div>
 				</div>
 
-				<div class="absolute -inset-4 bg-gradient-to-tr from-red-500/20 to-purple-500/20 blur-xl opacity-50 rounded-[3rem]"></div>
-				<div class="relative bg-white dark:bg-black border-4 border-gray-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl h-[650px] flex flex-col">
-					<!-- Fake Phone Status Bar -->
-					<div class="h-6 w-full flex justify-between items-center px-6 mt-2 text-[10px] font-medium opacity-50">
-						<span>9:41</span>
-						<div class="flex gap-1">
-							<div class="w-4 h-2.5 bg-current rounded-[1px]"></div>
-							<div class="w-0.5 h-2.5 bg-current rounded-[1px]"></div>
-						</div>
-					</div>
-
+				<div class="relative bg-[#FFF9EE] dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden h-[680px] flex flex-col shadow-2xl border-4 border-zinc-200 dark:border-zinc-800">
 					<!-- App Header -->
-					<div class="flex justify-between items-center px-4 py-2 border-b border-gray-100 dark:border-gray-800">
-						<span class="font-semibold text-base">{profile.username}</span>
+					<div class="flex justify-between items-center px-6 py-6">
+						<span class="font-bold text-lg tracking-tight">{profile.username}</span>
 						<div class="flex gap-4">
 							<Heart class="h-5 w-5" />
 							<MessageCircle class="h-5 w-5" />
 						</div>
 					</div>
 
-					<div class="p-4 overflow-hidden pb-10">
+					<div class="px-6 pb-8 flex-1 flex flex-col">
 						<!-- Profile Info -->
-						<div class="flex items-center gap-4 mb-4">
-							<div class="relative">
-								<div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
-									<img src={profile.avatar_url} alt="Profile" class="rounded-full w-full h-full object-cover border-2 border-white dark:border-black" />
-								</div>
+						<div class="flex items-center gap-6 mb-6">
+							<div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+								<img src={profile.avatar_url} alt="Profile" class="rounded-full w-full h-full object-cover border-2 border-white" />
 							</div>
 							<div class="flex-1 flex justify-around text-center">
 								<div>
-									<div class="font-bold text-sm">1,245</div>
-									<div class="text-[10px]">Posts</div>
+									<div class="font-bold text-lg">1.2k</div>
+									<div class="text-[10px] uppercase tracking-wider opacity-60">Posts</div>
 								</div>
 								<div>
-									<div class="font-bold text-sm">45.2k</div>
-									<div class="text-[10px]">Followers</div>
+									<div class="font-bold text-lg">45k</div>
+									<div class="text-[10px] uppercase tracking-wider opacity-60">Followers</div>
 								</div>
 								<div>
-									<div class="font-bold text-sm">892</div>
-									<div class="text-[10px]">Following</div>
+									<div class="font-bold text-lg">892</div>
+									<div class="text-[10px] uppercase tracking-wider opacity-60">Following</div>
 								</div>
 							</div>
 						</div>
 						
-						<div class="px-1 mb-6">
-							<div class="font-semibold text-sm">{profile.display_name}</div>
-							<div class="text-xs">{profile.bio}</div>
+						<div class="mb-8">
+							<div class="font-bold text-base mb-1">{profile.display_name}</div>
+							<div class="text-sm opacity-80 leading-snug">{profile.bio}</div>
 						</div>
 
 						<!-- Tabs -->
-						<div class="flex justify-around border-t border-gray-100 dark:border-gray-800 py-2 mb-1">
-							<Grid class="h-5 w-5 text-blue-500" />
+						<div class="flex justify-around border-t border-zinc-200 dark:border-zinc-800 py-3 mb-1">
+							<Grid class="h-6 w-6 text-zinc-900 dark:text-zinc-100" />
 						</div>
 
 						<!-- Grid -->
-						<div class="grid grid-cols-3 gap-0.5">
+						<div class="grid grid-cols-3 gap-1 flex-1 content-start">
 							{#each images as image, i}
-								<div class="aspect-square relative overflow-hidden bg-gray-100">
+								<div class="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-800 rounded-md">
 									<img src={image.url} alt="Post" class="w-full h-full object-cover" />
 									{#if image.fake}
 										<div class="absolute inset-0 bg-black/40 flex items-center justify-center">
-											<div class="bg-red-500 text-white px-2 py-0.5 rounded-full font-bold text-[8px] border border-white shadow-lg animate-slam-down" style="animation-delay: {i * 100}ms; animation-fill-mode: both;">
-												FAKE ✕
+											<div class="bg-red-500 text-white px-3 py-1 rounded-full font-bold text-[10px] tracking-widest uppercase shadow-lg animate-slam-down" style="animation-delay: {i * 100}ms; animation-fill-mode: both;">
+												Fake
 											</div>
 										</div>
 									{/if}
@@ -174,185 +167,179 @@
 						</div>
 					</div>
 					
-					<!-- Tab Bar -->
-					<div class="mt-auto border-t border-gray-100 dark:border-gray-800 p-3 flex justify-around items-center bg-white dark:bg-black relative z-10">
-						<div class="w-32 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+					<!-- Bottom Indicator -->
+					<div class="p-6 flex justify-center">
+						<div class="w-32 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full"></div>
 					</div>
-				</div>
-				<div class="text-center mt-6">
-					<h3 class="text-xl font-bold mb-2 text-red-500">The Usual Suspects</h3>
-					<p class="text-sm text-muted-foreground">Unverified content. Is it real? Is it AI? Who knows.</p>
 				</div>
 			</div>
 
 			<!-- Right Side: Dennis Smith (Instagram + Proof in Bio Stack) -->
-			<div class="relative group w-full max-w-[340px]">
+			<div class="relative group w-full max-w-[360px]">
+				<div class="text-center mb-8">
+					<h3 class="text-xl font-bold mb-2 text-[#00D165]">Verified</h3>
+					<p class="text-sm text-zinc-500 dark:text-zinc-400">Seamlessly verify your identity.</p>
+				</div>
 				<!-- Dynamic Cat (Thinking -> Happy) https://giphy.com/Kennymays-->
 				<div class="absolute -top-24 -right-4 z-30 pointer-events-none w-28 h-28">
 					{#if showProof}
-						<div class="absolute inset-0 animate-bounce-subtle" in:fade={{ duration: 300 }} out:fade={{ duration: 200 }}>
+						<div class="absolute inset-0 animate-bounce-subtle">
 							<img src="/landing/cat_happy.gif" alt="Happy Cat" class="w-full h-full object-contain drop-shadow-xl" />
-							<div class="absolute left-0 -top-2 bg-green-500 text-white text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm transform -rotate-12">
+							<div class="absolute left-0 -top-2 bg-[#00D165] text-white text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform -rotate-12">
 								Verified! ✅
 							</div>
 						</div>
 					{:else}
-						<div class="absolute inset-0 animate-bounce-subtle" in:fade={{ duration: 300 }} out:fade={{ duration: 200 }}>
+						<div class="absolute inset-0 animate-bounce-subtle">
 							<img src="/landing/cat_think.gif" alt="Thinking Cat" class="w-full h-full object-contain drop-shadow-xl" />
-							<div class="absolute left-0 -top-2 bg-white dark:bg-black text-foreground text-[10px] font-bold px-2 py-1 rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 transform -rotate-12">
+							<div class="absolute left-0 -top-2 bg-[#FFF9EE] dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform -rotate-12">
 								Real? 🤔
 							</div>
 						</div>
 					{/if}
 				</div>
 
-				<div class="absolute -inset-4 bg-gradient-to-tr from-green-500/20 to-blue-500/20 blur-xl opacity-50 rounded-[3rem]"></div>
-				
 				<!-- Container for stacked phones -->
-				<div class="relative h-[650px] w-full">
+				<div class="relative h-[680px] w-full">
 					
 					<!-- Phone 1: Dennis Instagram -->
-					<div class="swap-card {showProof ? 'top' : 'bottom'} absolute inset-0 bg-white dark:bg-black border-4 border-gray-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
-						<!-- Fake Phone Status Bar -->
-						<div class="h-6 w-full flex justify-between items-center px-6 mt-2 text-[10px] font-medium opacity-50">
-							<span>9:41</span>
-							<div class="flex gap-1">
-								<div class="w-4 h-2.5 bg-current rounded-[1px]"></div>
-								<div class="w-0.5 h-2.5 bg-current rounded-[1px]"></div>
-							</div>
-						</div>
-
+					<div class="swap-card {showProof ? 'top' : 'bottom'} absolute inset-0 bg-[#FFF9EE] dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-zinc-200 dark:border-zinc-800">
 						<!-- App Header -->
-						<div class="flex justify-between items-center px-4 py-2 border-b border-gray-100 dark:border-gray-800">
-							<span class="font-semibold text-base">{profileDennis.username}</span>
+						<div class="flex justify-between items-center px-6 py-6">
+							<span class="font-bold text-lg tracking-tight">{profileDennis.username}</span>
 							<div class="flex gap-4">
 								<Heart class="h-5 w-5" />
 								<MessageCircle class="h-5 w-5" />
 							</div>
 						</div>
 
-						<div class="p-4 overflow-hidden pb-10">
+						<div class="px-6 pb-8 flex-1 flex flex-col">
 							<!-- Profile Info -->
-							<div class="flex items-center gap-4 mb-4">
-								<div class="relative">
-									<div class="w-16 h-16 rounded-full p-[2px] bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
-										<img src={profileDennis.avatar_url} alt="Profile" class="rounded-full w-full h-full object-cover border-2 border-white dark:border-black" />
-									</div>
+							<div class="flex items-center gap-6 mb-6">
+								<div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+									<img src={profileDennis.avatar_url} alt="Profile" class="rounded-full w-full h-full object-cover border-2 border-white" />
 								</div>
 								<div class="flex-1 flex justify-around text-center">
 									<div>
-										<div class="font-bold text-sm">342</div>
-										<div class="text-[10px]">Posts</div>
+										<div class="font-bold text-lg">342</div>
+										<div class="text-[10px] uppercase tracking-wider opacity-60">Posts</div>
 									</div>
 									<div>
-										<div class="font-bold text-sm">12.8k</div>
-										<div class="text-[10px]">Followers</div>
+										<div class="font-bold text-lg">12k</div>
+										<div class="text-[10px] uppercase tracking-wider opacity-60">Followers</div>
 									</div>
 									<div>
-										<div class="font-bold text-sm">450</div>
-										<div class="text-[10px]">Following</div>
+										<div class="font-bold text-lg">450</div>
+										<div class="text-[10px] uppercase tracking-wider opacity-60">Following</div>
 									</div>
 								</div>
 							</div>
 							
-							<div class="px-1 mb-6">
-								<div class="font-semibold text-sm">{profileDennis.display_name}</div>
-								<div class="text-xs">{profileDennis.bio}</div>
-								<div class="text-xs text-blue-600 dark:text-blue-400 font-semibold mt-1">{profileDennis.link}</div>
+							<div class="mb-8">
+								<div class="font-bold text-base mb-1">{profileDennis.display_name}</div>
+								<div class="text-sm opacity-80 leading-snug">{profileDennis.bio}</div>
+								<div class="text-sm text-[#FF5D00] font-bold mt-2">{profileDennis.link}</div>
 							</div>
 
 							<!-- Tabs -->
-							<div class="flex justify-around border-t border-gray-100 dark:border-gray-800 py-2 mb-1">
-								<Grid class="h-5 w-5 text-blue-500" />
+							<div class="flex justify-around border-t border-zinc-200 dark:border-zinc-800 py-3 mb-1">
+								<Grid class="h-6 w-6 text-zinc-900 dark:text-zinc-100" />
 							</div>
 
 							<!-- Grid -->
-							<div class="grid grid-cols-3 gap-0.5">
+							<div class="grid grid-cols-3 gap-1 flex-1 content-start">
 								{#each images as image, i}
-									<div class="aspect-square relative overflow-hidden bg-gray-100">
+									<div class="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-800 rounded-md">
 										<img src={image.url} alt="Post" class="w-full h-full object-cover" />
 									</div>
 								{/each}
 							</div>
 						</div>
 						
-						<!-- Tab Bar -->
-						<div class="mt-auto border-t border-gray-100 dark:border-gray-800 p-3 flex justify-around items-center bg-white dark:bg-black relative z-10">
-							<div class="w-32 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
+						<!-- Bottom Indicator -->
+						<div class="p-6 flex justify-center">
+							<div class="w-32 h-1.5 bg-zinc-200 dark:bg-zinc-700 rounded-full"></div>
 						</div>
 					</div>
 
 					<!-- Phone 2: Proof in Bio (Dennis) -->
-					<div class="swap-card {showProof ? 'bottom' : 'top'} absolute inset-0 bg-white dark:bg-black text-foreground border-4 border-gray-200 dark:border-gray-800 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col">
-						<!-- Fake Phone Status Bar -->
-						<div class="h-6 w-full flex justify-between items-center px-6 mt-2 text-[10px] font-medium opacity-50">
-							<span>9:41</span>
-							<div class="flex gap-1">
-								<div class="w-4 h-2.5 bg-current rounded-[1px]"></div>
-								<div class="w-0.5 h-2.5 bg-current rounded-[1px]"></div>
-							</div>
-						</div>
+					<div class="swap-card {showProof ? 'bottom' : 'top'} absolute inset-0 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-zinc-200 dark:border-zinc-800">
 
 						<!-- Content Area (Scrollable) -->
 						<div class="flex-1 overflow-hidden">
-                            <span class="font-bold pt-6 pl-5 text-lg text-foreground">ProofInBio</span>
-							<!-- Hero/Header area -->
-							<div class="px-6 pt-8 pb-6">
-								<div class="flex flex-col items-center text-center gap-4">
-									<Avatar class="h-20 w-20 border-2 border-background shadow-xl">
-										<AvatarImage src={profileDennis.avatar_url} alt={profileDennis.display_name} />
-										<AvatarFallback>DS</AvatarFallback>
-									</Avatar>
+							<!-- App Header -->
+							<div class="flex justify-between items-center px-6 pt-8 pb-4">
+								<div class="flex items-center gap-2">
+									<div class="w-6 h-6 rounded-full bg-gradient-to-tr from-orange-400 to-red-500"></div>
+									<span class="font-bold text-lg tracking-tight">ProofInBio</span>
+								</div>
+								<div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700">
+									<img src="https://i.pravatar.cc/150?u=user" alt="User" class="w-full h-full object-cover" />
+								</div>
+							</div>
+
+							<!-- Profile Header -->
+							<div class="px-6 pb-6">
+								<div class="flex flex-row items-start gap-5">
+									<!-- Left: Avatar -->
+									<div class="flex-shrink-0">
+										<Avatar class="h-20 w-20 border-4 border-zinc-50 dark:border-zinc-900 shadow-sm">
+											<AvatarImage src={profileDennis.avatar_url} alt={profileDennis.display_name} />
+											<AvatarFallback>DS</AvatarFallback>
+										</Avatar>
+									</div>
 									
-									<div>
-										<h1 class="text-xl font-bold tracking-tight">
+									<!-- Right: Info Stack -->
+									<div class="flex flex-col pt-1 min-w-0">
+										<h1 class="text-xl font-bold tracking-tight leading-none text-zinc-900 dark:text-zinc-100">
 											{profileDennis.display_name}
 										</h1>
-										<p class="text-xs text-muted-foreground">@{profileDennis.username}</p>
-										<p class="mt-2 text-[11px] text-balance max-w-[200px] mx-auto">{profileDennis.bio}</p>
-										<div class="mt-3 flex flex-wrap justify-center gap-1.5">
+										<p class="text-xs text-zinc-400 dark:text-zinc-500 font-medium mt-1">@{profileDennis.username}</p>
+										<p class="mt-2 text-xs text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-3">{profileDennis.bio}</p>
+										<div class="mt-3 flex flex-wrap gap-1.5">
 											{#each profileDennis.interests as interest}
-												<Badge variant="secondary" class="text-[9px] px-1.5 py-0">{interest}</Badge>
+												<Badge variant="secondary" class="bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 border-0 text-[9px] px-2 py-0.5 rounded-full font-medium">{interest}</Badge>
 											{/each}
 										</div>
 									</div>
 								</div>
 
 								<!-- Authenticated Photos Alert -->
-								<div class="mt-6 backdrop-blur-md bg-green-500/10 flex w-full items-center rounded-lg border border-green-500/20 py-2 px-3">
-									<ShieldCheck class="h-4 w-4 mt-0.5 shrink-0 text-green-600" />
-									<div class="ml-2.5 flex-grow">
-										<h5 class="font-semibold text-[10px] text-green-700 dark:text-green-400">Made by Humans.</h5>
-										<div class="text-[9px] text-muted-foreground">
-											Verified authentic. No AI.
-										</div>
-									</div>
+								<div class="mt-6 min-h-[52px]">
+									{#key showProof}
+										{#if showProof}
+											<div class="bg-[#00D165] flex w-full items-center rounded-xl p-3 text-white animate-bam">
+												<ShieldCheck class="h-4 w-4 shrink-0 relative z-10" />
+												<div class="ml-3 flex-grow relative z-10">
+													<h5 class="font-bold text-[10px] uppercase tracking-wider leading-none">Verified Human</h5>
+													<div class="text-[9px] opacity-90 mt-0.5">
+														Verified authentic. No AI.
+													</div>
+												</div>
+											</div>
+										{/if}
+									{/key}
 								</div>
 							</div>
 
 							<!-- Photo Grid -->
-							<div class="px-4 pb-10">
-								<div class="grid grid-cols-3 gap-0.5">
+							<div class="px-6 pb-10">
+								<div class="grid grid-cols-3 gap-1">
 									{#each images as image, i}
-										<div class="aspect-square relative overflow-hidden bg-gray-100">
+										<div class="aspect-square relative overflow-hidden bg-zinc-100 dark:bg-zinc-800 rounded-lg">
 											<img
 												src={image.url}
 												alt="User photo"
-												class="w-full h-full object-cover"
+												class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
 											/>
 											<!-- Verified Checkmark Overlay -->
-											<div class="absolute top-1 right-1 bg-green-500 text-white rounded-full p-0.5 shadow-sm">
-												<CheckCircle class="h-2 w-2" />
+											<div class="absolute top-1 right-1 bg-[#00D165] text-white rounded-full p-0.5 shadow-sm">
+												<CheckCircle class="h-3 w-3" />
 											</div>
 										</div>
 									{/each}
 								</div>
 							</div>
-						</div>
-
-						<!-- Tab Bar -->
-						<div class="mt-auto border-t border-gray-100 dark:border-gray-800 p-3 flex justify-around items-center bg-white dark:bg-black relative z-10">
-							<div class="w-32 h-1.5 bg-gray-300 dark:bg-gray-700 rounded-full"></div>
 						</div>
 					</div>
 
@@ -360,7 +347,7 @@
 					<div 
 						class="absolute z-50 pointer-events-none transition-all duration-200 ease-out"
 						style="
-							top: 215px;
+							top: 240px;
 							left: 30%;
 							transform: translate(-10%, -10%) translate({showHand ? '0px, 0px' : '20px, 20px'}) scale({clickHand ? 0.9 : 1});
 							opacity: {showHand ? 1 : 0};
@@ -368,11 +355,6 @@
 					>
 						<img src="/landing/mini_pointer.png" alt="Hand cursor" class="w-12 h-12 drop-shadow-xl" />
 					</div>
-				</div>
-
-				<div class="text-center mt-6">
-					<h3 class="text-xl font-bold mb-2">Prove it with <span class="text-green-600">ProofInBio</span></h3>
-					<p class="text-sm text-muted-foreground">Seamlessly verify your identity from Instagram.</p>
 				</div>
 			</div>
 
@@ -413,6 +395,47 @@
 	}
 	.animate-slam-down {
 		animation: slam-down 4s ease-out infinite;
+	}
+	@keyframes sheen-sweep {
+		0%   { transform: translateX(-120%) rotate(12deg); opacity: 0; }
+		8%   { opacity: 0.9; }
+		50%  { opacity: 1; }
+		92%  { opacity: 0.85; }
+		100% { transform: translateX(120%) rotate(12deg); opacity: 0; }
+	}
+	.animate-bam {
+		position: relative;
+		overflow: hidden;
+		isolation: isolate;
+	}
+	.animate-bam::after {
+		content: "";
+		position: absolute;
+		inset: -40% -60%;
+		width: 200%;
+		height: 180%;
+		pointer-events: none;
+		z-index: 1;
+		background: linear-gradient(
+			90deg,
+			rgba(255,255,255,0) 0%,
+			rgba(255,255,255,0.18) 35%,
+			rgba(255,255,255,0.55) 50%,
+			rgba(255,255,255,0.18) 65%,
+			rgba(255,255,255,0) 100%
+		);
+		filter: blur(0.2px);
+		mix-blend-mode: screen;
+		transform: translateX(-120%) rotate(12deg);
+		opacity: 0;
+		animation: sheen-sweep 980ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+		animation-delay: 560ms;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.animate-bam,
+		.animate-bam::after {
+			animation: none !important;
+		}
 	}
 
 /* Ultra-smooth orbit swap with Midpoint Opacity Control */
