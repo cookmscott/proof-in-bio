@@ -42,7 +42,7 @@
 						Made by people, not prompts.
 					</h1>
 					<p class="text-lg text-gray-600 text-balance">
-						Upload real work. We verify its origin and create a verified gallery you can share anywhere.
+						Stop the AI-confusion. Create a verified gallery to show your followers that your perspective, your eye, and your life are real.
 					</p>
 					<div class="flex justify-center md:justify-start gap-4 pt-4">
 						<Button size="lg" class="group text-white font-bold" onclick={handleCtaClick}>

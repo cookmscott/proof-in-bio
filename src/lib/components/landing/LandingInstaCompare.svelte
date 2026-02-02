@@ -311,8 +311,8 @@
 											<div class="bg-[#00D165] flex w-full items-center rounded-xl p-3 text-white animate-bam">
 												<ShieldCheck class="h-4 w-4 shrink-0 relative z-10" />
 												<div class="ml-3 flex-grow relative z-10">
-													<h5 class="font-bold text-[10px] uppercase tracking-wider leading-none">Verified Human</h5>
-													<div class="text-[9px] opacity-90 mt-0.5">
+													<h5 class="font-bold text-[12px] uppercase tracking-wider leading-none">Verified Human</h5>
+													<div class="text-[12px] mt-0.5">
 														Verified authentic. No AI.
 													</div>
 												</div>

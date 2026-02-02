@@ -219,67 +219,88 @@
 
             <!-- Main Content Area -->
             <div class="flex-1 min-w-0 bg-card rounded-2xl border shadow-sm flex flex-col h-[600px] overflow-hidden">
-                <div class="flex-1 overflow-y-auto p-6 md:p-8 space-y-12 no-scrollbar scroll-smooth" bind:this={scrollContainer}>
+                <div class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 space-y-12 no-scrollbar scroll-smooth" bind:this={scrollContainer}>
                     {#each filteredManufacturers as brand}
                         <div id={brand.name} class="scroll-mt-6 {!searchTerm && selectedId !== brand.name ? 'hidden md:block' : ''}">
-                            <div class="mb-6 border-b pb-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="p-2 rounded-lg {brand.iconBg}">
-                                        {#if brand.icon}
-                                            <svelte:component this={brand.icon} class="h-5 w-5 {brand.iconColor}" />
-                                        {:else}
-                                            <Camera class="h-5 w-5 {brand.iconColor}" />
-                                        {/if}
-                                    </div>
-                                    <h3 class="text-2xl font-bold">{brand.name}</h3>
+                            <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
+                                <div class="p-1.5 rounded-md {brand.iconBg}">
+                                    {#if brand.icon}
+                                        <svelte:component this={brand.icon} class="h-4 w-4 {brand.iconColor}" />
+                                    {:else}
+                                        <Camera class="h-4 w-4 {brand.iconColor}" />
+                                    {/if}
                                 </div>
-                                <p class="text-muted-foreground">{brand.description}</p>
+                                <h3 class="text-lg font-bold">{brand.name}</h3>
                             </div>
 
-                            <div class="grid gap-4">
-                                {#each brand.models as model}
-                                    <div class="group flex flex-col sm:flex-row sm:items-center justify-between p-4 border rounded-xl bg-background hover:border-primary/50 transition-colors gap-4">
-                                        <div class="min-w-0 flex-1">
-                                            <div class="flex flex-wrap items-center gap-2 mb-1">
-                                                <h4 class="font-semibold text-lg">{model.name}</h4>
-                                                <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors border-transparent bg-secondary text-secondary-foreground">
-                                                    {model.implementation}
-                                                </span>
-                                                {#if model.status.includes('Upcoming') || model.status.includes('Suspended')}
-                                                    <span class="inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold transition-colors border-transparent bg-amber-100 text-amber-700 dark:bg-amber-900/30">
-                                                        {model.status}
+                            <div class="overflow-x-auto rounded-lg border border-border bg-background">
+                                <table class="w-full min-w-[600px] text-sm text-left">
+                                    <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-3 w-[25%]">Model</th>
+                                            <th class="px-4 py-3 w-[20%]">Implementation</th>
+                                            <th class="px-4 py-3">Details</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        {#each brand.models as model}
+                                            <tr class="group hover:bg-muted/20 transition-colors">
+                                                <td class="px-4 py-2.5 font-medium text-foreground align-top">
+                                                    <div class="flex flex-col items-start gap-1.5">
+                                                        <span>{model.name}</span>
+                                                        {#if model.status.includes('Upcoming') || model.status.includes('Suspended')}
+                                                            <span class="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold transition-colors border-transparent bg-amber-100 text-amber-700 dark:bg-amber-900/30 leading-none">
+                                                                {model.status}
+                                                            </span>
+                                                        {/if}
+                                                    </div>
+                                                </td>
+                                                <td class="px-4 py-2.5 align-top">
+                                                    <span class="inline-flex items-center rounded-md bg-secondary/50 px-2 py-1 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-border/50 whitespace-nowrap">
+                                                        {model.implementation}
                                                     </span>
-                                                {/if}
-                                            </div>
-                                            <p class="text-sm text-muted-foreground leading-relaxed">{model.details}</p>
-                                        </div>
-                                    </div>
-                                {/each}
+                                                </td>
+                                                <td class="px-4 py-2.5 text-muted-foreground align-top leading-snug">
+                                                    {model.details}
+                                                </td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     {/each}
 
                     {#each filteredSoftware as group}
                         <div id={group.category} class="scroll-mt-6 {!searchTerm && selectedId !== group.category ? 'hidden md:block' : ''}">
-                            <div class="mb-6 border-b pb-4">
-                                <div class="flex items-center gap-3 mb-2">
-                                    <div class="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/20">
-                                        <Monitor class="h-5 w-5 text-purple-600" />
-                                    </div>
-                                    <h3 class="text-2xl font-bold">{group.category}</h3>
+                            <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
+                                <div class="p-1.5 rounded-md bg-purple-100 dark:bg-purple-900/20">
+                                    <Monitor class="h-4 w-4 text-purple-600" />
                                 </div>
-                                <p class="text-muted-foreground">Compatible software tools and platforms.</p>
+                                <h3 class="text-lg font-bold">{group.category}</h3>
                             </div>
 
-                            <div class="grid gap-4">
-                                {#each group.tools as tool}
-                                    <div class="group flex items-center justify-between p-4 border rounded-xl bg-background hover:border-primary/50 transition-colors">
-                                        <div class="min-w-0 flex-1">
-                                            <h4 class="font-semibold text-lg">{tool.name}</h4>
-                                            <p class="text-sm text-muted-foreground mt-0.5">{tool.description}</p>
-                                        </div>
-                                    </div>
-                                {/each}
+                            <div class="overflow-x-auto rounded-lg border border-border bg-background">
+                                <table class="w-full min-w-[500px] text-sm text-left">
+                                    <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
+                                        <tr>
+                                            <th class="px-4 py-3 w-[35%]">Tool / Platform</th>
+                                            <th class="px-4 py-3">Description</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody class="divide-y divide-border">
+                                        {#each group.tools as tool}
+                                            <tr class="group hover:bg-muted/20 transition-colors">
+                                                <td class="px-4 py-2.5 font-medium text-foreground align-top">
+                                                    {tool.name}
+                                                </td>
+                                                <td class="px-4 py-2.5 text-muted-foreground align-top leading-snug">
+                                                    {tool.description}
+                                                </td>
+                                            </tr>
+                                        {/each}
+                                    </tbody>
+                                </table>
                             </div>
                         </div>
                     {/each}
