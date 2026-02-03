@@ -101,14 +101,14 @@
 					<p class="text-sm text-zinc-500 dark:text-zinc-400">Is it real? Is it AI? Who knows.</p>
 				</div>
 				<!-- Thinking Cat (Always suspicious) -->
-				<div class="absolute -top-24 -left-4 z-30 animate-bounce-subtle pointer-events-none">
+				<div class="absolute -top-10 -left-8 z-30 animate-bounce-subtle pointer-events-none">
 					<img src="/landing/cat_think.gif" alt="Thinking Cat" class="w-28 h-28 object-contain drop-shadow-xl" />
 					<div class="absolute right-0 -top-2 bg-[#FFF9EE] dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform rotate-12">
 						Is this real? 🤔
 					</div>
 				</div>
 
-				<div class="relative bg-[#FFF9EE] dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden h-[680px] flex flex-col shadow-2xl border-4 border-zinc-200 dark:border-zinc-800">
+				<div class="relative phone-shell bg-[#FFF9EE] dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden h-[680px] flex flex-col shadow-2xl border-4 border-zinc-200 dark:border-zinc-800">
 					<!-- App Header -->
 					<div class="flex justify-between items-center px-6 py-6">
 						<span class="font-bold text-lg tracking-tight">{profile.username}</span>
@@ -181,7 +181,7 @@
 					<p class="text-sm text-zinc-500 dark:text-zinc-400">Seamlessly verify your identity.</p>
 				</div>
 				<!-- Dynamic Cat (Thinking -> Happy) https://giphy.com/Kennymays-->
-				<div class="absolute -top-24 -right-4 z-30 pointer-events-none w-28 h-28">
+				<div class="absolute -top-10 -right-8 z-30 pointer-events-none w-28 h-28">
 					{#if showProof}
 						<div class="absolute inset-0 animate-bounce-subtle">
 							<img src="/landing/cat_happy.gif" alt="Happy Cat" class="w-full h-full object-contain drop-shadow-xl" />
@@ -203,7 +203,7 @@
 				<div class="relative h-[680px] w-full">
 					
 					<!-- Phone 1: Dennis Instagram -->
-					<div class="swap-card {showProof ? 'top' : 'bottom'} absolute inset-0 bg-[#FFF9EE] dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-zinc-200 dark:border-zinc-800">
+					<div class="swap-card phone-shell {showProof ? 'top' : 'bottom'} absolute inset-0 bg-[#FFF9EE] dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-zinc-200 dark:border-zinc-800">
 						<!-- App Header -->
 						<div class="flex justify-between items-center px-6 py-6">
 							<span class="font-bold text-lg tracking-tight">{profileDennis.username}</span>
@@ -263,7 +263,7 @@
 					</div>
 
 					<!-- Phone 2: Proof in Bio (Dennis) -->
-					<div class="swap-card {showProof ? 'bottom' : 'top'} absolute inset-0 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-zinc-200 dark:border-zinc-800">
+					<div class="swap-card phone-shell {showProof ? 'bottom' : 'top'} absolute inset-0 bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-100 rounded-[2.5rem] overflow-hidden shadow-2xl flex flex-col border-4 border-zinc-200 dark:border-zinc-800">
 
 						<!-- Content Area (Scrollable) -->
 						<div class="flex-1 overflow-hidden">
@@ -395,6 +395,56 @@
 	}
 	.animate-slam-down {
 		animation: slam-down 4s ease-out infinite;
+	}
+	.phone-shell {
+		position: relative;
+		box-shadow: 0 30px 70px rgba(0, 0, 0, 0.18), 0 6px 12px rgba(0, 0, 0, 0.12);
+	}
+	.phone-shell::before {
+		content: "";
+		position: absolute;
+		inset: 0;
+		border-radius: inherit;
+		pointer-events: none;
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.65),
+			inset 0 0 0 2px rgba(0, 0, 0, 0.08),
+			inset 0 16px 24px rgba(255, 255, 255, 0.25);
+		background: linear-gradient(
+			120deg,
+			rgba(255, 255, 255, 0.16) 0%,
+			rgba(255, 255, 255, 0.06) 18%,
+			rgba(255, 255, 255, 0) 32%,
+			rgba(255, 255, 255, 0.08) 58%,
+			rgba(255, 255, 255, 0) 75%
+		);
+		opacity: 0.4;
+	}
+	.phone-shell::after {
+		content: "";
+		position: absolute;
+		bottom: 10px;
+		left: 50%;
+		transform: translateX(-50%);
+		width: 110px;
+		height: 5px;
+		border-radius: 999px;
+		background: rgba(0, 0, 0, 0.25);
+		box-shadow:
+			inset 0 1px 0 rgba(255, 255, 255, 0.25),
+			0 1px 2px rgba(0, 0, 0, 0.25);
+		opacity: 0.6;
+		pointer-events: none;
+	}
+	:global(.dark) .phone-shell::before {
+		box-shadow:
+			inset 0 0 0 1px rgba(255, 255, 255, 0.12),
+			inset 0 0 0 2px rgba(0, 0, 0, 0.4),
+			inset 0 16px 24px rgba(255, 255, 255, 0.05);
+		opacity: 0.35;
+	}
+	:global(.dark) .phone-shell::after {
+		background: rgba(255, 255, 255, 0.2);
 	}
 	@keyframes sheen-sweep {
 		0%   { transform: translateX(-120%) rotate(12deg); opacity: 0; }
