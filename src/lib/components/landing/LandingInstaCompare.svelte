@@ -92,12 +92,12 @@
 			</p>
 		</div>
 
-		<div class="grid lg:grid-cols-2 gap-12 lg:gap-24 items-start max-w-5xl mx-auto justify-items-center">
+		<div class="grid lg:grid-cols-2 gap-20 lg:gap-24 items-start max-w-5xl mx-auto justify-items-center">
 			
 			<!-- The "Other" App (Instagram Style) -->
 			<div class="relative group w-full max-w-[360px]">
 				<div class="text-center mb-8">
-					<h3 class="text-xl font-bold mb-2 text-red-500">Unverified</h3>
+					<h2 class="text-xl font-bold mb-2 text-red-500">Unverified</h2>
 					<p class="text-sm text-zinc-500 dark:text-zinc-400">Is it real? Is it AI? Who knows.</p>
 				</div>
 				<!-- Thinking Cat (Always suspicious) -->

@@ -219,10 +219,10 @@
 
             <!-- Main Content Area -->
             <div class="flex-1 min-w-0 bg-card rounded-2xl border shadow-sm flex flex-col h-[600px] overflow-hidden">
-                <div class="flex-1 overflow-y-auto px-4 md:px-8 pb-4 md:pb-8 space-y-12 no-scrollbar scroll-smooth" bind:this={scrollContainer}>
+                <div class="flex-1 overflow-y-auto px-4 md:px-8 pb-0 md:pb-8 space-y-12 no-scrollbar scroll-smooth" bind:this={scrollContainer}>
                     {#each filteredManufacturers as brand}
                         <div id={brand.name} class="scroll-mt-6 {!searchTerm && selectedId !== brand.name ? 'hidden md:block' : ''}">
-                            <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
+                            <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-0 md:mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
                                 <div class="p-1.5 rounded-md {brand.iconBg}">
                                     {#if brand.icon}
                                         <svelte:component this={brand.icon} class="h-4 w-4 {brand.iconColor}" />
@@ -233,19 +233,19 @@
                                 <h3 class="text-lg font-bold">{brand.name}</h3>
                             </div>
 
-                            <div class="overflow-x-auto rounded-lg border border-border bg-background">
-                                <table class="w-full min-w-[600px] text-sm text-left">
+                            <div class="overflow-x-auto border border-border bg-background -mx-4 md:mx-0 rounded-none md:rounded-lg">
+                                <table class="w-full min-w-[500px] md:min-w-[600px] text-sm text-left">
                                     <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                                         <tr>
-                                            <th class="px-4 py-3 w-[25%]">Model</th>
-                                            <th class="px-4 py-3 w-[20%]">Implementation</th>
-                                            <th class="px-4 py-3">Details</th>
+                                            <th class="px-3 md:px-4 py-3 w-[28%]">Model</th>
+                                            <th class="px-3 md:px-4 py-3 w-[22%]">Implementation</th>
+                                            <th class="px-3 md:px-4 py-3">Details</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-border">
                                         {#each brand.models as model}
                                             <tr class="group hover:bg-muted/20 transition-colors">
-                                                <td class="px-4 py-2.5 font-medium text-foreground align-top">
+                                                <td class="px-3 md:px-4 py-2.5 font-medium text-foreground align-top">
                                                     <div class="flex flex-col items-start gap-1.5">
                                                         <span>{model.name}</span>
                                                         {#if model.status.includes('Upcoming') || model.status.includes('Suspended')}
@@ -255,12 +255,12 @@
                                                         {/if}
                                                     </div>
                                                 </td>
-                                                <td class="px-4 py-2.5 align-top">
+                                                <td class="px-3 md:px-4 py-2.5 align-top">
                                                     <span class="inline-flex items-center rounded-md bg-secondary/50 px-2 py-1 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-border/50 whitespace-nowrap">
                                                         {model.implementation}
                                                     </span>
                                                 </td>
-                                                <td class="px-4 py-2.5 text-muted-foreground align-top leading-snug">
+                                                <td class="px-3 md:px-4 py-2.5 text-muted-foreground align-top leading-snug">
                                                     {model.details}
                                                 </td>
                                             </tr>
@@ -281,20 +281,20 @@
                             </div>
 
                             <div class="overflow-x-auto rounded-lg border border-border bg-background">
-                                <table class="w-full min-w-[500px] text-sm text-left">
+                                <table class="w-full min-w-0 md:min-w-[500px] text-sm text-left">
                                     <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                                         <tr>
-                                            <th class="px-4 py-3 w-[35%]">Tool / Platform</th>
-                                            <th class="px-4 py-3">Description</th>
+                                            <th class="px-3 md:px-4 py-3 w-[40%]">Tool / Platform</th>
+                                            <th class="px-3 md:px-4 py-3">Description</th>
                                         </tr>
                                     </thead>
                                     <tbody class="divide-y divide-border">
                                         {#each group.tools as tool}
                                             <tr class="group hover:bg-muted/20 transition-colors">
-                                                <td class="px-4 py-2.5 font-medium text-foreground align-top">
+                                                <td class="px-3 md:px-4 py-2.5 font-medium text-foreground align-top">
                                                     {tool.name}
                                                 </td>
-                                                <td class="px-4 py-2.5 text-muted-foreground align-top leading-snug">
+                                                <td class="px-3 md:px-4 py-2.5 text-muted-foreground align-top leading-snug">
                                                     {tool.description}
                                                 </td>
                                             </tr>

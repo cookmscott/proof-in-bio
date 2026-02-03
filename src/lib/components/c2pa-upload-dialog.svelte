@@ -25,7 +25,7 @@
   } from '$lib/c2pa';
 
   // Props
-  let { open = $bindable(false), supabase, onUploadComplete } = $props();
+  let { open = $bindable(false), supabase, onUploadComplete, allowAllPhotos = false } = $props();
 
   let dragOver = $state(false);
   let uploads = $state([]);
@@ -65,6 +65,11 @@
   let captureUnknownCount = $derived(uploads.filter(isCaptureUnknown).length);
   let softwareSignedCount = $derived(uploads.filter(isSoftwareSignedOnly).length);
   let unverifiedCount = $derived(uploads.filter(isUnverified).length);
+  let uploadableCount = $derived(
+    allowAllPhotos
+      ? uploads.filter((u) => !u.processing && !u.error).length
+      : verifiedCount + captureUnknownCount
+  );
 
   $effect(() => {
     supabase.auth.getSession().then(({ data }) => {
@@ -84,7 +89,7 @@
 
   async function handleUpload() {
     // Allow upload if we have any Verified OR Capture Unknown images
-    const canUploadCount = verifiedCount + captureUnknownCount;
+    const canUploadCount = uploadableCount;
     if (isUploading || canUploadCount === 0) return;
     
     // Check if we have a valid session before starting
@@ -98,8 +103,10 @@
     isUploading = true;
     error = null;
     
-    // Filter for EITHER verified OR capture unknown
-    const uploadsToProcess = uploads.filter(u => isVerifiedCapture(u) || isCaptureUnknown(u));
+    // Filter for EITHER verified OR capture unknown, unless testing flag is enabled
+    const uploadsToProcess = allowAllPhotos
+      ? uploads.filter((u) => !u.processing && !u.error)
+      : uploads.filter((u) => isVerifiedCapture(u) || isCaptureUnknown(u));
     let successCount = 0;
 
     for (const upload of uploadsToProcess) {
@@ -307,6 +314,11 @@
         <CardHeader>
           <CardTitle>Add Photos</CardTitle>
           <CardDescription class="mb-3">Upload images to verify their C2PA metadata locally in your browser.</CardDescription>
+          {#if allowAllPhotos}
+            <p class="text-sm font-semibold text-red-500">
+              C2PA checks are disabled for testing.
+            </p>
+          {/if}
         </CardHeader>
 
         <CardContent class="space-y-6">
@@ -510,8 +522,8 @@
                 {/if}
               </div>
 
-              {#if verifiedCount > 0 || captureUnknownCount > 0}
-                {@const totalUploadable = verifiedCount + captureUnknownCount}
+              {#if uploadableCount > 0}
+                {@const totalUploadable = uploadableCount}
                 <Button onclick={handleUpload} disabled={isUploading} class="w-full md:w-auto">
                     {#if isUploading}
                         <Loader2 class="mr-2 h-4 w-4 animate-spin" />

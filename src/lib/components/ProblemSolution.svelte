@@ -22,9 +22,9 @@
         
         <!-- Header: High Design / Clean -->
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <div class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors border-red-200/50 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 mb-6 gap-2">
-                <AlertTriangle class="h-4 w-4" />
-                <span>The Reality Gap</span>
+            <div class="inline-flex items-center rounded-full px-3 py-1 text-sm font-medium transition-colors border-red-200/50 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-400 mb-6 gap-2">
+                <Eye class="h-4 w-4" />
+                <span>Reality Check</span>
             </div>
             <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-6 text-foreground">
                 Nobody knows what's real anymore.
