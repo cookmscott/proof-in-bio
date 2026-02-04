@@ -18,9 +18,11 @@ export async function load({ locals: { supabase } }) {
           created_at,
           width,
           height,
-          blurhash
+          blurhash,
+          deleted_at
         )
       `)
+      .is('photos.deleted_at', null)
       .limit(50);
 
     if (error) {
