@@ -12,7 +12,7 @@
 		<div class="relative p-12 md:p-16 text-center space-y-6">
 			<h2 class="text-4xl md:text-5xl font-bold">Prove it's human.</h2>
 			<p class="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-				Join thousands of creators building trust with every upload. Free to start, powerful
+				Join thousands of creators building proof with every upload. Free to start, powerful
 				forever.
 			</p>
 			<div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">

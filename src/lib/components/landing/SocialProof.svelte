@@ -6,7 +6,7 @@
 <section class="bg-muted/50 py-20">
 	<div class="container mx-auto max-w-6xl px-6">
 		<div class="text-center space-y-4 mb-12">
-			<h2 class="text-3xl md:text-4xl font-bold">For creators who value authenticity</h2>
+			<h2 class="text-3xl md:text-4xl font-bold">For creators who value proof</h2>
 		</div>
 
 		<div class="grid md:grid-cols-3 gap-6 max-w-4xl mx-auto">
@@ -18,7 +18,7 @@
 				</div>
 				<p class="text-sm">
 					"Finally, a way to show my photography is actually mine. Game changer for client
-					trust."
+					confidence."
 				</p>
 				<div class="flex items-center gap-3">
 					<img
@@ -40,7 +40,7 @@
 					{/each}
 				</div>
 				<p class="text-sm">
-					"My illustrations stand out now. Collectors know they're getting authentic human
+					"My illustrations stand out now. Collectors know they're getting real, human
 					art."
 				</p>
 				<div class="flex items-center gap-3">

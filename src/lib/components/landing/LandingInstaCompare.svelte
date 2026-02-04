@@ -97,7 +97,7 @@
 			<!-- The "Other" App (Instagram Style) -->
 			<div class="relative group w-full max-w-[360px]">
 				<div class="text-center mb-8">
-					<h2 class="text-xl font-bold mb-2 text-red-500">Unverified</h2>
+					<h2 class="text-xl font-bold mb-2 text-red-500">Unproven</h2>
 					<p class="text-sm text-zinc-500 dark:text-zinc-400">Is it real? Is it AI? Who knows.</p>
 				</div>
 				<!-- Thinking Cat (Always suspicious) -->
@@ -177,8 +177,8 @@
 			<!-- Right Side: Dennis Smith (Instagram + Proof in Bio Stack) -->
 			<div class="relative group w-full max-w-[360px]">
 				<div class="text-center mb-8">
-					<h3 class="text-xl font-bold mb-2 text-[#00D165]">Verified</h3>
-					<p class="text-sm text-zinc-500 dark:text-zinc-400">Seamlessly verify your identity.</p>
+					<h3 class="text-xl font-bold mb-2 text-[#00D165]">Proven human capture</h3>
+					<p class="text-sm text-zinc-500 dark:text-zinc-400">We check it’s real — not fake or AI-generated.</p>
 				</div>
 				<!-- Dynamic Cat (Thinking -> Happy) https://giphy.com/Kennymays-->
 				<div class="absolute -top-10 -right-8 z-30 pointer-events-none w-28 h-28">
@@ -186,7 +186,7 @@
 						<div class="absolute inset-0 animate-bounce-subtle">
 							<img src="/landing/cat_happy.gif" alt="Happy Cat" class="w-full h-full object-contain drop-shadow-xl" />
 							<div class="absolute left-0 -top-2 bg-[#00D165] text-white text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform -rotate-12">
-								Verified! ✅
+								Proven! ✅
 							</div>
 						</div>
 					{:else}
@@ -311,9 +311,9 @@
 											<div class="bg-[#00D165] flex w-full items-center rounded-xl p-3 text-white animate-bam">
 												<ShieldCheck class="h-4 w-4 shrink-0 relative z-10" />
 												<div class="ml-3 flex-grow relative z-10">
-													<h5 class="font-bold text-[12px] uppercase tracking-wider leading-none">Verified Human</h5>
+													<h5 class="font-bold text-[12px] uppercase tracking-wider leading-none">Proven Human Capture</h5>
 													<div class="text-[12px] mt-0.5">
-														Verified authentic. No AI.
+														Not fake or AI-generated.
 													</div>
 												</div>
 											</div>

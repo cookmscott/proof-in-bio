@@ -42,7 +42,7 @@
 						Made by people, not prompts.
 					</h1>
 					<p class="text-lg text-gray-600 text-balance">
-						Stop the AI-confusion. Create a verified gallery to show your followers that your perspective, your eye, and your life are real.
+						Stop the AI-confusion. Create a proof gallery to show your followers that your perspective, your eye, and your life are real.
 					</p>
 					<div class="flex justify-center md:justify-start gap-4 pt-4">
 						<Button size="lg" class="group text-white font-bold" onclick={handleCtaClick}>
@@ -80,7 +80,7 @@
 				<div class="verified-info absolute bottom-0 left-0 w-full p-8 opacity-0 z-30 pointer-events-none">
 					<div class="flex items-center gap-2 mb-2">
 						<div class="h-px w-8 bg-emerald-500/50"></div>
-						<p class="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase">Verified</p>
+						<p class="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase">Proven</p>
 					</div>
 					<h2 class="text-2xl font-bold text-white tracking-tight leading-none">Mathias Reding</h2>
 					<p class="text-gray-300 text-xs mt-1 font-light">Photographer</p>

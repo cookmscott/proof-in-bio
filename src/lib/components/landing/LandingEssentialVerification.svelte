@@ -79,10 +79,10 @@
             <div class="max-w-2xl">
                 <div class="inline-flex items-center gap-2 text-primary font-medium mb-3">
                     <ShieldCheck class="h-4 w-4" />
-                    <span class="text-sm uppercase tracking-wider">High-Stakes Verification</span>
+                    <span class="text-sm uppercase tracking-wider">High-Stakes Proof</span>
                 </div>
                 <h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-                    Where Authenticity is Non-Negotiable
+                    Where Being Real Is Non-Negotiable
                 </h2>
             </div>
             <div class="max-w-md space-y-4">
@@ -90,7 +90,7 @@
                     Millions of images, infinite feeds. We provide the infrastructure to know what's real in an era of synthetic media.
                 </p>
                 <Button variant="outline" href="#how-it-works" class="group rounded-full bg-background">
-                    Verify Your Content
+                    Prove It’s Real
                     <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
             </div>
@@ -125,7 +125,7 @@
                     <div class="relative h-40 w-56 md:h-52 md:w-80 rounded-lg overflow-hidden shrink-0">
                         <img 
                             src={url} 
-                            alt="Verified Photo" 
+                            alt="Proven Photo" 
                             loading="lazy"
                             class="w-full h-full object-cover"
                         />

@@ -8,10 +8,10 @@
 		{
 			icon: Upload,
 			title: 'You upload',
-			description: 'Drop in a photo exported by a supported camera or editing app. We read the embedded Content Credentials and surface what was signed.',
+			description: 'Drop in a photo from a supported camera or editing app. We read the built-in proof and show what was captured.',
 			points: [
-				'Extract the C2PA manifest and device/app info.',
-				'Capture timestamps and any edit history included.',
+				'Read the proof data and capture info.',
+				'Capture time and camera/app details.',
 				'Keep the original file intact.'
 			],
 			image: 'https://images.pexels.com/photos/3762375/pexels-photo-3762375.jpeg?w=800',
@@ -19,11 +19,11 @@
 		},
 		{
 			icon: ShieldCheck,
-			title: 'We verify',
-			description: "We validate the signature chain and check for tampering. If anything is missing or broken, it's marked unverified.",
+			title: "We check it's real",
+			description: "We check it's real and not fake or AI-generated. If anything doesn't add up, it's marked unproven.",
 			points: [
-				'Confirm signatures match the original capture.',
-				'Highlight any edits recorded by the credentials.',
+				'Confirm it came from the original capture.',
+				'Call out edits recorded in the file.',
 				'Show a clear pass/fail badge.'
 			],
 			image: 'https://images.pexels.com/photos/8090132/pexels-photo-8090132.jpeg?w=800',
@@ -31,12 +31,12 @@
 		},
 		{
 			icon: Link2,
-			title: 'Share a trusted proof link',
-			description: 'Publish a proof page with a verified badge and machine-readable details anyone can inspect.',
+			title: 'Share a proof link',
+			description: 'Publish a proof page with a clear badge that says it’s not fake or AI-generated.',
 			points: [
 				'Use the URL in bios, portfolios, and client deliveries.',
-				'Metadata stays attached for quick verification.',
-				'Share once, build trust everywhere.'
+				'Details stay attached so anyone can check it’s real.',
+				'Share once, earn trust everywhere.'
 			],
 			image: 'https://images.pexels.com/photos/1540338/pexels-photo-1540338.jpeg?w=800',
 			color: '#ECF9FD'
@@ -49,7 +49,7 @@
 		<div class="text-center max-w-3xl mx-auto mb-16">
 			<h2 class="text-3xl md:text-4xl font-bold tracking-tight mb-4">How It Works</h2>
 			<p class="text-lg text-muted-foreground">
-				Turn a signed photo into a shareable proof page. Every step keeps the credential trail intact so viewers can trust what they see.
+				Turn a real photo into a shareable proof page. Every step keeps the proof trail intact so viewers can see it’s not fake or AI-generated.
 			</p>
 		</div>
 
