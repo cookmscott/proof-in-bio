@@ -1,0 +1,156 @@
+-- WARNING: This schema is for context only and is not meant to be run.
+-- Table order and constraints may not be valid for execution.
+
+CREATE TABLE public.comments (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  photo_id uuid NOT NULL,
+  user_id uuid NOT NULL,
+  parent_id uuid,
+  content text NOT NULL CHECK (length(TRIM(BOTH FROM content)) > 0),
+  is_edited boolean DEFAULT false,
+  edited_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT comments_pkey PRIMARY KEY (id),
+  CONSTRAINT comments_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES public.photos(id),
+  CONSTRAINT comments_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_profiles(id),
+  CONSTRAINT comments_parent_id_fkey FOREIGN KEY (parent_id) REFERENCES public.comments(id)
+);
+CREATE TABLE public.follows (
+  id integer NOT NULL DEFAULT nextval('follows_id_seq'::regclass),
+  follower_id uuid NOT NULL,
+  following_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT follows_pkey PRIMARY KEY (id),
+  CONSTRAINT follows_follower_id_fkey FOREIGN KEY (follower_id) REFERENCES public.user_profiles(id),
+  CONSTRAINT follows_following_id_fkey FOREIGN KEY (following_id) REFERENCES public.user_profiles(id)
+);
+CREATE TABLE public.likes (
+  id integer NOT NULL DEFAULT nextval('likes_id_seq'::regclass),
+  user_id uuid NOT NULL,
+  photo_id uuid NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT likes_pkey PRIMARY KEY (id),
+  CONSTRAINT likes_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_profiles(id),
+  CONSTRAINT likes_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES public.photos(id)
+);
+CREATE TABLE public.photo_history (
+  id integer NOT NULL DEFAULT nextval('photo_history_id_seq'::regclass),
+  photo_id uuid NOT NULL,
+  c2pa_assertion jsonb NOT NULL,
+  performed_at timestamp with time zone NOT NULL CHECK (performed_at <= now()),
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT photo_history_pkey PRIMARY KEY (id),
+  CONSTRAINT photo_history_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES public.photos(id)
+);
+CREATE TABLE public.photos (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  user_id uuid NOT NULL,
+  title character varying,
+  description text,
+  storage_url character varying NOT NULL,
+  thumbnail_url character varying,
+  width integer NOT NULL,
+  height integer NOT NULL,
+  is_public boolean DEFAULT true,
+  is_archived boolean DEFAULT false,
+  view_count integer DEFAULT 0,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  visibility text NOT NULL DEFAULT 'public'::text CHECK (visibility = ANY (ARRAY['public'::text, 'unlisted'::text, 'followers'::text, 'private'::text])),
+  status text NOT NULL DEFAULT 'processing'::text CHECK (status = ANY (ARRAY['processing'::text, 'ready'::text, 'failed'::text, 'deleted'::text])),
+  taken_at timestamp with time zone,
+  published_at timestamp with time zone,
+  archived_at timestamp with time zone,
+  deleted_at timestamp with time zone,
+  like_count integer NOT NULL DEFAULT 0,
+  comment_count integer NOT NULL DEFAULT 0,
+  blurhash text,
+  storage_key text,
+  thumbnail_key text,
+  file_ext text,
+  CONSTRAINT photos_pkey PRIMARY KEY (id),
+  CONSTRAINT photos_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_profiles(id)
+);
+CREATE TABLE public.photos_metadata (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  photo_id uuid NOT NULL UNIQUE,
+  file_size integer NOT NULL,
+  mime_type character varying NOT NULL,
+  c2pa_manifest jsonb,
+  c2pa_verified boolean NOT NULL DEFAULT false,
+  c2pa_verified_at timestamp with time zone,
+  exif_data jsonb,
+  camera character varying,
+  lens character varying,
+  focal_length character varying,
+  aperture character varying,
+  shutter_speed character varying,
+  iso integer,
+  captured_at timestamp with time zone,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  original_filename text,
+  file_ext text,
+  sha256 text,
+  phash bigint,
+  metadata_extracted_at timestamp with time zone,
+  captured_at_source text,
+  gps_lat double precision,
+  gps_lng double precision,
+  gps_alt double precision,
+  gps_accuracy_meters integer,
+  location_name text,
+  location_visibility text NOT NULL DEFAULT 'hidden'::text CHECK (location_visibility = ANY (ARRAY['public'::text, 'followers'::text, 'private'::text, 'hidden'::text])),
+  location_obfuscated boolean NOT NULL DEFAULT false,
+  color_space text,
+  bit_depth smallint,
+  has_alpha boolean,
+  is_hdr boolean,
+  focal_length_35mm integer,
+  exposure_compensation numeric,
+  exposure_mode text,
+  metering_mode text,
+  white_balance text,
+  flash text,
+  focus_mode text,
+  has_ai boolean NOT NULL DEFAULT false,
+  CONSTRAINT photos_metadata_pkey PRIMARY KEY (id),
+  CONSTRAINT photos_metadata_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES public.photos(id)
+);
+CREATE TABLE public.user_interests (
+  id integer NOT NULL DEFAULT nextval('user_interests_id_seq'::regclass),
+  user_id uuid NOT NULL,
+  interest character varying NOT NULL,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT user_interests_pkey PRIMARY KEY (id),
+  CONSTRAINT user_interests_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_profiles(id)
+);
+CREATE TABLE public.user_profiles (
+  id uuid NOT NULL,
+  email character varying NOT NULL UNIQUE,
+  username character varying NOT NULL UNIQUE CHECK (username::text ~ '^[a-z0-9]([a-z0-9-]*[a-z0-9])?$'::text AND length(username::text) >= 3),
+  display_name character varying,
+  bio text,
+  avatar_url character varying,
+  website character varying,
+  location character varying,
+  is_verified boolean DEFAULT false,
+  is_public boolean DEFAULT true,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  updated_at timestamp with time zone NOT NULL DEFAULT now(),
+  username_changes integer NOT NULL DEFAULT 0,
+  CONSTRAINT user_profiles_pkey PRIMARY KEY (id),
+  CONSTRAINT user_profiles_id_fkey FOREIGN KEY (id) REFERENCES auth.users(id)
+);
+CREATE TABLE public.views (
+  id uuid NOT NULL DEFAULT gen_random_uuid(),
+  photo_id uuid NOT NULL,
+  user_id uuid,
+  ip_address inet,
+  user_agent text,
+  created_at timestamp with time zone NOT NULL DEFAULT now(),
+  CONSTRAINT views_pkey PRIMARY KEY (id),
+  CONSTRAINT views_photo_id_fkey FOREIGN KEY (photo_id) REFERENCES public.photos(id),
+  CONSTRAINT views_user_id_fkey FOREIGN KEY (user_id) REFERENCES public.user_profiles(id)
+);

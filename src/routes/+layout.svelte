@@ -61,7 +61,17 @@
 	{#if !isLandingPage}
 		<header class="border-b bg-background/95 backdrop-blur z-40 sticky top-0">
 			<div class="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-				<a href="/" class="font-bold tracking-tight"> ProofInBio </a>
+				<div class="flex items-center gap-8">
+					<a href="/" class="font-bold tracking-tight text-xl"> ProofInBio </a>
+					<nav class="hidden md:flex items-center gap-6 text-sm font-medium">
+						<a 
+							href="/following" 
+							class="transition-colors hover:text-primary {$page.url.pathname.startsWith('/following') ? 'text-primary' : 'text-muted-foreground'}"
+						>
+							Following
+						</a>
+					</nav>
+				</div>
 				<GlobalAvatar {session} {user} {supabase} />
 			</div>
 		</header>

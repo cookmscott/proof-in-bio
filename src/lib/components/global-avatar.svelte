@@ -4,7 +4,7 @@
 	import { page } from '$app/stores';
 	import * as DropdownMenu from '$lib/ui/dropdown-menu/index.js';
 	import { goto, invalidate, invalidateAll } from '$app/navigation';
-	import { User, Settings, LogOut } from 'lucide-svelte';
+	import { User, Settings, LogOut, Users } from 'lucide-svelte';
 	import { authDialog } from '$lib/stores/auth';
 
 	// Props from layout
@@ -94,6 +94,12 @@
 						<a href={username ? `/${username}` : '/profile'} class="flex w-full items-center px-2 py-1.5">
 							<User class="w-4 h-4 mr-2" />
 							Profile
+						</a>
+					</DropdownMenu.Item>
+					<DropdownMenu.Item asChild class="p-0">
+						<a href="/following" class="flex w-full items-center px-2 py-1.5">
+							<Users class="w-4 h-4 mr-2" />
+							Following
 						</a>
 					</DropdownMenu.Item>
 					<DropdownMenu.Item asChild class="p-0">
