@@ -101,7 +101,7 @@
 					<p class="text-sm text-zinc-500 dark:text-zinc-400">Is it real? Is it AI? Who knows.</p>
 				</div>
 				<!-- Thinking Cat (Always suspicious) -->
-				<div class="absolute -top-10 -left-8 z-30 animate-bounce-subtle pointer-events-none">
+				<div class="absolute top-0 -left-8 z-30 animate-bounce-subtle pointer-events-none">
 					<img src="/landing/cat_think.gif" alt="Thinking Cat" class="w-28 h-28 object-contain drop-shadow-xl" />
 					<div class="absolute right-0 -top-2 bg-[#FFF9EE] dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform rotate-12">
 						Is this real? 🤔
@@ -181,7 +181,7 @@
 					<p class="text-sm text-zinc-500 dark:text-zinc-400">We check it’s real — not fake or AI-generated.</p>
 				</div>
 				<!-- Dynamic Cat (Thinking -> Happy) https://giphy.com/Kennymays-->
-				<div class="absolute -top-10 -right-8 z-30 pointer-events-none w-28 h-28">
+				<div class="absolute top-0 -right-8 z-30 pointer-events-none w-28 h-28">
 					{#if showProof}
 						<div class="absolute inset-0 animate-bounce-subtle">
 							<img src="/landing/cat_happy.gif" alt="Happy Cat" class="w-full h-full object-contain drop-shadow-xl" />

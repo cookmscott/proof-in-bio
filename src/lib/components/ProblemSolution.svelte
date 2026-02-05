@@ -15,8 +15,15 @@
     import { Button } from '$lib/ui/button/index.js';
 </script>
 
-<section class="bg-background py-24 font-sans selection:bg-primary selection:text-primary-foreground">
-    <div class="container mx-auto max-w-7xl px-6">
+<section class="relative overflow-hidden bg-background py-24 font-sans selection:bg-primary selection:text-primary-foreground">
+<div class="absolute inset-0 pointer-events-none bg-gradient-to-b from-background/0 via-background/40 to-background"></div>
+
+<div class="absolute -top-24 left-1/2 h-96 w-[520px] -translate-x-1/2 rounded-full bg-gradient-to-b from-red-400/20 via-orange-400/10 to-transparent blur-3xl"></div>
+
+
+
+
+<div class="container relative z-10 mx-auto max-w-7xl px-6">
         
         <!-- SECTION 1: The Problem & Solution -->
         
