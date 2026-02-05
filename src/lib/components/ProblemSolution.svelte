@@ -122,7 +122,7 @@
                 <!-- Solution Visual -->
                 <div class="relative rounded-2xl overflow-hidden border border-green-200/50 dark:border-green-900/50 shadow-lg aspect-video bg-white dark:bg-zinc-900 flex items-center justify-center group">
                     <img 
-                        src="/landing/tokyo_sm.jpg" 
+                        src="https://images.unsplash.com/photo-1503899036084-c55cdd92da26?w=800&h=600&fit=crop" 
                         alt="Verified Content" 
                         class="absolute inset-0 w-full h-full object-cover opacity-90"
                     />
