@@ -1,0 +1,53 @@
+model,make
+EOS R1,Canon
+EOS R5 Mark II,Canon
+Z6III,Nikon
+M11-P,Leica
+M11-D,Leica
+SL3-S,Leica
+Q3 Monochrom,Leica
+M EV1,Leica
+Alpha 1,Sony
+Alpha 1 II,Sony
+Alpha 9 III,Sony
+Alpha 7 IV,Sony
+Alpha 7S III,Sony
+Alpha 7R V,Sony
+Cinema Line FX3,Sony
+Cinema Line FX30,Sony
+PXW-Z300,Sony
+Pixel 10,Google
+Pixel 10 Pro,Google
+Pixel 10 Pro XL,Google
+Pixel 10 Pro Fold,Google
+Galaxy S25,Samsung
+Galaxy S25+,Samsung
+Galaxy S25 Ultra,Samsung
+
+model,make,release_status,support_type
+m11-p,leica,released,native hardware
+m11-d,leica,released,native hardware
+sl3-s,leica,released,native hardware
+q3 monochrom,leica,released,native hardware
+alpha 1 ii,sony,released,native hardware/video
+alpha 9 iii,sony,released,firmware v2.00+
+alpha 1,sony,released,firmware v2.00+ (stills) / v4.00+ (video)
+alpha 7 iv,sony,released,firmware v3.00+ (stills) / v6.00+ (video)
+alpha 7s iii,sony,released,firmware v3.00+ (stills) / 2026 update (video)
+alpha 7r v,sony,released,firmware v4.00+
+fx3,sony,released,firmware v4.00+
+fx30,sony,released,firmware v4.00+
+pxw-z300,sony,released,native hardware/video
+z6 iii,nikon,released,firmware v2.00+
+z9,nikon,released,pilot/agency firmware
+z8,nikon,released,firmware v3.10+
+eos r1,canon,released,native hardware/agency firmware
+eos r5 mark ii,canon,released,native hardware/agency firmware
+gfx100s ii,fujifilm,released,native hardware
+x-t50,fujifilm,released,native hardware
+gfx100 ii,fujifilm,released,firmware v2.30+
+x-h2s,fujifilm,released,firmware v7.10+
+x-h2,fujifilm,released,firmware v5.10+
+pixel 10,google,released,native hardware
+galaxy s25,samsung,released,native hardware
+alpha 7r vi,sony,rumored 2026,expected native support

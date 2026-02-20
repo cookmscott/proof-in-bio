@@ -32,3 +32,6 @@ vite.config.ts.timestamp-*
 
 # Editor
 /.vscode
+
+# Photos
+downloads
