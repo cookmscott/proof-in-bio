@@ -98,7 +98,16 @@
     </div>
 
     <!-- Marquee Rows -->
-    <div class="flex flex-col gap-4 relative">
+    <div class="flex flex-col gap-4 relative isolate">
+        <!-- Centered vertical glow to lift logo contrast in dark mode -->
+        <div
+            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[125%] pointer-events-none -z-10
+            bg-gradient-to-b from-transparent via-zinc-100/70 to-transparent dark:via-white/8 blur-2xl"
+        ></div>
+        <div
+            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[78%] pointer-events-none -z-10
+            bg-gradient-to-b from-transparent via-white/60 to-transparent dark:via-zinc-100/10"
+        ></div>
         
         <!-- Row 1: News Logos (Right to Left) - Slow -->
         <div class="relative flex overflow-hidden w-full select-none">

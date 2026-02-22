@@ -1,8 +1,7 @@
 <script>
     import { Input } from "$lib/ui/input";
-    import * as Carousel from "$lib/ui/carousel";
     import * as Avatar from "$lib/ui/avatar";
-    import { Search, Heart, Eye } from "lucide-svelte";
+    import { Search, Heart, MessageCircle, Share2, Bookmark, MoreHorizontal } from "lucide-svelte";
     
     let { data } = $props();
     let searchQuery = $state("");
@@ -29,75 +28,6 @@
         return { key, label: dateFormatter.format(date), value };
     };
 
-    let feed = $derived.by(() => {
-        const allPhotos = [];
-        const query = searchQuery.toLowerCase().trim();
-
-        // 1. Flatten all photos with user reference
-        for (const user of data.users ?? []) {
-            // Filter users by search query if present
-            if (query && !user.username?.toLowerCase().includes(query)) {
-                continue;
-            }
-
-            if (user.photos) {
-                for (const photo of user.photos) {
-                    allPhotos.push({ ...photo, user });
-                }
-            }
-        }
-
-        // 2. Group by Date
-        const dateGroups = new Map();
-        for (const photo of allPhotos) {
-            const { key, label, value } = getDateGrouping(photo.created_at);
-            
-            if (!dateGroups.has(key)) {
-                dateGroups.set(key, {
-                    key,
-                    label,
-                    value,
-                    items: []
-                });
-            }
-            dateGroups.get(key).items.push(photo);
-        }
-
-        // 3. Sort dates descending
-        const sortedDates = Array.from(dateGroups.values())
-            .sort((a, b) => b.value - a.value);
-
-        // 4. Group by User within each Date
-        return sortedDates.map(dateGroup => {
-            const userMap = new Map();
-            
-            for (const photo of dateGroup.items) {
-                const username = photo.user.username;
-                if (!userMap.has(username)) {
-                    userMap.set(username, {
-                        user: photo.user,
-                        photos: []
-                    });
-                }
-                userMap.get(username).photos.push(photo);
-            }
-
-            // Sort users by latest photo in that group
-            const userGroups = Array.from(userMap.values()).sort((a, b) => {
-                const maxA = Math.max(...a.photos.map(p => new Date(p.created_at ?? 0).getTime()));
-                const maxB = Math.max(...b.photos.map(p => new Date(p.created_at ?? 0).getTime()));
-                return maxB - maxA;
-            });
-
-            return {
-                ...dateGroup,
-                userGroups
-            };
-        });
-    });
-
-    const statCache = new Map();
-
     const hashString = (input) => {
         let hash = 0;
         for (let i = 0; i < input.length; i += 1) {
@@ -112,119 +42,209 @@
         return min + (seed % range);
     };
 
-    const getPhotoStats = (photo) => {
-        const key = `${photo?.id ?? "no-id"}|${photo?.storage_url ?? ""}|${photo?.created_at ?? ""}`;
-        if (statCache.has(key)) {
-            return statCache.get(key);
+    // Calculate aggregated stats for a post based on its unique key
+    const getPostStats = (postKey, photos) => {
+        const seed = hashString(postKey);
+        
+        let realLikes = 0;
+        let hasRealStats = false;
+        
+        for (const photo of photos) {
+            if (Number.isFinite(photo.like_count) && photo.like_count > 0) {
+                realLikes += photo.like_count;
+                hasRealStats = true;
+            }
         }
 
-        const seed = hashString(key);
-        const stats = {
-            likes: Number.isFinite(photo?.like_count) && photo.like_count > 0
-                ? photo.like_count
-                : seededCount(seed, 8, 420),
-            views: Number.isFinite(photo?.view_count) && photo.view_count > 0
-                ? photo.view_count
-                : seededCount(seed * 7, 150, 12000)
+        return {
+            likes: hasRealStats ? realLikes : seededCount(seed, 12, 850),
+            comments: seededCount(seed * 2, 0, 85)
         };
-
-        statCache.set(key, stats);
-        return stats;
     };
+
+    let feed = $derived.by(() => {
+        const query = searchQuery.toLowerCase().trim();
+        const postsMap = new Map();
+
+        // 1. Flatten and filter all photos
+        for (const user of data.users ?? []) {
+            if (query && !user.username?.toLowerCase().includes(query)) {
+                continue;
+            }
+
+            if (user.photos) {
+                for (const photo of user.photos) {
+                    const { key: dateKey, label: dateLabel, value: dateValue } = getDateGrouping(photo.created_at);
+                    
+                    // Grouping photos by user AND date to form a "Post"
+                    const postKey = `${user.username}-${dateKey}`;
+                    
+                    if (!postsMap.has(postKey)) {
+                        postsMap.set(postKey, {
+                            id: postKey,
+                            user: user,
+                            dateLabel,
+                            timestamp: dateValue,
+                            photos: []
+                        });
+                    }
+                    postsMap.get(postKey).photos.push(photo);
+                }
+            }
+        }
+
+        // 2. Convert map to array and sort by most recent
+        return Array.from(postsMap.values())
+            .sort((a, b) => b.timestamp - a.timestamp)
+            .map(post => ({
+                ...post,
+                stats: getPostStats(post.id, post.photos)
+            }));
+    });
 </script>
 
-<div class="container py-8 max-w-3xl mx-auto space-y-8 px-4 md:px-6">
+<div class="container py-8 max-w-2xl mx-auto space-y-8 px-4 sm:px-6">
     <!-- Search Section -->
-    <div class="relative max-w-md mx-auto mb-8">
+    <div class="relative max-w-md mx-auto mb-10">
         <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
             placeholder="Search users..." 
-            class="pl-9 bg-background border-input" 
+            class="pl-9 bg-background border-input rounded-full" 
             bind:value={searchQuery}
         />
     </div>
 
     <!-- Feed -->
-    <div class="space-y-12">
+    <div class="space-y-8">
         {#if feed.length === 0}
-            <div class="text-center py-12 text-muted-foreground">
+            <div class="text-center py-16 text-muted-foreground border rounded-2xl bg-card border-dashed">
                 <p>No photos found.</p>
             </div>
         {/if}
 
-        {#each feed as dateGroup (dateGroup.key)}
-            <div class="relative">
-                <!-- Date Header -->
-                <div class="sticky top-0 z-10 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-3 mb-6 border-b">
-                    <h2 class="text-sm font-semibold text-muted-foreground uppercase tracking-wider flex items-center gap-2">
-                        <span class="w-1.5 h-1.5 rounded-full bg-primary/50"></span>
-                        {dateGroup.label}
-                    </h2>
+        {#each feed as post (post.id)}
+            <article class="bg-card text-card-foreground border rounded-2xl overflow-hidden shadow-sm">
+                <!-- Post Header -->
+                <div class="flex items-center justify-between p-4">
+                    <div class="flex items-center gap-3">
+                        <a href="/{post.user.username}">
+                            <Avatar.Root class="h-10 w-10 border border-border transition-opacity hover:opacity-80">
+                                {#if post.user.avatar_url}
+                                    <Avatar.Image src={post.user.avatar_url} alt={post.user.username} />
+                                {/if}
+                                <Avatar.Fallback class="bg-primary/5">{post.user.username?.slice(0, 2).toUpperCase() || 'U'}</Avatar.Fallback>
+                            </Avatar.Root>
+                        </a>
+                        <div class="flex flex-col leading-tight">
+                            <a href="/{post.user.username}" class="font-semibold text-sm hover:underline decoration-primary underline-offset-2">
+                                {post.user.username}
+                            </a>
+                            <span class="text-xs text-muted-foreground mt-0.5">
+                                {post.dateLabel}
+                            </span>
+                        </div>
+                    </div>
+                    <button class="p-2 text-muted-foreground hover:text-foreground transition-colors rounded-full hover:bg-muted">
+                        <MoreHorizontal class="h-5 w-5" />
+                    </button>
                 </div>
 
-                <div class="space-y-10 pl-2 md:pl-4 border-l border-border/40 ml-0.5 md:ml-1">
-                    {#each dateGroup.userGroups as userGroup (userGroup.user.username)}
-                        <div class="space-y-4">
-                            <!-- User Header -->
-                            <div class="flex items-center gap-3">
-                                <Avatar.Root class="h-9 w-9 border border-border">
-                                    {#if userGroup.user.avatar_url}
-                                        <Avatar.Image src={userGroup.user.avatar_url} alt={userGroup.user.username} />
-                                    {/if}
-                                    <Avatar.Fallback>{userGroup.user.username?.slice(0, 2).toUpperCase() || 'U'}</Avatar.Fallback>
-                                </Avatar.Root>
-                                <div class="flex flex-col leading-none">
-                                    <a href="/{userGroup.user.username}" class="font-semibold hover:underline decoration-primary underline-offset-4 text-sm">
-                                        {userGroup.user.username}
+                <!-- Post Content (Photo Grid) -->
+                <div class="w-full bg-muted/30 border-y">
+                    {#if post.photos.length === 1}
+                        <a href="/{post.user.username}/{post.photos[0].id}" class="block group overflow-hidden">
+                            <img 
+                                src={post.photos[0].storage_url} 
+                                alt="" 
+                                class="w-full h-auto max-h-[600px] object-cover transition-transform duration-500 group-hover:scale-[1.02]" 
+                                loading="lazy" 
+                            />
+                        </a>
+                    
+                    {:else if post.photos.length === 2}
+                        <div class="grid grid-cols-2 gap-0.5">
+                            {#each post.photos.slice(0, 2) as photo}
+                                <a href="/{post.user.username}/{photo.id}" class="block aspect-square overflow-hidden group">
+                                    <img src={photo.storage_url} alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" />
+                                </a>
+                            {/each}
+                        </div>
+                    
+                    {:else if post.photos.length === 3}
+                        <div class="grid grid-cols-2 gap-0.5 h-[400px] sm:h-[500px]">
+                            <a href="/{post.user.username}/{post.photos[0].id}" class="block h-full overflow-hidden group">
+                                <img src={post.photos[0].storage_url} alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" />
+                            </a>
+                            <div class="grid grid-rows-2 gap-0.5 h-full">
+                                {#each post.photos.slice(1, 3) as photo}
+                                    <a href="/{post.user.username}/{photo.id}" class="block h-full overflow-hidden group">
+                                        <img src={photo.storage_url} alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" />
                                     </a>
-                                    <span class="text-xs text-muted-foreground mt-1">
-                                        Added {userGroup.photos.length} photo{userGroup.photos.length === 1 ? '' : 's'}
-                                    </span>
-                                </div>
-                            </div>
-
-                            <!-- Photos Carousel -->
-                            <div class="relative">
-                                <Carousel.Root opts={{ align: "start", loop: false }} class="w-full">
-                                    <Carousel.Content class="-ml-4">
-                                        {#each userGroup.photos as photo (photo.id)}
-                                            {@const stats = getPhotoStats(photo)}
-                                            <Carousel.Item class="pl-4 basis-1/2 sm:basis-1/3">
-                                                <a href="/{userGroup.user.username}/{photo.id}" class="group relative block aspect-[4/5] overflow-hidden rounded-lg border bg-muted shadow-sm transition-all hover:shadow-md">
-                                                    <img 
-                                                        src={photo.storage_url} 
-                                                        alt="" 
-                                                        class="h-full w-full object-cover"
-                                                        loading="lazy"
-                                                    />
-                                                    <!-- Overlay -->
-                                                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-100 group-hover:opacity-0 transition-opacity duration-300"></div>
-                                                    
-                                                    <!-- Stats -->
-                                                    <div class="absolute bottom-0 left-0 right-0 p-3 flex items-center justify-between text-white text-xs opacity-100 group-hover:opacity-0 transition-opacity duration-300">
-                                                        <div class="flex items-center gap-1">
-                                                            <Heart class="h-3 w-3 fill-current" />
-                                                            <span>{stats.likes}</span>
-                                                        </div>
-                                                        <div class="flex items-center gap-1">
-                                                            <Eye class="h-3 w-3" />
-                                                            <span>{stats.views}</span>
-                                                        </div>
-                                                    </div>
-                                                </a>
-                                            </Carousel.Item>
-                                        {/each}
-                                    </Carousel.Content>
-                                    {#if userGroup.photos.length > 2}
-                                        <Carousel.Previous class="left-2 hidden md:flex h-8 w-8" />
-                                        <Carousel.Next class="right-2 hidden md:flex h-8 w-8" />
-                                    {/if}
-                                </Carousel.Root>
+                                {/each}
                             </div>
                         </div>
-                    {/each}
+                    
+                    {:else}
+                        <div class="grid grid-cols-2 grid-rows-2 gap-0.5 aspect-square">
+                            {#each post.photos.slice(0, 3) as photo}
+                                <a href="/{post.user.username}/{photo.id}" class="block overflow-hidden group h-full">
+                                    <img src={photo.storage_url} alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" />
+                                </a>
+                            {/each}
+                            
+                            <!-- 4th Item with potential "5+" overlay -->
+                            <a href="/{post.user.username}/{post.photos[3].id}" class="block relative overflow-hidden group h-full">
+                                <img src={post.photos[3].storage_url} alt="" class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-[1.05]" loading="lazy" />
+                                
+                                {#if post.photos.length > 4}
+                                    <div class="absolute inset-0 bg-black/50 backdrop-blur-[2px] flex items-center justify-center transition-colors group-hover:bg-black/60">
+                                        <span class="text-white text-3xl font-medium tracking-tight">+{post.photos.length - 3}</span>
+                                    </div>
+                                {/if}
+                            </a>
+                        </div>
+                    {/if}
                 </div>
-            </div>
+
+                <!-- Post Actions & Footer -->
+                <div class="p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-4">
+                            <button class="hover:text-muted-foreground transition-colors group">
+                                <Heart class="h-6 w-6 group-hover:fill-current group-hover:text-red-500 transition-all" />
+                            </button>
+                            <button class="hover:text-muted-foreground transition-colors">
+                                <MessageCircle class="h-6 w-6" />
+                            </button>
+                            <button class="hover:text-muted-foreground transition-colors">
+                                <Share2 class="h-6 w-6" />
+                            </button>
+                        </div>
+                        <button class="hover:text-muted-foreground transition-colors">
+                            <Bookmark class="h-6 w-6" />
+                        </button>
+                    </div>
+
+                    <div class="flex flex-col gap-1">
+                        <span class="font-semibold text-sm">
+                            {post.stats.likes.toLocaleString()} likes
+                        </span>
+                        
+                        {#if post.photos.length > 1}
+                            <div class="text-sm">
+                                <span class="font-semibold">{post.user.username}</span> 
+                                <span class="text-foreground/90">added a collection of {post.photos.length} photos.</span>
+                            </div>
+                        {/if}
+                        
+                        {#if post.stats.comments > 0}
+                            <button class="text-sm text-muted-foreground text-left mt-1 hover:underline">
+                                View all {post.stats.comments} comments
+                            </button>
+                        {/if}
+                    </div>
+                </div>
+            </article>
         {/each}
     </div>
 </div>

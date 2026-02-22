@@ -234,7 +234,7 @@
                             </div>
 
                             <div class="overflow-x-auto border border-border bg-background -mx-4 md:mx-0 rounded-none md:rounded-lg">
-                                <table class="w-full min-w-[500px] md:min-w-[600px] text-sm text-left">
+                                <table class="w-full min-w-[500px] md:min-w-0 text-sm text-left">
                                     <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                                         <tr>
                                             <th class="px-3 md:px-4 py-3 w-[28%]">Model</th>
@@ -281,7 +281,7 @@
                             </div>
 
                             <div class="overflow-x-auto rounded-lg border border-border bg-background">
-                                <table class="w-full min-w-0 md:min-w-[500px] text-sm text-left">
+                                <table class="w-full min-w-[500px] md:min-w-0 text-sm text-left">
                                     <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                                         <tr>
                                             <th class="px-3 md:px-4 py-3 w-[40%]">Tool / Platform</th>

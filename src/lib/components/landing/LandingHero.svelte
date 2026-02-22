@@ -79,8 +79,7 @@
 				<!-- Verified Badge & Attribution -->
 				<div class="verified-info absolute bottom-0 left-0 w-full p-8 opacity-0 z-30 pointer-events-none">
 					<div class="flex items-center gap-2 mb-2">
-						<div class="h-px w-8 bg-emerald-500/50"></div>
-						<p class="text-[10px] font-bold tracking-[0.2em] text-emerald-400 uppercase">Proven</p>
+						<p class="text-[11px] font-bold tracking-[0.2em] text-emerald-400 uppercase">Real and Verified</p>
 					</div>
 					<h2 class="text-2xl font-bold text-white tracking-tight leading-none">Mathias Reding</h2>
 					<p class="text-gray-300 text-xs mt-1 font-light">Photographer</p>
