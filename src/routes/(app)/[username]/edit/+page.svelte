@@ -147,12 +147,22 @@
                         <input
                             type="text"
                             id="username"
-                            value={formData.username}
-                            readonly
-                            disabled
-                            class="flex h-10 w-full rounded-md border border-input bg-muted px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                            name="username"
+                            bind:value={formData.username}
+                            readonly={(data.profile?.username_changes || 0) >= 2}
+                            disabled={(data.profile?.username_changes || 0) >= 2}
+                            class="flex h-10 w-full rounded-md border border-input px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 {(data.profile?.username_changes || 0) >= 2 ? 'bg-muted' : 'bg-background'}"
                         />
-                        <p class="text-[0.8rem] text-muted-foreground">Your unique profile URL.</p>
+                        <div class="flex justify-between items-center text-[0.8rem] text-muted-foreground">
+                            <span>Your unique profile URL.</span>
+                            <span class={(data.profile?.username_changes || 0) >= 2 ? 'text-destructive' : ''}>
+                                {#if (data.profile?.username_changes || 0) >= 2}
+                                    Max changes reached
+                                {:else}
+                                    {2 - (data.profile?.username_changes || 0)} changes remaining
+                                {/if}
+                            </span>
+                        </div>
                     </div>
 
                     <div class="space-y-2">

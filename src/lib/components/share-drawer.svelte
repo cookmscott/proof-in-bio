@@ -149,7 +149,7 @@
             
             <Drawer.Footer>
                 <Drawer.Close>
-                    <Button variant="outline">Close<X class="h-4 w-4" /></Button>
+                    <Button variant="secondary" class="rounded-full bg-secondary/30 border-none">Close<X class="ml-2 h-4 w-4" /></Button>
                 </Drawer.Close>
             </Drawer.Footer>
         </div>

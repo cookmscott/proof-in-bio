@@ -10,7 +10,7 @@
 					<Camera class="h-5 w-5 text-muted-foreground" />
 					<span class="font-bold">Proof in Bio</span>
 				</div>
-				<p class="text-sm text-muted-foreground">The verified gallery for real creators.</p>
+				<p class="text-sm text-muted-foreground">The proof gallery for real creators.</p>
 			</div>
 
 			<div class="space-y-4">

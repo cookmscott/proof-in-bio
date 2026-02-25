@@ -104,15 +104,18 @@ serve(async (req) => {
       }
     }
 
-    // Upload to Storage
-    const fileExt = file.name.split('.').pop()?.toLowerCase() || 'jpg'
-    const fileName = `${user.id}/${crypto.randomUUID()}.${fileExt}`
+    // Generate ID and Storage Key
+    const photoId = crypto.randomUUID()
+    const fileExt =
+      file.name.split('.').pop()?.toLowerCase() ||
+      (file.type === 'image/png' ? 'png' : 'jpg')
+    const storage_key = `${user.id}/${photoId}.${fileExt}`
     
     console.log("before upload", file.size, file.type);
     const { data: storageData, error: storageError } = await supabase.storage
       .from('photos')
-      .upload(fileName, file, {
-        contentType: file.type || 'application/octet-stream',
+      .upload(storage_key, file, {
+        contentType: file.type || `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
         upsert: false
       })
 
@@ -121,7 +124,7 @@ serve(async (req) => {
 
     const { data: { publicUrl } } = supabase.storage
       .from('photos')
-      .getPublicUrl(fileName)
+      .getPublicUrl(storage_key)
 
     const width = Number(metadata.width) || 0
     const height = Number(metadata.height) || 0
@@ -131,9 +134,11 @@ serve(async (req) => {
     const { data: photo, error: photoError } = await supabase
       .from('photos')
       .insert({
+        id: photoId,
         user_id: user.id,
         storage_url: publicUrl,
-        storage_key: storageData?.path ?? fileName,
+        storage_key: storage_key,
+        file_ext: fileExt,
         width,
         height,
         title: metadata.title || file.name,
@@ -150,7 +155,7 @@ serve(async (req) => {
     console.log("after photos insert", photo?.id);
     if (photoError) {
         // Cleanup storage if db fails
-        await supabase.storage.from('photos').remove([fileName])
+        await supabase.storage.from('photos').remove([storage_key])
         throw photoError
     }
 
@@ -165,6 +170,7 @@ serve(async (req) => {
         c2pa_manifest: metadata.c2pa_manifest,
         c2pa_verified: metadata.c2pa_verified || false,
         c2pa_verified_at: metadata.c2pa_verified ? new Date().toISOString() : null,
+        has_ai: metadata.has_ai || false,
         exif_data: metadata.exif_data,
         camera: metadata.camera,
         lens: metadata.lens,

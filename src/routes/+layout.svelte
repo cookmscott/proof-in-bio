@@ -61,7 +61,9 @@
 	{#if !isLandingPage}
 		<header class="border-b bg-background/95 backdrop-blur z-40 sticky top-0">
 			<div class="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
-				<a href="/" class="font-bold tracking-tight"> ProofInBio </a>
+				<div class="flex items-center gap-8">
+					<span class="font-bold text-lg text-foreground tracking-tight">ProofInBio</span>
+				</div>
 				<GlobalAvatar {session} {user} {supabase} />
 			</div>
 		</header>

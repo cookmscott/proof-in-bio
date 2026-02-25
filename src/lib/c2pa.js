@@ -30,6 +30,16 @@ export const ACTION_CATEGORIES = {
     // Font-Specific (13)
 };
 
+export function isAiAction(action) {
+    if (!action) return false;
+    const digitalSourceType = action.digitalSourceType || action.parameters?.['digitalSourceType'] || action.parameters?.['http://cv.iptc.org/newscodes/digitalsourcetype/'];
+    if (digitalSourceType) {
+         const t = String(digitalSourceType);
+         if (t.includes('trainedAlgorithmicData') || t.includes('compositeWithTrainedAlgorithmicMedia')) return true;
+    }
+    return false;
+}
+
 export function getActionCategory(actionId) {
     return ACTION_CATEGORIES[actionId] || { order: 99, label: 'Other Actions', icon: Code };
 }
@@ -327,6 +337,7 @@ export function analyzeProvenance(store) {
     const hasManifest = true;
     const { actions: activeActions } = extractActionsAll(activeManifest.assertions || []);
     const hasActions = activeActions.length > 0;
+    const has_ai = activeActions.some(isAiAction);
 
     const activeIsCapture = getManifestCaptureStatus(activeManifest);
     let hasCaptureProvenance = activeIsCapture;
@@ -397,7 +408,8 @@ export function analyzeProvenance(store) {
         captureSignatureValidated,
 
         // UI: show actions from active (edits) chain
-        actions: activeActions
+        actions: activeActions,
+        has_ai
     };
 }
 
@@ -411,6 +423,17 @@ export function extractImageMetadata(manifestStore) {
         c2pa_manifest: manifestStore,
         // c2pa_verified will be set by the caller based on validation logic
     };
+
+    // Calculate has_ai
+    let has_ai = false;
+    const { actions } = extractActionsAll(activeManifest.assertions || []);
+    for (const action of actions) {
+        if (isAiAction(action)) {
+            has_ai = true;
+            break;
+        }
+    }
+    metadata.has_ai = has_ai;
 
     // Helper to find assertion data by label prefix
     const findAssertionData = (labelPrefix) => {

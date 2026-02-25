@@ -16,6 +16,7 @@ export async function load({ params, locals: { supabase } }) {
 		`
 		)
 		.eq('id', params.id)
+		.is('deleted_at', null)
 		.single();
 
 	if (photoError || !photo) {

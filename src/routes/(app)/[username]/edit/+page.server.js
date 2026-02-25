@@ -57,6 +57,7 @@ export const actions = {
 		}
 
 		const formData = await request.formData();
+		const newUsername = formData.get('username')?.toString().trim();
 		const display_name = formData.get('display_name');
 		const bio = formData.get('bio');
 		const website = formData.get('website');
@@ -68,6 +69,55 @@ export const actions = {
 				.map((i) => i.trim())
 				.filter(Boolean) || [];
 		const avatarFile = formData.get('avatar');
+
+		// Fetch current profile to check change limits
+		const { data: currentProfile, error: fetchError } = await locals.supabase
+			.from('user_profiles')
+			.select('username, username_changes')
+			.eq('id', currentUser.id)
+			.single();
+		
+		if (fetchError || !currentProfile) {
+			return fail(500, { error: 'Failed to fetch user profile' });
+		}
+
+		const updateData = {
+			display_name,
+			bio,
+			website,
+			location
+		};
+
+		let usernameChanged = false;
+
+		// Handle username change
+		if (newUsername && newUsername !== currentProfile.username) {
+			// Check limit
+			if ((currentProfile.username_changes || 0) >= 2) {
+				return fail(400, { error: 'Username can only be changed twice.' });
+			}
+
+			// Validate format (basic regex, adjust as needed)
+			if (!/^[a-zA-Z0-9_-]{3,30}$/.test(newUsername)) {
+				return fail(400, { error: 'Username must be 3-30 characters and contain only letters, numbers, underscores, or hyphens.' });
+			}
+
+			// Check uniqueness
+			const { data: existingUser } = await locals.supabase
+				.from('user_profiles')
+				.select('id')
+				.eq('username', newUsername)
+				.single();
+
+			if (existingUser) {
+				return fail(400, { error: 'Username is already taken.' });
+			}
+
+			// Apply change
+			updateData.username = newUsername;
+			updateData.username_changes = (currentProfile.username_changes || 0) + 1;
+			usernameChanged = true;
+		}
 
 		let avatar_url = null;
 
@@ -110,14 +160,6 @@ export const actions = {
 			avatar_url = urlData.publicUrl;
 		}
 
-		// Prepare update data (no username - it shouldn't be changed)
-		const updateData = {
-			display_name,
-			bio,
-			website,
-			location
-		};
-
 		// Add avatar_url if it was uploaded
 		if (avatar_url) {
 			updateData.avatar_url = avatar_url;
@@ -150,6 +192,10 @@ export const actions = {
 			if (interestsError) {
 				return fail(400, { error: interestsError.message });
 			}
+		}
+
+		if (usernameChanged) {
+			throw redirect(302, `/${updateData.username}/edit`);
 		}
 
 		return { success: true };

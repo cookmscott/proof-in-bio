@@ -1,5 +1,7 @@
 <script>
-	import { Share2, Plus, User, Upload } from 'lucide-svelte';
+	import { Share2, Plus, User, Upload, Check } from 'lucide-svelte';
+    import { invalidateAll } from '$app/navigation';
+    import { toast } from 'svelte-sonner';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
 	import { Button } from '$lib/ui/button';
 	import { Badge } from '$lib/ui/badge';
@@ -55,6 +57,10 @@
         uploadDialogOpen = true;
     }
 
+    function handleUploadComplete() {
+        invalidateAll();
+    }
+
 	// Use derived runes to reactively access profile and photos from loaded data
 	let profile = $derived(data.profile);
 	let photos = $derived(data.photos);
@@ -63,15 +69,90 @@
 	// Extract interests from the nested structure
 	let interests = $derived(profile.interests.map((i) => i.interest));
 
-	// Track loaded state for each image in the gallery
-	let loaded = $state(Array(photos.length).fill(false));
+	// Track loaded state for each image in the gallery using an object map
+	let loaded = $state({});
 
-	// Reset loaded state if photos array changes
-	$effect(() => {
-		if (photos.length !== loaded.length) {
-			loaded = Array(photos.length).fill(false);
-		}
-	});
+    // No need to reset loaded state on length change anymore, as we key by ID.
+    // New photos will simply not be in the map yet (undefined -> falsy).
+
+    function getPhotoUrl(photo) {
+        if (photo.storage_key) {
+            const { data: urlData } = data.supabase.storage
+                .from('photos')
+                .getPublicUrl(photo.storage_key);
+            return urlData.publicUrl;
+        }
+        return photo.storage_url;
+    }
+
+	let showCopiedTooltip = $state(false);
+	let copyTimeout;
+    let editImages = $state(false);
+    let selectedPhotoIds = $state([]);
+    let deleteSubmitting = $state(false);
+
+    function copyUsername() {
+        navigator.clipboard.writeText(`@${profile.username}`);
+        showCopiedTooltip = true;
+        if (copyTimeout) clearTimeout(copyTimeout);
+        copyTimeout = setTimeout(() => {
+            showCopiedTooltip = false;
+        }, 2000);
+    }
+
+    function toggleEditImages() {
+        editImages = !editImages;
+        if (!editImages) {
+            selectedPhotoIds = [];
+        }
+    }
+
+    function isPhotoSelected(photoId) {
+        return selectedPhotoIds.includes(photoId);
+    }
+
+    function togglePhotoSelection(photoId) {
+        if (isPhotoSelected(photoId)) {
+            selectedPhotoIds = selectedPhotoIds.filter((id) => id !== photoId);
+            return;
+        }
+        selectedPhotoIds = [...selectedPhotoIds, photoId];
+    }
+
+    async function handleDeleteSelected() {
+        if (selectedPhotoIds.length === 0 || deleteSubmitting) return;
+        const confirmed = confirm(
+            `Delete ${selectedPhotoIds.length} selected photo${selectedPhotoIds.length > 1 ? 's' : ''}?`
+        );
+        if (!confirmed) return;
+
+        deleteSubmitting = true;
+        try {
+            const formData = new FormData();
+            formData.set('photo_ids', selectedPhotoIds.join(','));
+
+            const response = await fetch('?/deletePhotos', {
+                method: 'POST',
+                body: formData
+            });
+
+            const result = await response.json();
+
+            if (result?.type === 'success') {
+                toast.success('Photos deleted.');
+                selectedPhotoIds = [];
+                editImages = false;
+                await invalidateAll();
+            } else {
+                toast.error(result?.data?.error || 'Failed to delete photos.');
+            }
+        } catch (err) {
+            console.error('Delete request failed', err);
+            toast.error('Failed to delete photos.');
+        } finally {
+            deleteSubmitting = false;
+        }
+    }
 </script>
 
 <svelte:window 
@@ -81,7 +162,7 @@
     ondragleave={handleWindowDragLeave}
 />
 
-{#if isDragging}
+{#if isDragging && !uploadDialogOpen}
     <div class="fixed inset-0 z-[1000] flex items-center justify-center bg-background/20 backdrop-blur-sm pointer-events-none">
         
         <div class="bg-background/40 backdrop-blur-xl border-2 border-dashed border-primary/50 p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-4 animate-in zoom-in-95 duration-200 ring-1 ring-white/10">
@@ -140,7 +221,19 @@
                         <h1 class="text-xl font-bold tracking-tight leading-tight sm:text-3xl">
                             {profile.display_name || profile.username}
                         </h1>
-                        <p class="text-muted-foreground text-sm sm:text-base">@{profile.username}</p>
+                        <button 
+                            class="text-muted-foreground text-sm sm:text-base hover:text-foreground transition-colors relative cursor-pointer"
+                            onclick={copyUsername}
+                            type="button"
+                            title="Click to copy username"
+                        >
+                            @{profile.username}
+                            {#if showCopiedTooltip}
+                                <span class="absolute left-full ml-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground text-xs px-2 py-1 rounded-md whitespace-nowrap z-50 animate-in fade-in zoom-in-95 duration-200 shadow-md">
+                                    Copied to clipboard
+                                </span>
+                            {/if}
+                        </button>
                         <p class="mt-2 max-w-xl text-balance text-sm sm:text-base">{profile.bio}</p>
                         <div class="mt-3 flex flex-wrap gap-2">
                             {#each interests as interest}
@@ -165,22 +258,84 @@
 
             <!-- Authenticated Photos Alert -->     
             <AuthenticatedPhotosAlert />
+
+            {#if canEdit}
+                <div class="my-3 flex items-center justify-end">
+                    <Button variant="ghost" size="sm" onclick={toggleEditImages}>
+                        {editImages ? 'Done Editing' : 'Edit Images'}
+                    </Button>
+                </div>
+            {/if}
             
+            {#if photos.length === 0}
+                {#if canEdit}
+                    <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg border-muted mt-4">
+                        <div class="bg-muted/30 p-4 rounded-full mb-4">
+                            <Upload class="h-10 w-10 text-muted-foreground/60" />
+                        </div>
+                        <h3 class="text-xl font-semibold tracking-tight">Upload your first photo</h3>
+                        <p class="text-muted-foreground max-w-sm mt-2 mb-6 text-sm">
+                            Your gallery is empty. Upload a photo to get started with C2PA verification.
+                        </p>
+                        <Button onclick={openUploadDialog} variant="outline">
+                            <Plus class="mr-2 h-4 w-4" />
+                            Add Photos
+                        </Button>
+                    </div>
+                {:else}
+                    <div class="flex flex-col items-center justify-center py-16 text-center border-2 border-dashed rounded-lg border-muted mt-4">
+                        <p class="text-muted-foreground">No photos yet.</p>
+                    </div>
+                {/if}
+            {/if}
+
             <!-- Photo Gallery Section -->
             <div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">
 				{#each photos as photo, i (photo.id)}
-					<a href={`/${profile.username}/${photo.id}`} class="group">
-                        <Card class="overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out group-hover:shadow-lg group-hover:-translate-y-1">
+					<a
+                        href={`/${profile.username}/${photo.id}`}
+                        class="group"
+                        onclick={(event) => {
+                            if (editImages) {
+                                event.preventDefault();
+                                togglePhotoSelection(photo.id);
+                            }
+                        }}
+                    >
+                        <Card
+                            class={`overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out ${
+                                editImages ? 'ring-2 ring-transparent' : ''
+                            } ${isPhotoSelected(photo.id) ? 'ring-2 ring-primary' : ''} group-hover:shadow-lg group-hover:-translate-y-1`}
+                        >
                             <AspectRatio ratio={1} class="bg-slate-100 dark:bg-slate-800 rounded-sm relative">
-                                {#if !loaded[i]}
+                                {#if !loaded[photo.id]}
                                     <Skeleton class="h-full w-full absolute" />
                                 {/if}
+                                {#if editImages}
+                                    <button
+                                        type="button"
+                                        class={`absolute top-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 ${
+                                            isPhotoSelected(photo.id)
+                                                ? 'border-primary bg-primary text-primary-foreground'
+                                                : 'border-white/90 bg-background/80 text-transparent'
+                                        } shadow-sm backdrop-blur`}
+                                        onclick={(event) => {
+                                            event.preventDefault();
+                                            event.stopPropagation();
+                                            togglePhotoSelection(photo.id);
+                                        }}
+                                        aria-pressed={isPhotoSelected(photo.id)}
+                                        aria-label={`Select photo ${photo.title || photo.id}`}
+                                    >
+                                        <Check class="h-3 w-3" />
+                                    </button>
+                                {/if}
                                 <img
-									src={photo.storage_url}
+									src={getPhotoUrl(photo)}
 									alt={photo.title || 'User photo'}
                                     class="h-full w-full object-cover rounded-sm transition-opacity duration-300"
-                                    style="opacity: {loaded[i] ? 1 : 0};"
-                                    onload={() => loaded[i] = true}
+                                    style="opacity: {loaded[photo.id] ? 1 : 0};"
+                                    onload={() => loaded[photo.id] = true}
                                 />
                             </AspectRatio>
                         </Card>
@@ -191,22 +346,58 @@
     </div>
 
     <!-- Fixed "Add Images" Button -->
-    <Button 
-        style="z-index: 999" 
-        class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn"
-        onclick={openUploadDialog}
-    >
-        <span class="flex items-center">
-            <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon" />
-            <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text">
-                Add Images
+    {#if canEdit && !editImages}
+        <Button 
+            style="z-index: 999" 
+            class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn"
+            onclick={openUploadDialog}
+        >
+            <span class="flex items-center">
+                <Plus class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon" />
+                <span class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text">
+                    Add Images
+                </span>
             </span>
-        </span>
-        <span class="sr-only">Add Images</span>
-    </Button>
+            <span class="sr-only">Add Images</span>
+        </Button>
+    {/if}
 </div>
 
-<C2paUploadDialog bind:this={uploadDialogComponent} bind:open={uploadDialogOpen} supabase={data.supabase} />
+{#if canEdit && editImages}
+    <div class="fixed bottom-0 left-0 right-0 z-[999] border-t bg-background/95 backdrop-blur-sm">
+        <div class="container mx-auto max-w-screen-lg px-4 py-3">
+            <div class="flex gap-3">
+                <Button
+                    variant="ghost"
+                    class="w-1/3"
+                    onclick={toggleEditImages}
+                >
+                    Cancel
+                </Button>
+                <Button
+                    variant="destructive"
+                    class="w-2/3 !bg-red-500 hover:!bg-red-600"
+                    disabled={selectedPhotoIds.length === 0 || deleteSubmitting}
+                    onclick={handleDeleteSelected}
+                >
+                    {#if deleteSubmitting}
+                        Deleting...
+                    {:else}
+                        Delete {selectedPhotoIds.length > 0 ? `(${selectedPhotoIds.length})` : ''}
+                    {/if}
+                </Button>
+            </div>
+        </div>
+    </div>
+{/if}
+
+<C2paUploadDialog 
+    bind:this={uploadDialogComponent} 
+    bind:open={uploadDialogOpen} 
+    supabase={data.supabase} 
+    allowAllPhotos={data.allowAllPhotos}
+    onUploadComplete={handleUploadComplete}
+/>
 
 <style>
     @keyframes expand-btn {
