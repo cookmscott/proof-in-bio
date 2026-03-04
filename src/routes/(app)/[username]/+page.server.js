@@ -29,7 +29,7 @@ export async function load({ params, locals: { supabase } }) {
 
 	if (profileError || !profile) {
 		// If the user doesn't exist, return a 404
-		error(404, 'User not found');
+		throw error(404, 'User not found');
 	}
 
 	// Fetch the user's photos

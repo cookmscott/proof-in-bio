@@ -6,8 +6,6 @@ export const load = async ({ cookies }) => {
 
   return {
     session,
-    user,
-    cookies: cookies.getAll()
+    user
   };
 };
-

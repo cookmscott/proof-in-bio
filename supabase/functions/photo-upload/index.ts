@@ -214,7 +214,34 @@ serve(async (req) => {
     console.log("after metadata insert");
     if (metaError) {
         console.error('Metadata insert failed', metaError)
-        // Optionally delete photo or ignore? For now we just log and return error
+
+        // Best-effort cleanup so we don't leave partially-ingested uploads behind.
+        const cleanupErrors: string[] = []
+
+        const { error: photoDeleteError } = await supabase
+          .from('photos')
+          .delete()
+          .eq('id', photo.id)
+          .eq('user_id', user.id)
+
+        if (photoDeleteError) {
+          console.error('Photo row cleanup failed', photoDeleteError)
+          cleanupErrors.push(`photo row cleanup failed: ${photoDeleteError.message}`)
+        }
+
+        const { error: storageCleanupError } = await supabase.storage
+          .from('photos')
+          .remove([storage_key])
+
+        if (storageCleanupError) {
+          console.error('Storage cleanup failed', storageCleanupError)
+          cleanupErrors.push(`storage cleanup failed: ${storageCleanupError.message}`)
+        }
+
+        if (cleanupErrors.length) {
+          throw new Error(`${metaError.message} (${cleanupErrors.join('; ')})`)
+        }
+
         throw metaError
     }
 
