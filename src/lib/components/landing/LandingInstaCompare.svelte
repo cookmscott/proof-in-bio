@@ -271,7 +271,7 @@
                             <div class="flex justify-between items-center px-6 pt-8 pb-4">
                                 <div class="flex items-center gap-2">
                                     <div class="w-6 h-6 rounded-full bg-gradient-to-tr from-orange-400 to-red-500"></div>
-                                    <span class="font-bold text-lg tracking-tight">ProofInBio</span>
+                                   <a href="/"><span class="font-bold text-lg tracking-tight">ProofInBio</span></a>
                                 </div>
                                 <div class="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800 overflow-hidden border border-zinc-200 dark:border-zinc-700">
                                     <img src="https://i.pravatar.cc/150?u=user" alt="User" class="w-full h-full object-cover" />

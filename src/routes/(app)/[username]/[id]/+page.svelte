@@ -15,77 +15,20 @@
 		Fallback as AvatarFallback
 	} from '$lib/ui/avatar';
 	import {
-        Root as Accordion,
-        Item as AccordionItem,
-        Trigger as AccordionTrigger,
-        Content as AccordionContent
-    } from '$lib/ui/accordion';
-    import {
-        getActionCategory,
-        formatActionParameter,
         normalizeManifestStore,
         analyzeProvenance,
-        isAiAction
+        getSimpleC2paStatus
     } from '$lib/c2pa';
     import { 
         Download, Camera, ArrowLeft,
-        MapPin, Calendar, HardDrive, FileImage, Aperture, Maximize, Focus, Timer, Zap, Fingerprint, Globe, CheckCircle2, Sparkles
+        MapPin, Calendar, HardDrive, FileImage, Aperture, Maximize, Focus, Timer, Zap, Fingerprint, Globe, CheckCircle2, Sparkles, Paintbrush
     } from 'lucide-svelte';
     import ShareDrawer from '$lib/components/share-drawer.svelte';
 	import ImageCarousel from '$lib/components/image-carousel.svelte';
-    import AuthenticatedPhotosAlert from '$lib/components/authenticated-photos-alert.svelte';
 
 	let { data } = $props();
 	const { photo } = data;
     const metadata = photo.metadata || {};
-
-	const CATEGORY_EXPLANATIONS = {
-		'AI Edits': 'AI-assisted generation or editing actions were recorded in the file history.',
-		'Creation & Ingestion': 'How the file was first created or brought into an editing app.',
-		'Editorial Content Changes': 'Changes to the visible content of the image.',
-		'Color & Tone Adjustments': 'Exposure, color, contrast, and similar tonal changes.',
-		'Enhancement (Non-Editorial)': 'Non-content-changing enhancements or automated improvements.',
-		'Metadata-Only Changes': 'Information changes (labels/tags/metadata) without changing pixels.',
-		'Resizing & Scaling': 'Crop, resize, rotate, or orientation changes.',
-		'File / Format Transformations': 'Export, convert, or format changes.',
-		'Publishing & Distribution': 'Publishing or distribution steps recorded by tools/platforms.',
-		'Removal & Redaction': 'Content removal or redaction actions.',
-		'Watermarking': 'Watermark-related changes.',
-		'Other Actions': 'Recorded edits that do not match a standard category yet.'
-	};
-
-	function formatActionLine(action) {
-		const detail = formatActionParameter(action);
-		if (detail) return detail;
-
-		const raw = String(action?.action || '').replace(/^c2pa\./, '');
-		if (!raw) return 'Recorded change';
-		return raw
-			.split(/[._]/g)
-			.filter(Boolean)
-			.map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-			.join(' ');
-	}
-
-	function getDigitalSourceTypeLabel(action) {
-		const raw =
-			action?.digitalSourceType ||
-			action?.parameters?.digitalSourceType ||
-			action?.parameters?.['http://cv.iptc.org/newscodes/digitalsourcetype/'];
-
-		if (!raw) return null;
-		const value = String(raw).split('/').pop() || String(raw);
-
-		const labels = {
-			compositeWithTrainedAlgorithmicMedia: 'AI-assisted composite/edit',
-			trainedAlgorithmicData: 'AI-generated content',
-			humanEdits: 'Human edit',
-			digitalCapture: 'Camera capture',
-			computationalCapture: 'Computational camera capture'
-		};
-
-		return labels[value] || value;
-	}
 
 	function safeParseManifest(rawManifest) {
 		if (!rawManifest) return null;
@@ -109,44 +52,22 @@
 		}
 	})();
 
-	const c2paHistoryGroups = (() => {
-		const actions = c2paProvenance?.actions || [];
-		const groups = {};
-
-		for (const action of actions) {
-			const category = getActionCategory(action?.action);
-			const key = category.label;
-			if (!groups[key]) groups[key] = { category, actions: [], aiCount: 0 };
-			groups[key].actions.push(action);
-			if (isAiAction(action)) groups[key].aiCount += 1;
-		}
-
-		return Object.values(groups).sort((a, b) => a.category.order - b.category.order);
-	})();
-
 	const showC2paHistorySection = Boolean(
-		metadata.c2pa_verified || c2paProvenance?.hasManifest || c2paHistoryGroups.length > 0
+		metadata.c2pa_verified || c2paProvenance?.hasManifest
 	);
-	const c2paHistoryIsStrictVerified = metadata.c2pa_verified === true;
-	const c2paHistoryHasSignedProof = c2paProvenance?.activeSignatureValidated === true;
-	const c2paHistoryCardClass = c2paHistoryIsStrictVerified
+	const c2paSimpleStatus = getSimpleC2paStatus(c2paProvenance);
+	const c2paHasSimpleMatch =
+		c2paSimpleStatus.confirmedCapture || c2paSimpleStatus.editedWithNonAi || c2paSimpleStatus.editedWithAi;
+	const c2paHistoryCardClass = c2paHasSimpleMatch
 		? 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-transparent'
 		: 'border-amber-200 dark:border-amber-800 bg-amber-50/60 dark:bg-transparent';
-	const c2paHistoryIconClass = c2paHistoryIsStrictVerified
+	const c2paHistoryIconClass = c2paHasSimpleMatch
 		? 'text-green-600 dark:text-green-500'
 		: 'text-amber-600 dark:text-amber-500';
 
 	function getC2paHistorySubtitle() {
-		if (c2paHistoryIsStrictVerified) {
-			return 'This photo is authentic and its history is securely tracked.';
-		}
-		if (c2paHistoryHasSignedProof && c2paProvenance?.signingCredentialTrusted === false) {
-			return 'This photo has signed C2PA history, but the signer is not trusted in this viewer.';
-		}
-		if (c2paHistoryHasSignedProof) {
-			return 'This photo has signed C2PA history available from the saved manifest.';
-		}
-		return 'This photo includes saved C2PA history from the uploaded manifest.';
+		if (c2paHasSimpleMatch) return 'Verified C2PA history found for this photo.';
+		return 'No matching verified C2PA status was found.';
 	}
 
 	// TODO: Replace with real data
@@ -256,81 +177,34 @@
                                 <CheckCircle2 class={`h-5 w-5 mt-0.5 flex-shrink-0 ${c2paHistoryIconClass}`} />
                                 <div>
                                     <h3 class="font-semibold text-base leading-tight">
-                                        {c2paHistoryIsStrictVerified ? 'C2PA Verified History' : 'C2PA Signed History'}
+                                        C2PA Verification
                                     </h3>
                                     <p class="text-sm text-slate-500 dark:text-slate-400">{getC2paHistorySubtitle()}</p>
                                 </div>
                             </div>
-                            <Accordion class="w-full" type="single" collapsible>
-                                {#if c2paHistoryGroups.length > 0}
-                                    {#each c2paHistoryGroups as group, index (group.category.label)}
-                                        <AccordionItem value={`c2pa-history-${index}`}>
-                                            <AccordionTrigger>
-                                                <div class="flex w-full min-w-0 items-start gap-3">
-                                                    <group.category.icon
-                                                        class="h-5 w-5 text-slate-700 dark:text-slate-300 mt-0.5 shrink-0"
-                                                    />
-                                                    <div class="min-w-0 text-left">
-                                                        <div class="flex flex-wrap items-center gap-2">
-                                                            <span class="text-sm font-medium">{group.category.label}</span>
-                                                            {#if group.aiCount > 0}
-                                                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                                                                    <Sparkles class="h-3 w-3" />
-                                                                    {group.aiCount} AI-tagged
-                                                                </span>
-                                                            {/if}
-                                                        </div>
-                                                        <p class="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                                                            {CATEGORY_EXPLANATIONS[group.category.label] || 'Recorded changes in this category.'}
-                                                        </p>
-                                                    </div>
-                                                </div>
-                                            </AccordionTrigger>
-                                            <AccordionContent>
-                                                <ul class="space-y-3 pt-1">
-                                                    {#each group.actions as action}
-                                                        <li class="flex items-start gap-3 text-sm">
-                                                            <span class="mt-2 h-1.5 w-1.5 rounded-full bg-green-600 dark:bg-green-500 shrink-0"></span>
-                                                            <div class="min-w-0">
-                                                                <p class="leading-snug">{formatActionLine(action)}</p>
-                                                                {#if isAiAction(action) || getDigitalSourceTypeLabel(action)}
-                                                                    <div class="mt-1 flex flex-wrap items-center gap-1.5">
-                                                                        {#if isAiAction(action)}
-                                                                            <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                                                                                <Sparkles class="h-3 w-3" />
-                                                                                AI-assisted
-                                                                            </span>
-                                                                        {/if}
-                                                                        {#if getDigitalSourceTypeLabel(action)}
-                                                                            <span class="inline-flex items-center rounded-full bg-slate-200/80 dark:bg-slate-800 px-2 py-0.5 text-[10px] text-slate-600 dark:text-slate-300">
-                                                                                {getDigitalSourceTypeLabel(action)}
-                                                                            </span>
-                                                                        {/if}
-                                                                    </div>
-                                                                {/if}
-                                                                <p class="mt-1 break-all text-[11px] text-slate-500 dark:text-slate-400">
-                                                                    Recorded action: {action.action}
-                                                                </p>
-                                                            </div>
-                                                        </li>
-                                                    {/each}
-                                                </ul>
-                                            </AccordionContent>
-                                        </AccordionItem>
-                                    {/each}
-                                {:else}
-                                    <div class="rounded-md border border-green-200/70 dark:border-green-900 px-3 py-2 text-sm text-slate-600 dark:text-slate-300">
-                                        No specific edit actions were listed in the saved C2PA history.
-                                    </div>
-                                {/if}
-                            </Accordion>
+                            <div class="text-sm">
+                                <ul class="space-y-2">
+                                    <li class={`flex items-center gap-2 ${c2paSimpleStatus.confirmedCapture ? 'text-green-700 dark:text-green-400 font-medium' : 'text-slate-500 dark:text-slate-400 opacity-60'}`}>
+                                        <Camera class="h-4 w-4 shrink-0" />
+                                        <span>Media captured with camera</span>
+                                    </li>
+                                    <li class={`flex items-center gap-2 ${c2paSimpleStatus.editedWithNonAi ? 'text-blue-700 dark:text-blue-400 font-medium' : 'text-slate-500 dark:text-slate-400 opacity-60'}`}>
+                                        <Paintbrush class="h-4 w-4 shrink-0" />
+                                        <span>Edited with non-AI tools</span>
+                                    </li>
+                                    <li class={`flex items-center gap-2 ${c2paSimpleStatus.editedWithAi ? 'text-amber-700 dark:text-amber-400 font-medium' : 'text-slate-500 dark:text-slate-400 opacity-60'}`}>
+                                        <Sparkles class="h-4 w-4 shrink-0" />
+                                        <span>Edited with AI</span>
+                                    </li>
+                                </ul>
+                            </div>
                         </div>
                     {/if}
 
                     <div class="grid gap-2">
                         <h3 class="font-semibold">Tags</h3>
                         <div class="flex flex-wrap gap-2">
-                            {#each photoDetails.tags as tag}
+                            {#each photoDetails.tags as tag (tag)}
                                 <Badge variant="secondary">{tag}</Badge>
                             {/each}
                             {#if photoDetails.tags.length === 0}
@@ -428,7 +302,7 @@
 
                     <div class="flex items-center gap-4">
                         <div class="flex -space-x-2">
-                            {#each photoDetails.likes.users as user, i}
+                            {#each photoDetails.likes.users as user, i (user.name)}
                                 {#if i < 2}
                                     <Avatar class="border-2 border-background">
                                         <AvatarImage src={user.avatar} alt={user.name} />

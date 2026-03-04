@@ -1,34 +1,7 @@
-import { 
-    PlusCircle, Paintbrush, Settings2, Sparkles, Code, 
-    MoveDiagonal, SquareStack, Rss, ListMinus, ShieldCheck 
-} from 'lucide-svelte';
-
 // Using a stable version for c2pa-web
 export const C2PA_VERSION = '0.5.6';
 
 let c2paInstance = null;
-
-export const ACTION_CATEGORIES = {
-    'c2pa.created': { order: 1, label: 'Creation & Ingestion', icon: PlusCircle },
-    'c2pa.opened': { order: 1, label: 'Creation & Ingestion', icon: PlusCircle },
-    'c2pa.placed': { order: 2, label: 'Editorial Content Changes', icon: Paintbrush },
-    'c2pa.edited': { order: 2, label: 'Editorial Content Changes', icon: Paintbrush },
-    'c2pa.color_adjustments': { order: 3, label: 'Color & Tone Adjustments', icon: Settings2 },
-    'c2pa.filtered': { order: 4, label: 'Enhancement (Non-Editorial)', icon: Sparkles },
-    // Speed & Timing (5) - c2pa.speed? c2pa.timing?
-    // Audio Production (6) - c2pa.audio?
-    'c2pa.metadata': { order: 7, label: 'Metadata-Only Changes', icon: Code },
-    'c2pa.cropped': { order: 8, label: 'Resizing & Scaling', icon: MoveDiagonal },
-    'c2pa.resized': { order: 8, label: 'Resizing & Scaling', icon: MoveDiagonal },
-    'c2pa.orientation': { order: 8, label: 'Resizing & Scaling', icon: MoveDiagonal },
-    'c2pa.converted': { order: 9, label: 'File / Format Transformations', icon: SquareStack },
-    'c2pa.transcoded': { order: 9, label: 'File / Format Transformations', icon: SquareStack },
-    'c2pa.published': { order: 10, label: 'Publishing & Distribution', icon: Rss },
-    'c2pa.redacted': { order: 11, label: 'Removal & Redaction', icon: ListMinus },
-    'c2pa.removed': { order: 11, label: 'Removal & Redaction', icon: ListMinus },
-    'c2pa.watermarked': { order: 12, label: 'Watermarking', icon: ShieldCheck },
-    // Font-Specific (13)
-};
 
 export function isAiAction(action) {
     if (!action) return false;
@@ -38,32 +11,6 @@ export function isAiAction(action) {
          if (t.includes('trainedAlgorithmicData') || t.includes('compositeWithTrainedAlgorithmicMedia')) return true;
     }
     return false;
-}
-
-export function getActionCategory(actionId) {
-    return ACTION_CATEGORIES[actionId] || { order: 99, label: 'Other Actions', icon: Code };
-}
-
-export function formatActionParameter(action) {
-    const params = action.parameters;
-    if (!params) return null;
-    
-    // Handle Adobe ACR specific parameters
-    if (params['com.adobe.acr']) {
-        const name = params['com.adobe.acr'];
-        const value = params['com.adobe.acr.value'];
-        return value ? `${name}: ${value}` : name;
-    }
-    
-    // Handle ingredients (e.g. c2pa.opened)
-    if (params.ingredients) {
-        return `Imported ${params.ingredients.length} asset(s)`;
-    }
-
-    // Generic fallback
-    const keys = Object.keys(params).filter(k => k !== 'instance_id');
-    if (keys.length > 0) return keys.join(', ');
-    return null;
 }
 
 /**
@@ -313,6 +260,31 @@ function pickManifestValidationResult(store, manifestId) {
   return null;
 }
 
+function pickIngredientValidationForParent(store, parentManifestId) {
+  if (!store?.manifests || !parentManifestId) return null;
+
+  // Some C2PA toolchains only expose non-active manifest validation on
+  // ingredient entries (child -> parent link), not top-level manifest maps.
+  for (const manifest of Object.values(store.manifests)) {
+    for (const ing of (manifest?.ingredients || [])) {
+      const linkedParentId =
+        ing?.active_manifest ||
+        ing?.activeManifest ||
+        ing?.manifest_id ||
+        ing?.manifestId ||
+        null;
+
+      if (linkedParentId !== parentManifestId) continue;
+
+      const ingResults = ing?.validation_results || ing?.validationResults;
+      const active = ingResults?.activeManifest || ingResults?.active_manifest || null;
+      if (active) return active;
+    }
+  }
+
+  return null;
+}
+
 function computeCryptoValidated(vres) {
   const failures = vres?.failure || [];
   const successes = vres?.success || [];
@@ -325,6 +297,13 @@ function computeCryptoValidated(vres) {
 
   const ok = successes.some(s => (s.code || '') === 'claimSignature.validated');
   return ok && !hasCryptoFailure;
+}
+
+function isLikelyEditAction(actionId) {
+  if (!actionId || typeof actionId !== 'string') return false;
+
+  // Created/opened are provenance boilerplate and not user-visible edits.
+  return actionId !== 'c2pa.created' && actionId !== 'c2pa.opened';
 }
 
 export function analyzeProvenance(store) {
@@ -380,7 +359,9 @@ export function analyzeProvenance(store) {
     const activeV = pickManifestValidationResult(store, activeId) || store.validation_results?.activeManifest;
     const activeSignatureValidated = computeCryptoValidated(activeV);
 
-    const captureV = captureManifestId ? pickManifestValidationResult(store, captureManifestId) : null;
+    const captureV = captureManifestId
+      ? (pickManifestValidationResult(store, captureManifestId) || pickIngredientValidationForParent(store, captureManifestId))
+      : null;
     
     // If we can’t locate a capture validation result, treat it as unknown (null), not false.
     const captureSignatureValidated =
@@ -410,6 +391,33 @@ export function analyzeProvenance(store) {
         // UI: show actions from active (edits) chain
         actions: activeActions,
         has_ai
+    };
+}
+
+export function getSimpleC2paStatus(provenance) {
+    if (!provenance?.hasManifest) {
+        return {
+            hasManifest: false,
+            confirmedCapture: false,
+            editedWithNonAi: false,
+            editedWithAi: false
+        };
+    }
+
+    const actions = Array.isArray(provenance.actions) ? provenance.actions : [];
+    const hasEditsByAction = actions.some((a) => isLikelyEditAction(a?.action));
+    const hasEditsByChain = provenance.hasCaptureProvenance === true && provenance.activeIsCapture === false;
+    const hasEdits = hasEditsByAction || hasEditsByChain;
+    const hasAi = provenance.has_ai === true;
+
+    return {
+        hasManifest: true,
+        confirmedCapture:
+            provenance.activeSignatureValidated === true &&
+            provenance.hasCaptureProvenance === true &&
+            provenance.captureSignatureValidated === true,
+        editedWithNonAi: hasEdits && !hasAi,
+        editedWithAi: hasEdits && hasAi
     };
 }
 

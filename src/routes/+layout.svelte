@@ -62,7 +62,9 @@
 		<header class="border-b bg-background/95 backdrop-blur z-40 sticky top-0">
 			<div class="container mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
 				<div class="flex items-center gap-8">
-					<span class="font-bold text-lg text-foreground tracking-tight">ProofInBio</span>
+					<a href="/">
+						<span class="font-bold text-lg text-foreground tracking-tight">ProofInBio</span>
+					</a>
 				</div>
 				<GlobalAvatar {session} {user} {supabase} />
 			</div>
