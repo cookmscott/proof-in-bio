@@ -9,6 +9,7 @@
 	import LandingHero from '$lib/components/landing/LandingHero.svelte';
 	import LandingPolaroidScroll from '$lib/components/landing/LandingPolaroidScroll.svelte';
 	import LandingInstaCompare from '$lib/components/landing/LandingInstaCompare.svelte';
+	import LandingC2PAPhotos from '$lib/components/landing/LandingC2PAPhotos.svelte';
 	import LandingEssentialVerification from '$lib/components/landing/LandingEssentialVerification.svelte';
 	import LandingCompatibility from '$lib/components/landing/LandingCompatibility.svelte';
 	import LandingProblemSolution from '$lib/components/landing/LandingProblemSolution.svelte';
@@ -43,6 +44,9 @@
 
 		<!-- Instagram Comparison Real vs Fake -->
 		<LandingInstaCompare />
+
+		<!-- C2PA Photos Section -->
+		<LandingC2PAPhotos />
 
 
 		<!-- The Problem/Solution Section -->

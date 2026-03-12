@@ -1,5 +1,5 @@
-// Using a stable version for c2pa-web
-export const C2PA_VERSION = '0.5.6';
+import { createC2pa } from '@contentauth/c2pa-web';
+import wasmSrc from '@contentauth/c2pa-web/resources/c2pa.wasm?url';
 
 let c2paInstance = null;
 
@@ -486,13 +486,7 @@ export async function loadC2pa() {
     if (c2paInstance) return c2paInstance;
 
     try {
-        const url = `https://cdn.jsdelivr.net/npm/@contentauth/c2pa-web@${C2PA_VERSION}/+esm`;
-        const module = await import(/* @vite-ignore */ url);
-        const createC2pa = module.createC2pa;
-        
-        c2paInstance = await createC2pa({
-            wasmSrc: `https://cdn.jsdelivr.net/npm/@contentauth/c2pa-web@${C2PA_VERSION}/dist/resources/c2pa_bg.wasm`
-        });
+        c2paInstance = await createC2pa({ wasmSrc });
         return c2paInstance;
     } catch (err) {
         console.error("Failed to load C2PA library", err);

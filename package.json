@@ -44,6 +44,7 @@
     "wrangler": "^4.25.1"
   },
   "dependencies": {
+    "@contentauth/c2pa-web": "^0.6.1",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.51.0",
     "gsap": "^3.13.0",
