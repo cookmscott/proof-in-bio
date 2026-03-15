@@ -20,6 +20,46 @@ function decodeJwtPayload(token: string) {
   }
 }
 
+function formatError(error: unknown) {
+  if (!error || typeof error !== 'object') {
+    return { message: String(error) }
+  }
+
+  const err = error as {
+    message?: string
+    code?: string
+    details?: string
+    hint?: string
+  }
+
+  return {
+    message: err.message ?? 'Unknown error',
+    code: err.code,
+    details: err.details,
+    hint: err.hint,
+  }
+}
+
+function isSchemaColumnError(error: unknown) {
+  const formatted = formatError(error)
+  const combined = [
+    formatted.message,
+    formatted.details,
+    formatted.hint,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase()
+
+  return (
+    combined.includes('schema cache') ||
+    combined.includes('could not find the') ||
+    combined.includes('column') ||
+    formatted.code === 'PGRST204' ||
+    formatted.code === '42703'
+  )
+}
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response('ok', { headers: corsHeaders })
@@ -109,12 +149,13 @@ serve(async (req) => {
     const fileExt =
       file.name.split('.').pop()?.toLowerCase() ||
       (file.type === 'image/png' ? 'png' : 'jpg')
-    const storage_key = `${user.id}/${photoId}.${fileExt}`
+    const storageProvider = 'supabase'
+    const objectKey = `${user.id}/${photoId}.${fileExt}`
     
     console.log("before upload", file.size, file.type);
-    const { data: storageData, error: storageError } = await supabase.storage
+    const { error: storageError } = await supabase.storage
       .from('photos')
-      .upload(storage_key, file, {
+      .upload(objectKey, file, {
         contentType: file.type || `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
         upsert: false
       })
@@ -124,38 +165,75 @@ serve(async (req) => {
 
     const { data: { publicUrl } } = supabase.storage
       .from('photos')
-      .getPublicUrl(storage_key)
+      .getPublicUrl(objectKey)
+
+    // Public buckets do not need signed URLs. Keep the column explicit so a
+    // future private-provider migration can populate it without schema changes.
+    const signedUrl = null
 
     const width = Number(metadata.width) || 0
     const height = Number(metadata.height) || 0
 
     // Insert Photo
     console.log("before photos insert");
-    const { data: photo, error: photoError } = await supabase
+    const basePhotoInsert = {
+      id: photoId,
+      user_id: user.id,
+      storage_url: publicUrl,
+      storage_key: objectKey,
+      file_ext: fileExt,
+      width,
+      height,
+      title: metadata.title || file.name,
+      description: metadata.description,
+      is_public: true,
+      status: 'ready',
+      blurhash: metadata.blurhash,
+      taken_at: metadata.captured_at,
+    }
+
+    const canonicalPhotoInsert = {
+      ...basePhotoInsert,
+      storage_provider: storageProvider,
+      object_key: objectKey,
+      public_url: publicUrl,
+      signed_url: signedUrl,
+    }
+
+    let photo = null
+    let photoError = null
+
+    const canonicalInsertResult = await supabase
       .from('photos')
-      .insert({
-        id: photoId,
-        user_id: user.id,
-        storage_url: publicUrl,
-        storage_key: storage_key,
-        file_ext: fileExt,
-        width,
-        height,
-        title: metadata.title || file.name,
-        description: metadata.description,
-        is_public: true,
-        status: 'ready',
-        // Optional fields that might be passed
-        blurhash: metadata.blurhash,
-        taken_at: metadata.captured_at, // Use captured_at for taken_at as well
-      })
+      .insert(canonicalPhotoInsert)
       .select()
       .single()
 
+    photo = canonicalInsertResult.data
+    photoError = canonicalInsertResult.error
+
+    if (photoError && isSchemaColumnError(photoError)) {
+      console.warn('Canonical photo insert failed; retrying with legacy columns only', formatError(photoError))
+
+      const legacyInsertResult = await supabase
+        .from('photos')
+        .insert(basePhotoInsert)
+        .select()
+        .single()
+
+      photo = legacyInsertResult.data
+      photoError = legacyInsertResult.error
+    }
+
     console.log("after photos insert", photo?.id);
     if (photoError) {
+        console.error('Photo insert failed', {
+          error: formatError(photoError),
+          attemptedObjectKey: objectKey,
+          storageProvider,
+        })
         // Cleanup storage if db fails
-        await supabase.storage.from('photos').remove([storage_key])
+        await supabase.storage.from('photos').remove([objectKey])
         throw photoError
     }
 
@@ -231,7 +309,7 @@ serve(async (req) => {
 
         const { error: storageCleanupError } = await supabase.storage
           .from('photos')
-          .remove([storage_key])
+          .remove([objectKey])
 
         if (storageCleanupError) {
           console.error('Storage cleanup failed', storageCleanupError)
@@ -251,8 +329,9 @@ serve(async (req) => {
     )
 
   } catch (error) {
+    console.error('photo-upload fatal error', formatError(error))
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: formatError(error) }),
       { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     )
   }

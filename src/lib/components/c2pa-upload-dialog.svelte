@@ -30,6 +30,10 @@
   let error = $state(null);
   let selectedUpload = $state(null);
   let isUploading = $state(false);
+  const C2PA_READ_TIMEOUT_MS = 15000;
+  const IMAGE_DECODE_TIMEOUT_MS = 10000;
+  const UPLOAD_REQUEST_TIMEOUT_MS = 45000;
+  const SUPPORTED_C2PA_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/tiff']);
 
   // --- Simple C2PA status helpers ---
   const hasC2pa = (u) => !!u?.c2pa;
@@ -75,6 +79,21 @@
     });
   }
 
+  function withTimeout(promise, timeoutMs, message) {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+      promise
+        .then((value) => {
+          clearTimeout(timeoutId);
+          resolve(value);
+        })
+        .catch((err) => {
+          clearTimeout(timeoutId);
+          reject(err);
+        });
+    });
+  }
+
   async function handleUpload() {
     // Allow upload if we have any eligible C2PA statuses.
     const canUploadCount = uploadableCount;
@@ -109,7 +128,11 @@
             upload.processing = true; // Show spinner per item
             
             // Get basic dimensions
-            const { width, height } = await getImageDimensions(upload.previewUrl);
+            const { width, height } = await withTimeout(
+              getImageDimensions(upload.previewUrl),
+              IMAGE_DECODE_TIMEOUT_MS,
+              'Image decode timed out'
+            );
             
             // Extract detailed metadata
             const c2paMeta = extractImageMetadata(upload.c2pa?.data);
@@ -132,9 +155,13 @@
             formData.append('file', upload.file);
             formData.append('metadata', JSON.stringify(metadata));
 
-            const { error: uploadError } = await supabase.functions.invoke('photo-upload', {
+            const { error: uploadError } = await withTimeout(
+              supabase.functions.invoke('photo-upload', {
                 body: formData
-            });
+              }),
+              UPLOAD_REQUEST_TIMEOUT_MS,
+              'Upload request timed out'
+            );
 
             if (uploadError) throw uploadError;
             
@@ -210,15 +237,32 @@
 
     uploads = [...uploads, ...newUploads];
 
-    for (const upload of newUploads) {
-      await processSingleUpload(upload);
-    }
+    await Promise.allSettled(newUploads.map((upload) => processSingleUpload(upload)));
   }
 
   async function processSingleUpload(uploadItem) {
     try {
-      const c2pa = await loadC2pa();
-      const result = await c2pa.reader.fromBlob(uploadItem.file.type, uploadItem.file);
+      const fileType = (uploadItem.file.type || '').toLowerCase();
+      const index = uploads.findIndex((u) => u.id === uploadItem.id);
+      if (index === -1) return;
+
+      // Skip C2PA parsing for image types that are commonly unsupported by the browser/WASM parser on mobile.
+      if (!SUPPORTED_C2PA_TYPES.has(fileType)) {
+        uploads[index].c2pa = { hasManifest: false, hasActions: false, actions: [] };
+        uploads[index].processing = false;
+        return;
+      }
+
+      const c2pa = await withTimeout(
+        loadC2pa(),
+        C2PA_READ_TIMEOUT_MS,
+        'C2PA initialization timed out'
+      );
+      const result = await withTimeout(
+        c2pa.reader.fromBlob(uploadItem.file.type, uploadItem.file),
+        C2PA_READ_TIMEOUT_MS,
+        'C2PA read timed out'
+      );
 
       let manifestData = null;
       let analysis = {
@@ -227,7 +271,11 @@
 
       if (result) {
         // Raw manifest store (as returned by the library)
-        const manifestStore = await result.manifestStore();
+        const manifestStore = await withTimeout(
+          result.manifestStore(),
+          C2PA_READ_TIMEOUT_MS,
+          'C2PA manifest read timed out'
+        );
 
         // Normalized store for consistent keys + easier analysis
         const normalized = normalizeManifestStore(manifestStore);
@@ -249,7 +297,6 @@
         }
       }
 
-      const index = uploads.findIndex((u) => u.id === uploadItem.id);
       if (index !== -1) {
         uploads[index].c2pa = {
           ...analysis,
@@ -261,7 +308,7 @@
       console.error('Error processing image:', err);
       const index = uploads.findIndex((u) => u.id === uploadItem.id);
       if (index !== -1) {
-        uploads[index].error = 'Failed to process';
+        uploads[index].c2pa = { hasManifest: false, hasActions: false, actions: [] };
         uploads[index].processing = false;
       }
     }

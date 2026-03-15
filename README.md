@@ -9,6 +9,9 @@ This project uses [SvelteKit](https://kit.svelte.dev) with components from [shad
    npm install
    ```
 2. Copy `.env.example` to `.env` and provide your `PUBLIC_SUPABASE_URL` and `PUBLIC_SUPABASE_ANON_KEY` values.
+   - For local Supabase OAuth testing, also set:
+     - `SUPABASE_AUTH_EXTERNAL_GOOGLE_CLIENT_ID`
+     - `SUPABASE_AUTH_EXTERNAL_GOOGLE_SECRET`
 3. Start the development server
    ```bash
    npm run dev

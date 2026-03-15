@@ -12,6 +12,7 @@ node_modules
 .wrangler
 /.svelte-kit
 /build
+static/_headers
 
 # OS
 .DS_Store
