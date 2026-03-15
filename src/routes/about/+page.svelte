@@ -26,7 +26,7 @@
             <a href="/" class="flex items-center gap-2 group">
                 <div class="relative">
                     <Camera class="h-7 w-7 transition-transform group-hover:scale-110" />
-                    <CheckCircle2 class="h-3 w-3 absolute -bottom-1 -right-1 text-green-500 bg-background rounded-full" />
+                    <CheckCircle2 class="h-3 w-3 absolute -bottom-1 -right-1 text-verified bg-background rounded-full" />
                 </div>
                 <span class="font-bold text-lg tracking-tight">Proof in Bio</span>
             </a>
@@ -45,7 +45,7 @@
             <header class="text-center">
                 <h1 class="text-5xl md:text-6xl lg:text-7xl font-extrabold tracking-tighter leading-[1.1]">
                     To build a more 
-                    <span class="bg-gradient-to-r from-blue-600 to-cyan-500 bg-clip-text text-transparent">
+                    <span class="bg-gradient-to-r from-primary to-amber-400 bg-clip-text text-transparent">
                         human-created
                     </span>
                      internet.
@@ -56,10 +56,10 @@
             </header>
 
             <!-- Verified Content Notice -->
-            <div class="flex items-start gap-5 p-6 md:p-8 rounded-2xl bg-green-500/10 border border-green-500/20 text-green-900 dark:text-green-300 shadow-sm">
-                <ShieldCheck class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 text-green-600 dark:text-green-500" />
+            <div class="flex items-start gap-5 p-6 md:p-8 rounded-2xl bg-verified/10 border border-verified/20 text-zinc-900 dark:text-zinc-100 shadow-sm">
+                <ShieldCheck class="w-8 h-8 md:w-10 md:h-10 flex-shrink-0 text-verified" />
                 <div class="space-y-2">
-                    <h3 class="font-semibold text-lg md:text-xl text-green-950 dark:text-green-100">Strictly Human-Created</h3>
+                    <h3 class="font-semibold text-lg md:text-xl text-foreground">Strictly Human-Created</h3>
                     <p class="text-base opacity-90 leading-relaxed">
                         Only verified, human-created content is allowed on Proof in Bio. AI-generated, synthetic, or unverified images are strictly excluded by design. 
                     </p>
@@ -96,9 +96,9 @@
                     </div>
                     
                     <!-- Real / Verified Image -->
-                    <div class="relative group rounded-xl overflow-hidden border border-green-500/30 shadow-lg ring-1 ring-green-500/20">
+                    <div class="relative group rounded-xl overflow-hidden border border-verified/30 shadow-lg ring-1 ring-verified/20">
                         <div class="absolute top-4 left-4 z-10">
-                            <Badge class="bg-green-600 hover:bg-green-700 text-white flex items-center gap-1.5 font-bold shadow-md px-3 py-1 text-sm transition-colors">
+                            <Badge class="bg-verified hover:bg-verified/90 text-verified-foreground flex items-center gap-1.5 font-bold shadow-md px-3 py-1 text-sm transition-colors">
                                 <BadgeCheck class="w-4 h-4" /> 
                                 C2PA Verified
                             </Badge>

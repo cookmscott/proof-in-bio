@@ -27,7 +27,7 @@
 	});
 </script>
 
-<div class="container mx-auto max-w-7xl px-6">
+<div class="container mx-auto max-w-5xl px-6">
 	<section class="my-8 rounded-2xl overflow-hidden shadow-lg bg-white">
 		<div class="md:grid md:grid-cols-2 md:h-[450px]">
 			<!-- Text content on the left -->
@@ -38,10 +38,10 @@
 					<p class="text-lg font-medium tracking-widest uppercase text-stone-600">
 						For Human Creators
 					</p>
-					<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-balance text-gray-900">
+					<h1 class="text-4xl md:text-5xl font-bold tracking-tight text-balance text-zinc-900">
 						Made by people, not prompts.
 					</h1>
-					<p class="text-lg text-gray-600 text-balance">
+					<p class="text-lg text-zinc-500 text-balance">
 						Stop the AI-confusion. Create a proof gallery to show your followers that your perspective, your eye, and your life are real.
 					</p>
 					<div class="flex justify-center md:justify-start gap-4 pt-4">
@@ -79,15 +79,15 @@
 				<!-- Verified Badge & Attribution -->
 				<div class="verified-info absolute bottom-0 left-0 w-full p-8 opacity-0 z-30 pointer-events-none">
 					<div class="flex items-center gap-2 mb-2">
-						<p class="text-[11px] font-bold tracking-[0.2em] text-emerald-400 uppercase">Real and Verified</p>
+						<p class="text-[11px] font-bold tracking-[0.2em] text-verified uppercase">Real and Verified</p>
 					</div>
 					<h2 class="text-2xl font-bold text-white tracking-tight leading-none">Mathias Reding</h2>
-					<p class="text-gray-300 text-xs mt-1 font-light">Photographer</p>
+					<p class="text-zinc-300 text-xs mt-1 font-light">Photographer</p>
 				</div>
 
 				<!-- Status Indicator -->
 				<div class="verified-check absolute top-5 right-5 opacity-0 z-30 pointer-events-none">
-					<div class="bg-green-500 text-white p-1.5 rounded-full shadow-lg">
+					<div class="bg-verified text-verified-foreground p-1.5 rounded-full shadow-lg">
 						<CheckCircle class="h-5 w-5" />
 					</div>
 				</div>
@@ -149,10 +149,10 @@
 		background: linear-gradient(
 			90deg, 
 			transparent 0%, 
-			rgba(16, 185, 129, 0) 45%,      /* Leading clear */
-			rgba(16, 185, 129, 0.4) 48%,    /* Emerald tint trailing */
+			rgba(0, 198, 96, 0) 45%,      /* Leading clear */
+			rgba(0, 198, 96, 0.4) 48%,    /* Verified tint trailing */
 			rgba(255, 255, 255, 0.9) 50%,   /* Sharp White Core */
-			rgba(16, 185, 129, 0.1) 52%,    /* Faint emerald lead */
+			rgba(0, 198, 96, 0.1) 52%,    /* Faint verified lead */
 			transparent 100%
 		);
 		width: 200%;
@@ -193,7 +193,7 @@
 			from 0deg,
 			transparent 0%,
 			transparent 40%,
-			rgba(16, 185, 129, 0.8) 50%, /* Emerald tail */
+			rgba(0, 198, 96, 0.8) 50%, /* Verified tail */
 			rgba(255, 255, 255, 1) 55%,  /* White head */
 			transparent 60%,
 			transparent 100%

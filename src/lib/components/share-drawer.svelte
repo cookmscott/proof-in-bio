@@ -83,7 +83,7 @@
                                 value={currentUrl}
                                 readonly
                                 class="flex-1 px-3 py-2 text-sm rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500
-                                    border border-gray-200 bg-white text-gray-900
+                                    border border-gray-200 bg-white text-zinc-900
                                     dark:border-gray-700 dark:bg-gray-900 dark:text-gray-100
                                     h-10"
                             />

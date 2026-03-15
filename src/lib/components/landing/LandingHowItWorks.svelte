@@ -45,20 +45,16 @@
 <section id="how-it-works" class="relative py-24 sm:py-32 bg-secondary/10 overflow-hidden">
     <!-- Ambient Background Decorative Elements -->
     <div class="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full overflow-hidden pointer-events-none z-0">
-        <div class="absolute top-[10%] left-[-10%] w-[40%] aspect-square rounded-full bg-blue-500/5 blur-3xl"></div>
-        <div class="absolute bottom-[20%] right-[-10%] w-[40%] aspect-square rounded-full bg-green-500/5 blur-3xl"></div>
+        <div class="absolute top-[10%] left-[-10%] w-[40%] aspect-square rounded-full bg-primary/5 blur-3xl"></div>
+        <div class="absolute bottom-[20%] right-[-10%] w-[40%] aspect-square rounded-full bg-verified/5 blur-3xl"></div>
     </div>
 
-    <div class="container mx-auto px-6 relative z-10">
+    <div class="container mx-auto max-w-5xl px-6 relative z-10">
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto mb-20 md:mb-32">
-            <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-sm font-medium mb-6">
-                <span class="relative flex h-2 w-2">
-                  <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-                  <span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-                </span>
+            <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
                 Verification Process
-            </div>
+            </p>
             <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-foreground">
                 How It Works
             </h2>
@@ -68,7 +64,7 @@
         </div>
 
         <!-- Steps Timeline -->
-        <div class="relative max-w-6xl mx-auto">
+        <div class="relative mx-auto">
             <!-- Central connecting line (Desktop only) -->
             <div class="hidden lg:block absolute left-1/2 top-10 bottom-10 w-px bg-gradient-to-b from-transparent via-border to-transparent -translate-x-1/2"></div>
 
@@ -104,8 +100,8 @@
                                 <ul class="space-y-4">
                                     {#each step.points as point}
                                         <li class="flex items-start gap-3 text-muted-foreground">
-                                            <div class="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-                                                <Check class="w-3 h-3 text-green-600 dark:text-green-400" strokeWidth={3} />
+                                            <div class="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-verified/10 flex items-center justify-center">
+                                                <Check class="w-3 h-3 text-verified" strokeWidth={3} />
                                             </div>
                                             <span>{point}</span>
                                         </li>
@@ -134,7 +130,7 @@
                                 
                                 <div class="absolute bottom-6 left-6 z-30">
                                     <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-xs font-bold text-white uppercase tracking-widest shadow-lg transition-transform hover:scale-105">
-                                        <span class="w-2 h-2 rounded-full bg-green-400 animate-pulse shadow-[0_0_8px_rgba(74,222,128,0.8)]"></span>
+                                        <span class="w-2 h-2 rounded-full bg-verified animate-pulse shadow-[0_0_8px_rgba(0,198,96,0.45)]"></span>
                                         C2PA Verified
                                     </div>
                                 </div>

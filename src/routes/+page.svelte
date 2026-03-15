@@ -12,7 +12,6 @@
 	import LandingC2PAPhotos from '$lib/components/landing/LandingC2PAPhotos.svelte';
 	import LandingEssentialVerification from '$lib/components/landing/LandingEssentialVerification.svelte';
 	import LandingCompatibility from '$lib/components/landing/LandingCompatibility.svelte';
-	import LandingProblemSolution from '$lib/components/landing/LandingProblemSolution.svelte';
 	import LandingHowItWorks from '$lib/components/landing/LandingHowItWorks.svelte';
 	import SocialProof from '$lib/components/landing/SocialProof.svelte';
 	import LandingFinalCta from '$lib/components/landing/LandingFinalCta.svelte';
@@ -48,9 +47,6 @@
 		<!-- C2PA Photos Section -->
 		<LandingC2PAPhotos />
 
-
-		<!-- The Problem/Solution Section -->
-		<LandingProblemSolution />		
 
 		<!-- Essential Verification Section -->
 		<LandingEssentialVerification />

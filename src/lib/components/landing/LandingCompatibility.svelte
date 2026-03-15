@@ -1,6 +1,6 @@
 <script>
     import { tick } from 'svelte';
-    import { Camera, ShieldCheck, Monitor, Smartphone, Check, Info, ChevronRight, Search } from 'lucide-svelte';
+    import { Camera, Monitor, Smartphone, Search } from 'lucide-svelte';
     
     const manufacturers = [
         {
@@ -53,8 +53,8 @@
         {
             name: "Fujifilm",
             description: "Integrated C2PA in GFX & X series.",
-            iconBg: "bg-emerald-100 dark:bg-emerald-900/20",
-            iconColor: "text-emerald-600",
+            iconBg: "bg-verified/10",
+            iconColor: "text-verified",
             models: [
                 { name: "GFX100S II", status: "Current", implementation: "Native", details: "Fujifilm announced its commitment to C2PA by including support in its new GFX and X series cameras." },
                 { name: "X-T50", status: "Current", implementation: "Native", details: "Launched alongside the GFX100S II with native C2PA support." }
@@ -64,8 +64,8 @@
             name: "Samsung",
             description: "Mobile credentials via Galaxy AI.",
             icon: Smartphone,
-            iconBg: "bg-blue-100 dark:bg-blue-900/20",
-            iconColor: "text-blue-600",
+            iconBg: "bg-primary/10",
+            iconColor: "text-primary",
             models: [
                 { name: "Galaxy S25 Series", status: "Current", implementation: "Native", details: "The first smartphone lineup with native C2PA support, creating Content Credentials for images generated or edited with Galaxy AI features. Support is expanding to more devices via One UI 7." }
             ]
@@ -74,8 +74,8 @@
             name: "Google",
             description: "Mobile credentials via Pixel Camera.",
             icon: Smartphone,
-            iconBg: "bg-blue-100 dark:bg-blue-900/20",
-            iconColor: "text-blue-500",
+            iconBg: "bg-primary/10",
+            iconColor: "text-primary",
             models: [
                 { name: "Pixel 10 Series", status: "Upcoming (2025)", implementation: "Native", details: "Google announced the Pixel 10 will embed C2PA metadata by default in every photo taken with the native camera app, a major step for widespread consumer adoption." }
             ]
@@ -150,12 +150,11 @@
     <!-- Subtle grid background -->
     <div class="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
 
-    <div class="container mx-auto px-6 max-w-5xl">
+    <div class="container mx-auto max-w-5xl px-6">
         <div class="text-center max-w-3xl mx-auto mb-16">
-            <div class="inline-flex items-center rounded-full border px-3 py-1 text-sm font-medium transition-colors border-transparent bg-primary/10 text-primary mb-6 gap-2">
-                <ShieldCheck class="h-4 w-4" />
-                <span>Ecosystem Support</span>
-            </div>
+            <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
+                Ecosystem Support
+            </p>
             <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-6">C2PA Supported Cameras & Software</h2>
             <p class="text-xl text-muted-foreground leading-relaxed">
                 Explore the growing ecosystem of cameras, software, and platforms that support Content Credentials.
@@ -274,8 +273,8 @@
                     {#each filteredSoftware as group}
                         <div id={group.category} class="scroll-mt-6 {!searchTerm && selectedId !== group.category ? 'hidden md:block' : ''}">
                             <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
-                                <div class="p-1.5 rounded-md bg-purple-100 dark:bg-purple-900/20">
-                                    <Monitor class="h-4 w-4 text-purple-600" />
+                                <div class="p-1.5 rounded-md bg-primary/10">
+                                    <Monitor class="h-4 w-4 text-primary" />
                                 </div>
                                 <h3 class="text-lg font-bold">{group.category}</h3>
                             </div>
