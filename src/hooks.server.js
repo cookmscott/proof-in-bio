@@ -43,14 +43,13 @@ const authGuard = async ({ event, resolve }) => {
   }
 
   if (!event.locals.session && event.url.pathname.startsWith('/private')) {
-    redirect(303, '/auth');
+    throw redirect(303, '/auth');
   }
   else if (event.locals.session && event.url.pathname === '/auth') {
-    redirect(303, '/profile');
+    throw redirect(303, '/profile');
   }
 
   return resolve(event);
 };
 
 export const handle = sequence(supabase, authGuard);
-

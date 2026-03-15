@@ -20,7 +20,7 @@ export async function load({ params, locals: { supabase } }) {
 		.single();
 
 	if (photoError || !photo) {
-		error(404, 'Not found');
+		throw error(404, 'Not found');
 	}
 
 	return {

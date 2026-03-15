@@ -1,13 +1,12 @@
-import { supabase } from '$lib/supabaseClient';
 import { error, fail } from '@sveltejs/kit';
 import { ALLOW_ALL_PHOTOS } from '$lib/server/featureFlags';
 
 /**
  * Loads the profile and photos for a given username.
  */
-export async function load({ params, locals: { supabase } }) {
+export async function load({ params, locals }) {
 	const { username } = params;
-	const { data: { session } } = await supabase.auth.getSession();
+	const { supabase, user } = locals;
 
 	// Fetch the user profile based on the username in the URL
 	const { data: profile, error: profileError } = await supabase
@@ -29,7 +28,7 @@ export async function load({ params, locals: { supabase } }) {
 
 	if (profileError || !profile) {
 		// If the user doesn't exist, return a 404
-		error(404, 'User not found');
+		throw error(404, 'User not found');
 	}
 
 	// Fetch the user's photos
@@ -47,7 +46,7 @@ export async function load({ params, locals: { supabase } }) {
 	}
 
 	// Determine if the logged-in user can edit this profile
-	const canEdit = session?.user?.id === profile.id;
+	const canEdit = user?.id === profile.id;
 
 	return {
 		profile,
@@ -82,7 +81,12 @@ export const actions = {
 
 		const formData = await request.formData();
 		const rawIds = formData.get('photo_ids')?.toString().trim();
-		const photoIds = rawIds ? rawIds.split(',').map((id) => id.trim()).filter(Boolean) : [];
+		const photoIds = rawIds
+			? rawIds
+					.split(',')
+					.map((id) => id.trim())
+					.filter(Boolean)
+			: [];
 
 		if (photoIds.length === 0) {
 			return fail(400, { error: 'No photos selected' });

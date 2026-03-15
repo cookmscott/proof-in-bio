@@ -1,0 +1,1 @@
+import{A as c,z as r,B as s,E as i,C as h,D as p,F as d}from"./FIC2SIRr.js";function u(t,f,o){r&&s();var n=t,a,e;c(()=>{a!==(a=f())&&(e&&(p(e),e=null),a&&(e=h(()=>o(n,a))))},i),r&&(n=d)}export{u as c};

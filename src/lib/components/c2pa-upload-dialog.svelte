@@ -6,23 +6,19 @@
     Loader2,
     CheckCircle,
     XCircle,
-    FileImage,
     AlertCircle,
-    Image as ImageIcon,
-    ChevronDown,
     X,
-    Sparkles
+    Sparkles,
+    Camera,
+    Paintbrush
   } from 'lucide-svelte';
-  import ContentCredentialStatus from './ContentCredentialStatus.svelte';
 
   import {
-    getActionCategory,
-    formatActionParameter,
     normalizeManifestStore,
     analyzeProvenance,
     loadC2pa,
     extractImageMetadata,
-    isAiAction
+    getSimpleC2paStatus
   } from '$lib/c2pa';
 
   // Props
@@ -34,42 +30,31 @@
   let error = $state(null);
   let selectedUpload = $state(null);
   let isUploading = $state(false);
+  const C2PA_READ_TIMEOUT_MS = 15000;
+  const IMAGE_DECODE_TIMEOUT_MS = 10000;
+  const UPLOAD_REQUEST_TIMEOUT_MS = 45000;
+  const SUPPORTED_C2PA_TYPES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/tiff']);
 
-  // --- Tri-state capture + signature helpers ---
+  // --- Simple C2PA status helpers ---
   const hasC2pa = (u) => !!u?.c2pa;
-  const hasManifest = (u) => !!u?.c2pa?.hasManifest;
-  const isCryptoValid = (u) => hasManifest(u) && u.c2pa?.activeSignatureValidated === true;
+  const getSimpleStatus = (u) => getSimpleC2paStatus(u?.c2pa);
+  const isConfirmedCapture = (u) => getSimpleStatus(u).confirmedCapture;
+  const isEditedWithNonAi = (u) => getSimpleStatus(u).editedWithNonAi;
+  const isEditedWithAi = (u) => getSimpleStatus(u).editedWithAi;
+  const isEligibleByStatus = (u) => {
+    const s = getSimpleStatus(u);
+    return s.confirmedCapture || s.editedWithNonAi || s.editedWithAi;
+  };
+  const isUnverified = (u) => !isEligibleByStatus(u);
 
-  const isCaptureDetected = (u) => u.c2pa?.hasCaptureProvenance === true;
-  const captureValidation = (u) => u.c2pa?.captureSignatureValidated; // true | false | null/undefined
-
-  // "Verified Capture" = capture provenance exists AND we can validate the capture manifest signature
-  // AND the active manifest signature is valid (asset is intact relative to active manifest).
-  const isVerifiedCapture = (u) =>
-    isCryptoValid(u) && isCaptureDetected(u) && captureValidation(u) === true;
-
-  // Capture provenance exists, active manifest validates, but we cannot confirm capture manifest validation
-  // (common when tooling only reports one validation result shape).
-  const isCaptureUnknown = (u) =>
-    isCryptoValid(u) && isCaptureDetected(u) && (captureValidation(u) == null);
-
-  // Signed by software only = active manifest signature valid, but no capture provenance detected
-  const isSoftwareSignedOnly = (u) => isCryptoValid(u) && !isCaptureDetected(u);
-
-  // Not verified = no manifest or active signature failed/unknown
-  const isUnverified = (u) => !hasManifest(u) || u.c2pa?.activeSignatureValidated !== true;
-
-  // Optional: distinguish “verified capture but edited later”
-  const isEditedFromVerifiedCapture = (u) => isVerifiedCapture(u) && u.c2pa?.activeIsCapture === false;
-
-  let verifiedCount = $derived(uploads.filter(isVerifiedCapture).length);
-  let captureUnknownCount = $derived(uploads.filter(isCaptureUnknown).length);
-  let softwareSignedCount = $derived(uploads.filter(isSoftwareSignedOnly).length);
+  let captureCount = $derived(uploads.filter(isConfirmedCapture).length);
+  let nonAiEditCount = $derived(uploads.filter(isEditedWithNonAi).length);
+  let aiEditCount = $derived(uploads.filter(isEditedWithAi).length);
   let unverifiedCount = $derived(uploads.filter(isUnverified).length);
   let uploadableCount = $derived(
     allowAllPhotos
       ? uploads.filter((u) => !u.processing && !u.error).length
-      : verifiedCount + captureUnknownCount
+      : uploads.filter((u) => !u.processing && !u.error && isEligibleByStatus(u)).length
   );
 
   $effect(() => {
@@ -94,8 +79,23 @@
     });
   }
 
+  function withTimeout(promise, timeoutMs, message) {
+    return new Promise((resolve, reject) => {
+      const timeoutId = setTimeout(() => reject(new Error(message)), timeoutMs);
+      promise
+        .then((value) => {
+          clearTimeout(timeoutId);
+          resolve(value);
+        })
+        .catch((err) => {
+          clearTimeout(timeoutId);
+          reject(err);
+        });
+    });
+  }
+
   async function handleUpload() {
-    // Allow upload if we have any Verified OR Capture Unknown images
+    // Allow upload if we have any eligible C2PA statuses.
     const canUploadCount = uploadableCount;
     if (isUploading || canUploadCount === 0) return;
     
@@ -110,10 +110,10 @@
     isUploading = true;
     error = null;
     
-    // Filter for EITHER verified OR capture unknown, unless testing flag is enabled
+    // Filter for eligible C2PA statuses, unless testing flag is enabled
     const uploadsToProcess = allowAllPhotos
       ? uploads.filter((u) => !u.processing && !u.error)
-      : uploads.filter((u) => isVerifiedCapture(u) || isCaptureUnknown(u));
+      : uploads.filter((u) => !u.processing && !u.error && isEligibleByStatus(u));
     if (uploadsToProcess.length === 0) {
       isUploading = false;
       error = 'No eligible images are ready to upload yet.';
@@ -128,7 +128,11 @@
             upload.processing = true; // Show spinner per item
             
             // Get basic dimensions
-            const { width, height } = await getImageDimensions(upload.previewUrl);
+            const { width, height } = await withTimeout(
+              getImageDimensions(upload.previewUrl),
+              IMAGE_DECODE_TIMEOUT_MS,
+              'Image decode timed out'
+            );
             
             // Extract detailed metadata
             const c2paMeta = extractImageMetadata(upload.c2pa?.data);
@@ -141,11 +145,7 @@
                 
                 // C2PA specific
                 c2pa_manifest: upload.c2pa?.data,
-                // Consider it "verified" if it is fully verified capture, 
-                // but we might want to store 'captureUnknown' state too?
-                // For now, let's keep boolean c2pa_verified as strict (isVerifiedCapture),
-                // but we are allowing the upload.
-                c2pa_verified: isVerifiedCapture(upload),
+                c2pa_verified: isConfirmedCapture(upload),
                 
                 // Extracted technical metadata
                 ...c2paMeta
@@ -155,9 +155,13 @@
             formData.append('file', upload.file);
             formData.append('metadata', JSON.stringify(metadata));
 
-            const { data, error: uploadError } = await supabase.functions.invoke('photo-upload', {
+            const { error: uploadError } = await withTimeout(
+              supabase.functions.invoke('photo-upload', {
                 body: formData
-            });
+              }),
+              UPLOAD_REQUEST_TIMEOUT_MS,
+              'Upload request timed out'
+            );
 
             if (uploadError) throw uploadError;
             
@@ -233,15 +237,32 @@
 
     uploads = [...uploads, ...newUploads];
 
-    for (const upload of newUploads) {
-      await processSingleUpload(upload);
-    }
+    await Promise.allSettled(newUploads.map((upload) => processSingleUpload(upload)));
   }
 
   async function processSingleUpload(uploadItem) {
     try {
-      const c2pa = await loadC2pa();
-      const result = await c2pa.reader.fromBlob(uploadItem.file.type, uploadItem.file);
+      const fileType = (uploadItem.file.type || '').toLowerCase();
+      const index = uploads.findIndex((u) => u.id === uploadItem.id);
+      if (index === -1) return;
+
+      // Skip C2PA parsing for image types that are commonly unsupported by the browser/WASM parser on mobile.
+      if (!SUPPORTED_C2PA_TYPES.has(fileType)) {
+        uploads[index].c2pa = { hasManifest: false, hasActions: false, actions: [] };
+        uploads[index].processing = false;
+        return;
+      }
+
+      const c2pa = await withTimeout(
+        loadC2pa(),
+        C2PA_READ_TIMEOUT_MS,
+        'C2PA initialization timed out'
+      );
+      const result = await withTimeout(
+        c2pa.reader.fromBlob(uploadItem.file.type, uploadItem.file),
+        C2PA_READ_TIMEOUT_MS,
+        'C2PA read timed out'
+      );
 
       let manifestData = null;
       let analysis = {
@@ -250,7 +271,11 @@
 
       if (result) {
         // Raw manifest store (as returned by the library)
-        const manifestStore = await result.manifestStore();
+        const manifestStore = await withTimeout(
+          result.manifestStore(),
+          C2PA_READ_TIMEOUT_MS,
+          'C2PA manifest read timed out'
+        );
 
         // Normalized store for consistent keys + easier analysis
         const normalized = normalizeManifestStore(manifestStore);
@@ -272,7 +297,6 @@
         }
       }
 
-      const index = uploads.findIndex((u) => u.id === uploadItem.id);
       if (index !== -1) {
         uploads[index].c2pa = {
           ...analysis,
@@ -284,7 +308,7 @@
       console.error('Error processing image:', err);
       const index = uploads.findIndex((u) => u.id === uploadItem.id);
       if (index !== -1) {
-        uploads[index].error = 'Failed to process';
+        uploads[index].c2pa = { hasManifest: false, hasActions: false, actions: [] };
         uploads[index].processing = false;
       }
     }
@@ -338,53 +362,6 @@
     open = false;
   }
 
-  const CATEGORY_EXPLANATIONS = {
-    'AI Edits': 'AI-assisted generation or editing actions were recorded in the file history.',
-    'Creation & Ingestion': 'How the file was first created or brought into an editing app.',
-    'Editorial Content Changes': 'Changes to the visible content of the image.',
-    'Color & Tone Adjustments': 'Exposure, color, contrast, and similar tonal changes.',
-    'Enhancement (Non-Editorial)': 'Non-content-changing enhancements or automated improvements.',
-    'Metadata-Only Changes': 'Information changes (labels/tags/metadata) without changing pixels.',
-    'Resizing & Scaling': 'Crop, resize, rotate, or orientation changes.',
-    'File / Format Transformations': 'Export, convert, or format changes.',
-    'Publishing & Distribution': 'Publishing or distribution steps recorded by tools/platforms.',
-    'Removal & Redaction': 'Content removal or redaction actions.',
-    'Watermarking': 'Watermark-related changes.',
-    'Other Actions': 'Recorded edits that do not match a standard category yet.'
-  };
-
-  function formatActionLine(action) {
-    const detail = formatActionParameter(action);
-    if (detail) return detail;
-
-    const raw = String(action?.action || '').replace(/^c2pa\./, '');
-    if (!raw) return 'Recorded change';
-    return raw
-      .split(/[._]/g)
-      .filter(Boolean)
-      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-      .join(' ');
-  }
-
-  function getDigitalSourceTypeLabel(action) {
-    const raw =
-      action?.digitalSourceType ||
-      action?.parameters?.digitalSourceType ||
-      action?.parameters?.['http://cv.iptc.org/newscodes/digitalsourcetype/'];
-
-    if (!raw) return null;
-    const value = String(raw).split('/').pop() || String(raw);
-
-    const labels = {
-      compositeWithTrainedAlgorithmicMedia: 'AI-assisted composite/edit',
-      trainedAlgorithmicData: 'AI-generated content',
-      humanEdits: 'Human edit',
-      digitalCapture: 'Camera capture',
-      computationalCapture: 'Computational camera capture'
-    };
-
-    return labels[value] || value;
-  }
 </script>
 
 {#if open}
@@ -485,27 +462,19 @@
 
                   {:else if hasC2pa(upload)}
                     <div class="absolute top-2 right-2">
-                      {#if isVerifiedCapture(upload)}
-                        <div
-                          class="bg-green-500 text-white p-1.5 rounded-full shadow-sm"
-                          title={isEditedFromVerifiedCapture(upload)
-                            ? 'Verified (edited, but traceable to capture-signed origin)'
-                            : 'Verified Capture (device/camera signed)'}
-                        >
+                      {#if isConfirmedCapture(upload)}
+                        <div class="bg-green-500 text-white p-1.5 rounded-full shadow-sm" title="Media captured with camera">
                           <CheckCircle class="h-5 w-5" />
                         </div>
 
-                      {:else if isCaptureUnknown(upload)}
-                        <div
-                          class="bg-emerald-500 text-white p-1.5 rounded-full shadow-sm"
-                          title="Capture provenance found and active manifest validates, but capture-manifest validation is unknown in this viewer"
-                        >
-                          <CheckCircle class="h-5 w-5" />
+                      {:else if isEditedWithAi(upload)}
+                        <div class="bg-amber-500 text-white p-1.5 rounded-full shadow-sm" title="Edited with AI">
+                          <Sparkles class="h-5 w-5" />
                         </div>
 
-                      {:else if isSoftwareSignedOnly(upload)}
-                        <div class="bg-blue-500 text-white p-1.5 rounded-full shadow-sm" title="Signed by software (no capture-signed provenance found)">
-                          <FileImage class="h-5 w-5" />
+                      {:else if isEditedWithNonAi(upload)}
+                        <div class="bg-blue-500 text-white p-1.5 rounded-full shadow-sm" title="Edited with non-AI tools">
+                          <CheckCircle class="h-5 w-5" />
                         </div>
 
                       {:else}
@@ -527,113 +496,33 @@
               {/each}
             </div>
 
-            {#if selectedUpload && selectedUpload.c2pa?.hasManifest}
-              {@const groupedActions = (() => {
-                const groups = {};
-                for (const action of selectedUpload.c2pa.actions || []) {
-                  const category = getActionCategory(action.action);
-
-                  const key = category.label;
-                  if (!groups[key]) groups[key] = { category, actions: [], aiCount: 0 };
-                  groups[key].actions.push(action);
-                  if (isAiAction(action)) groups[key].aiCount += 1;
-                }
-                return Object.values(groups).sort((a, b) => a.category.order - b.category.order);
-              })()}
-
-              <div class="mt-6">
-                <ContentCredentialStatus
-                  provenanceData={selectedUpload.c2pa}
-                  isLoading={selectedUpload.processing}
-                />
-              </div>
-
-              <div class="mt-8 space-y-4 animate-in fade-in slide-in-from-top-2 bg-muted/30 p-4 rounded-lg">
+            {#if selectedUpload && hasC2pa(selectedUpload)}
+              {@const status = getSimpleStatus(selectedUpload)}
+              <div class="mt-8 bg-muted/30 p-4 rounded-lg">
                 <div class="rounded-lg border bg-background/80 overflow-hidden">
                   <div class="px-4 py-3 border-b bg-muted/40">
-                    <h3 class="text-base md:text-lg font-semibold flex items-center gap-2">
-                      <ImageIcon class="h-5 w-5" />
-                      Edit & History Summary
-                    </h3>
-                    <p class="text-xs md:text-sm text-muted-foreground mt-1">
-                      This is the recorded history found in the file. It is grouped into plain-language sections to make the changes easier to read.
-                    </p>
-                    <p class="text-xs text-muted-foreground mt-1">
-                      Action names describe what changed (like crop or delete). "AI-assisted" labels describe how that change was made.
-                    </p>
-                    <p class="text-xs text-muted-foreground mt-1 truncate">
+                    <h3 class="text-base md:text-lg font-semibold">C2PA Summary</h3>
+                    <p class="text-xs md:text-sm text-muted-foreground mt-1 truncate">
                       File: {selectedUpload.file.name}
                     </p>
                   </div>
-
-                  <div class="p-3 md:p-4 space-y-2">
-                    {#each groupedActions as group}
-                      <details class="group border rounded-lg bg-card text-card-foreground shadow-sm open:ring-1 open:ring-primary/20">
-                        <summary
-                          class="flex items-center justify-between p-4 cursor-pointer select-none hover:bg-muted/50 transition-colors rounded-lg group-open:rounded-b-none"
-                        >
-                          <div class="min-w-0">
-                            <div class="flex items-center gap-3 font-medium">
-                              <group.category.icon class="h-5 w-5 text-primary shrink-0" />
-                              <span>{group.category.label}</span>
-                              <span class="inline-flex items-center rounded-full bg-secondary px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-secondary-foreground">
-                                {group.actions.length} {group.actions.length === 1 ? 'entry' : 'entries'}
-                              </span>
-                              {#if group.aiCount > 0}
-                                <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                                  <Sparkles class="h-3 w-3" />
-                                  {group.aiCount} AI-tagged
-                                </span>
-                              {/if}
-                            </div>
-                            <p class="text-xs text-muted-foreground mt-1 pl-8">
-                              {CATEGORY_EXPLANATIONS[group.category.label] || 'Recorded changes in this category.'}
-                            </p>
-                          </div>
-                          <ChevronDown class="h-4 w-4 text-muted-foreground transition-transform duration-200 group-open:rotate-180 shrink-0" />
-                        </summary>
-
-                        <div class="border-t bg-muted/10">
-                          <ul class="divide-y">
-                            {#each group.actions as action}
-                              <li class="px-4 py-3">
-                                <div class="flex items-start gap-3">
-                                  <span class="mt-1.5 h-1.5 w-1.5 rounded-full bg-primary/50 shrink-0"></span>
-                                  <div class="min-w-0 space-y-1">
-                                    <p class="text-sm text-foreground leading-snug">
-                                      {formatActionLine(action)}
-                                    </p>
-                                    {#if isAiAction(action) || getDigitalSourceTypeLabel(action)}
-                                      <div class="flex flex-wrap items-center gap-1.5">
-                                        {#if isAiAction(action)}
-                                          <span class="inline-flex items-center gap-1 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide">
-                                            <Sparkles class="h-3 w-3" />
-                                            AI-assisted
-                                          </span>
-                                        {/if}
-                                        {#if getDigitalSourceTypeLabel(action)}
-                                          <span class="inline-flex items-center rounded-full bg-muted px-2 py-0.5 text-[10px] text-muted-foreground">
-                                            {getDigitalSourceTypeLabel(action)}
-                                          </span>
-                                        {/if}
-                                      </div>
-                                    {/if}
-                                    <p class="text-[11px] text-muted-foreground break-all">
-                                      Recorded action: {action.action}
-                                    </p>
-                                  </div>
-                                </div>
-                              </li>
-                            {/each}
-                          </ul>
-                        </div>
-                      </details>
-                    {/each}
-
-                    {#if groupedActions.length === 0}
-                      <div class="p-4 border rounded-lg bg-muted/20 text-sm text-muted-foreground text-center">
-                        No specific edit actions were listed in the file history.
-                      </div>
+                  <div class="p-4 text-sm">
+                    <ul class="space-y-2">
+                      <li class={`flex items-center gap-2 ${status.confirmedCapture ? 'text-green-700 dark:text-green-400 font-medium' : 'text-muted-foreground opacity-60'}`}>
+                        <Camera class="h-4 w-4 shrink-0" />
+                        <span>Media captured with camera</span>
+                      </li>
+                      <li class={`flex items-center gap-2 ${status.editedWithNonAi ? 'text-blue-700 dark:text-blue-400 font-medium' : 'text-muted-foreground opacity-60'}`}>
+                        <Paintbrush class="h-4 w-4 shrink-0" />
+                        <span>Edited with non-AI tools</span>
+                      </li>
+                      <li class={`flex items-center gap-2 ${status.editedWithAi ? 'text-amber-700 dark:text-amber-400 font-medium' : 'text-muted-foreground opacity-60'}`}>
+                        <Sparkles class="h-4 w-4 shrink-0" />
+                        <span>Edited with AI</span>
+                      </li>
+                    </ul>
+                    {#if !status.confirmedCapture && !status.editedWithNonAi && !status.editedWithAi}
+                      <p class="text-xs text-muted-foreground mt-3">No matching verified C2PA status was found.</p>
                     {/if}
                   </div>
                 </div>
@@ -644,18 +533,18 @@
               <div class="flex-1 space-y-1.5">
                 <div class="flex gap-4 text-sm font-medium flex-wrap">
                   <span class="flex items-center gap-1.5">
-                    <CheckCircle class="h-4 w-4 text-green-500" /> {verifiedCount} Verified Capture
+                    <CheckCircle class="h-4 w-4 text-green-500" /> {captureCount} Media captured with camera
                   </span>
 
-                  {#if captureUnknownCount > 0}
+                  {#if nonAiEditCount > 0}
                     <span class="flex items-center gap-1.5">
-                      <CheckCircle class="h-4 w-4 text-emerald-500" /> {captureUnknownCount} Capture (Unverified)
+                      <CheckCircle class="h-4 w-4 text-blue-500" /> {nonAiEditCount} Edited with non-AI tools
                     </span>
                   {/if}
 
-                  {#if softwareSignedCount > 0}
+                  {#if aiEditCount > 0}
                     <span class="flex items-center gap-1.5">
-                      <FileImage class="h-4 w-4 text-blue-500" /> {softwareSignedCount} Signed by Software
+                      <Sparkles class="h-4 w-4 text-amber-500" /> {aiEditCount} Edited with AI
                     </span>
                   {/if}
 
@@ -666,14 +555,9 @@
                   {/if}
                 </div>
 
-                {#if unverifiedCount > 0 || softwareSignedCount > 0 || captureUnknownCount > 0}
+                {#if unverifiedCount > 0}
                   <p class="text-xs text-muted-foreground pr-8">
-                    <strong>Verified Capture:</strong> The photo&apos;s history is intact straight from a supported camera.
-                    <br /><strong>Signed by Software:</strong> The photo has verified history, but it originated in software (like editing or AI tools) instead of a camera.
-                    <br /><strong>Unsigned / Not Verified:</strong> The file is missing content credentials, or the signature could not be verified here.
-                    {#if captureUnknownCount > 0}
-                      <br /><strong>Capture (Unverified):</strong> Capture provenance was found, but this viewer could not independently verify the capture signature.
-                    {/if}
+                    Some files did not match a verified C2PA status and cannot be uploaded.
                   </p>
                 {/if}
               </div>
