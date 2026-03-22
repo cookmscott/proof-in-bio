@@ -12,7 +12,6 @@
 	import LandingC2PAPhotos from '$lib/components/landing/LandingC2PAPhotos.svelte';
 	import LandingEssentialVerification from '$lib/components/landing/LandingEssentialVerification.svelte';
 	import LandingCompatibility from '$lib/components/landing/LandingCompatibility.svelte';
-	import LandingProblemSolution from '$lib/components/landing/LandingProblemSolution.svelte';
 	import LandingHowItWorks from '$lib/components/landing/LandingHowItWorks.svelte';
 	import SocialProof from '$lib/components/landing/SocialProof.svelte';
 	import LandingFinalCta from '$lib/components/landing/LandingFinalCta.svelte';
@@ -26,7 +25,7 @@
 	}
 </script>
 
-<div class="bg-background text-foreground min-h-screen antialiased overflow-x-hidden">
+<div class="landing-page bg-background text-foreground min-h-screen antialiased overflow-x-hidden">
 	<!-- Header -->
 	<LandingHeader 
 		session={data.session} 
@@ -49,9 +48,6 @@
 		<LandingC2PAPhotos />
 
 
-		<!-- The Problem/Solution Section -->
-		<LandingProblemSolution />		
-
 		<!-- Essential Verification Section -->
 		<LandingEssentialVerification />
 
@@ -73,8 +69,12 @@
 </div>
 
 <style>
-	h1,
-	h2 {
-		font-family: 'Karma' !important;
+	:global(.landing-page h1),
+	:global(.landing-page h2),
+	:global(.landing-page h3),
+	:global(.landing-page h4),
+	:global(.landing-page h5),
+	:global(.landing-page h6) {
+		font-family: 'Sentient', serif !important;
 	}
 </style>

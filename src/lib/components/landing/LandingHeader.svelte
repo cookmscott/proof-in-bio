@@ -7,7 +7,7 @@
 </script>
 
 <header class="sticky top-0 z-30 w-full bg-background/80 backdrop-blur-md transition-all">
-	<div class="container mx-auto max-w-7xl px-6 py-4">
+	<div class="container mx-auto max-w-5xl px-6 py-4">
 		<nav class="flex items-center justify-between">
 			<a href="/" class="flex items-center gap-2 group">
 				<span class="font-bold text-lg text-foreground tracking-tight">ProofInBio</span>

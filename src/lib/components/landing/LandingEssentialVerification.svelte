@@ -1,5 +1,5 @@
 <script>
-    import { ShieldCheck, ArrowRight } from 'lucide-svelte';
+    import { ArrowRight } from 'lucide-svelte';
     import { Button } from '$lib/ui/button/index.js';
 
     // Local static assets
@@ -28,7 +28,6 @@
         "/landing/carousel_photos/dmanisi-skull5excavation.jpg",
         "/landing/carousel_photos/earthriseapollo15.jpg",
         "/landing/carousel_photos/eiffeltowerparis.jpg",
-        "/landing/carousel_photos/göbeklitepe-buildingc.jpg",
         "/landing/carousel_photos/grandcanyonusa.jpg",
         "/landing/carousel_photos/hubbleultradeepfieldhigh.jpg",
         "/landing/carousel_photos/jwstspacecraft.jpg",
@@ -64,31 +63,24 @@
     const triple = (arr) => [...arr, ...arr, ...arr];
     
     // Create rows (triple the shuffled arrays)
-    // For row 3, we can reshuffle newsLogos or just reverse/triple again.
-    // Let's create a fresh shuffle for Row 3 for variety.
     const row1 = triple([...newsLogos]);
     const row2 = triple([...photos]);
-    const row3 = triple(shuffle([...newsLogos]));
 
 </script>
 
 <section class="bg-zinc-50 dark:bg-zinc-900 py-20 border-y border-border/40 overflow-hidden">
-    <div class="container mx-auto max-w-7xl px-6 mb-12">
-        <!-- Header -->
-        <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-8">
-            <div class="max-w-2xl">
-                <div class="inline-flex items-center gap-2 text-primary font-medium mb-3">
-                    <ShieldCheck class="h-4 w-4" />
-                    <span class="text-sm uppercase tracking-wider">High-Stakes Proof</span>
-                </div>
-                <h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground">
-                    Where Being Real Is Non-Negotiable
-                </h2>
-            </div>
-            <div class="max-w-md space-y-4">
-                <p class="text-muted-foreground text-base leading-relaxed">
-                    Millions of images, infinite feeds. We provide the infrastructure to know what's real in an era of synthetic media.
-                </p>
+    <div class="container mx-auto max-w-5xl px-6 mb-12">
+        <div class="text-center max-w-3xl mx-auto pb-8">
+            <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
+                High-Stakes Proof
+            </p>
+            <h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+                Where Being Real Is Non-Negotiable
+            </h2>
+            <p class="text-zinc-500 text-base leading-relaxed">
+                Millions of images, infinite feeds, and one job: make what is real easy to prove in an era of synthetic media.
+            </p>
+            <div class="mt-6">
                 <Button variant="outline" href="#how-it-works" class="group rounded-full bg-background">
                     Prove It’s Real
                     <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
@@ -144,24 +136,6 @@
             </div>
         </div>
 
-        <!-- Row 3: News Logos (Right to Left) - Faster -->
-        <div class="relative flex overflow-hidden w-full select-none">
-            <div class="flex gap-4 animate-marquee whitespace-nowrap items-center will-change-transform" style="animation-duration: 45s;">
-                {#each row3 as url}
-                    <div class="h-12 w-24 md:h-16 md:w-32 flex items-center justify-center p-3 transition-all duration-500">
-                        <img 
-                            src={url} 
-                            alt="News Agency Logo" 
-                            loading="lazy"
-                            class="max-w-full max-h-full object-contain"
-                        />
-                    </div>
-                {/each}
-            </div>
-            <!-- Saturation Vignette Overlay -->
-            <div class="absolute inset-0 z-10 pointer-events-none vignette-saturation"></div>
-        </div>
-        
         <!-- Side Fades (Opacity/Background blend) -->
         <div class="absolute inset-y-0 left-0 w-16 md:w-48
         bg-gradient-to-r

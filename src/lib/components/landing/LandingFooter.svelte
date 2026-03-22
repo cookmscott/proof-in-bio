@@ -3,7 +3,7 @@
 </script>
 
 <footer class="border-t">
-	<div class="container mx-auto max-w-6xl px-6 py-12">
+	<div class="container mx-auto max-w-5xl px-6 py-12">
 		<div class="grid md:grid-cols-4 gap-8">
 			<div class="space-y-4">
 				<div class="flex items-center gap-2">

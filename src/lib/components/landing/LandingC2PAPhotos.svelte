@@ -73,28 +73,17 @@
 		style="background-image: url('data:image/svg+xml,%3Csvg width=%2260%22 height=%2260%22 viewBox=%220 0 60 60%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cg fill=%22none%22 fill-rule=%22evenodd%22%3E%3Cg fill=%22%23888%22 fill-opacity=%221%22%3E%3Cpath d=%22M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z%22/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');">
 	</div>
 
-	<div class="container mx-auto px-6 relative">
+	<div class="container mx-auto max-w-5xl px-6 relative">
 		<!-- ─── Intro / Hero Block ─── -->
-		<div class="max-w-4xl mx-auto mb-20 sm:mb-24">
-			<!-- Small badge -->
-			<div class="flex justify-center mb-8">
-				<div class="inline-flex items-center gap-2.5 px-4 py-2 rounded-full border border-emerald-500/20 bg-emerald-500/5">
-					<span class="relative flex h-2 w-2">
-						<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-						<span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
-					</span>
-					<span class="text-xs font-semibold uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400">
-						Built on C2PA
-					</span>
-				</div>
-			</div>
-
-			<!-- Headline -->
+		<div class="max-w-3xl mx-auto mb-20 sm:mb-24 text-center">
+			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
+				Built on C2PA
+			</p>
 			<h2 class="text-center text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-[1.05]">
 				Photos with a
 				<span class="relative inline-block">
 					<span class="relative z-10">proof trail</span>
-					<span class="absolute bottom-1 left-0 w-full h-3 bg-emerald-500/20 rounded-sm -z-0"></span>
+					<span class="absolute bottom-1 left-0 w-full h-3 bg-primary/20 rounded-sm -z-0"></span>
 				</span>
 			</h2>
 
@@ -115,16 +104,16 @@
 		<div class="max-w-5xl mx-auto mb-24 sm:mb-28">
 			<div class="grid gap-5 md:grid-cols-3 relative">
 				<!-- Step 1 — Capture -->
-				<div class="step-card group relative rounded-2xl border border-emerald-500/20 bg-gradient-to-b from-emerald-500/[0.06] to-card p-6 shadow-sm">
+				<div class="step-card group relative rounded-2xl border border-zinc-300/60 bg-gradient-to-b from-zinc-100/80 to-card p-6 shadow-sm dark:border-zinc-700/60 dark:from-zinc-900/70">
 					<div class="mb-4 flex items-center gap-3">
-						<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-emerald-500 text-sm font-bold text-white shadow-sm shadow-emerald-500/25">
+						<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-zinc-900 text-sm font-bold text-white shadow-sm shadow-zinc-900/20 dark:bg-zinc-100 dark:text-zinc-900 dark:shadow-zinc-100/10">
 							1
 						</span>
-						<span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-emerald-500/25 bg-card text-emerald-600 dark:text-emerald-400">
+						<span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-zinc-300/70 bg-card text-zinc-700 dark:border-zinc-700 dark:text-zinc-200">
 							<Camera class="h-4 w-4" />
 						</span>
 					</div>
-					<p class="text-[11px] font-bold uppercase tracking-[0.15em] text-emerald-600 dark:text-emerald-400 mb-2">
+					<p class="text-[11px] font-bold uppercase tracking-[0.15em] text-zinc-600 dark:text-zinc-300 mb-2">
 						Capture
 					</p>
 					<p class="text-base font-semibold text-foreground">Shoot with a supported camera</p>
@@ -141,16 +130,16 @@
 				</div>
 
 				<!-- Step 2 — Edit -->
-				<div class="step-card group relative rounded-2xl border border-sky-500/20 bg-gradient-to-b from-sky-500/[0.06] to-card p-6 shadow-sm">
+				<div class="step-card group relative rounded-2xl border border-primary/20 bg-gradient-to-b from-primary/[0.06] to-card p-6 shadow-sm">
 					<div class="mb-4 flex items-center gap-3">
-						<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-sky-500 text-sm font-bold text-white shadow-sm shadow-sky-500/25">
+						<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-sm shadow-primary/25">
 							2
 						</span>
-						<span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-sky-500/25 bg-card text-sky-600 dark:text-sky-400">
+						<span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-primary/25 bg-card text-primary">
 							<WandSparkles class="h-4 w-4" />
 						</span>
 					</div>
-					<p class="text-[11px] font-bold uppercase tracking-[0.15em] text-sky-600 dark:text-sky-400 mb-2">
+					<p class="text-[11px] font-bold uppercase tracking-[0.15em] text-primary mb-2">
 						Edit
 					</p>
 					<p class="text-base font-semibold text-foreground">Edit in supported software</p>
@@ -168,16 +157,16 @@
 				</div>
 
 				<!-- Step 3 — Verify -->
-				<div class="step-card group relative rounded-2xl border border-violet-500/20 bg-gradient-to-b from-violet-500/[0.06] to-card p-6 shadow-sm">
+				<div class="step-card group relative rounded-2xl border border-verified/20 bg-gradient-to-b from-verified/[0.06] to-card p-6 shadow-sm">
 					<div class="mb-4 flex items-center gap-3">
-						<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-violet-500 text-sm font-bold text-white shadow-sm shadow-violet-500/25">
+						<span class="inline-flex h-9 w-9 items-center justify-center rounded-full bg-verified text-sm font-bold text-verified-foreground shadow-sm shadow-verified/25">
 							3
 						</span>
-						<span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-violet-500/25 bg-card text-violet-600 dark:text-violet-400">
+						<span class="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-verified/25 bg-card text-verified">
 							<BadgeCheck class="h-4 w-4" />
 						</span>
 					</div>
-					<p class="text-[11px] font-bold uppercase tracking-[0.15em] text-violet-600 dark:text-violet-400 mb-2">
+					<p class="text-[11px] font-bold uppercase tracking-[0.15em] text-verified mb-2">
 						Verify
 					</p>
 					<p class="text-base font-semibold text-foreground">
@@ -202,7 +191,7 @@
 		</div>
 
 		<!-- ─── Photo Gallery ─── -->
-		<div class="max-w-6xl mx-auto">
+		<div class="mx-auto">
 			<div class="flex items-center justify-between mb-8">
 				<div>
 					<p class="text-xs font-bold uppercase tracking-[0.15em] text-muted-foreground/60 mb-1">
@@ -213,7 +202,7 @@
 					</h3>
 				</div>
 				<div class="hidden sm:flex items-center gap-2 text-sm text-muted-foreground">
-					<ShieldCheck class="h-4 w-4 text-emerald-500" />
+					<ShieldCheck class="h-4 w-4 text-verified" />
 					<span>All C2PA verified</span>
 				</div>
 			</div>

@@ -80,7 +80,7 @@
     });
 </script>
 
-<section class="py-24 bg-zinc-50 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 overflow-hidden font-sans selection:bg-orange-500 selection:text-white">
+<section class="py-24 dark:bg-[#0a0a0a] text-zinc-900 dark:text-zinc-100 overflow-hidden font-sans selection:bg-orange-500 selection:text-white">
     <div class="container mx-auto px-4 md:px-6">
         <div class="flex flex-col items-center text-center mb-20 space-y-6">
             <span class="text-xs font-bold tracking-widest text-zinc-500 uppercase">Reality Check</span>
@@ -121,7 +121,7 @@
                     <div class="px-6 pb-8 flex-1 flex flex-col">
                         <!-- Profile Info -->
                         <div class="flex items-center gap-6 mb-6">
-                            <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+                            <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-amber-300 via-primary to-zinc-800">
                                 <img src={profile.avatar_url} alt="Profile" class="rounded-full w-full h-full object-cover border-2 border-white" />
                             </div>
                             <div class="flex-1 flex justify-around text-center">
@@ -177,7 +177,7 @@
             <!-- Right Side: Dennis Smith (Instagram + Proof in Bio Stack) -->
             <div class="relative group w-full max-w-[360px]">
                 <div class="text-center mb-8">
-                    <h3 class="text-xl font-bold mb-2 text-[#00D165]">Proven human capture</h3>
+                    <h3 class="text-xl font-bold mb-2 text-verified">Proven human capture</h3>
                     <p class="text-sm text-zinc-500 dark:text-zinc-400">We check it’s real — not fake or AI-generated.</p>
                 </div>
                 <!-- Dynamic Cat (Thinking -> Happy) https://giphy.com/Kennymays-->
@@ -185,7 +185,7 @@
                     {#if showProof}
                         <div class="absolute inset-0 animate-bounce-subtle">
                             <img src="/landing/cat_happy.gif" alt="Happy Cat" class="w-full h-full object-contain drop-shadow-xl" />
-                            <div class="absolute left-0 -top-2 bg-[#00D165] text-white text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform -rotate-12">
+                            <div class="absolute left-0 -top-2 bg-verified text-verified-foreground text-[10px] font-bold px-3 py-1.5 rounded-xl shadow-sm transform -rotate-12">
                                 Proven! ✅
                             </div>
                         </div>
@@ -216,7 +216,7 @@
                         <div class="px-6 pb-8 flex-1 flex flex-col">
                             <!-- Profile Info -->
                             <div class="flex items-center gap-6 mb-6">
-                                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-yellow-400 via-red-500 to-purple-500">
+                                <div class="w-20 h-20 rounded-full p-1 bg-gradient-to-tr from-amber-300 via-primary to-zinc-800">
                                     <img src={profileDennis.avatar_url} alt="Profile" class="rounded-full w-full h-full object-cover border-2 border-white" />
                                 </div>
                                 <div class="flex-1 flex justify-around text-center">
@@ -238,7 +238,7 @@
                             <div class="mb-8">
                                 <div class="font-bold text-base mb-1">{profileDennis.display_name}</div>
                                 <div class="text-sm opacity-80 leading-snug">{profileDennis.bio}</div>
-                                <div class="text-sm text-[#FF5D00] font-bold mt-2">{profileDennis.link}</div>
+                                <div class="text-sm text-primary font-bold mt-2">{profileDennis.link}</div>
                             </div>
 
                             <!-- Tabs -->
@@ -308,10 +308,10 @@
                                 <div class="mt-6 min-h-[64px]">
                                     {#key showProof}
                                         {#if showProof}
-                                            <div class="relative overflow-hidden bg-gradient-to-br from-[#00D165] to-[#00A14E] shadow-lg shadow-[#00D165]/20 flex w-full items-center rounded-2xl p-3 text-white animate-bam border border-[#00D165]/30">
+                                            <div class="relative overflow-hidden bg-gradient-to-br from-verified to-verified/80 shadow-lg shadow-verified/20 flex w-full items-center rounded-2xl p-3 text-verified-foreground animate-bam border border-verified/30">
                                                 <!-- Subtle background glows -->
                                                 <div class="absolute -left-8 -top-8 w-24 h-24 bg-white/20 rounded-full blur-2xl pointer-events-none"></div>
-                                                <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-[#00D165]/40 rounded-full blur-xl pointer-events-none"></div>
+                                                <div class="absolute -right-4 -bottom-4 w-16 h-16 bg-verified/40 rounded-full blur-xl pointer-events-none"></div>
                                                 
                                                 <!-- Icon -->
                                                 <div class="bg-white/20 shadow-[inset_0_2px_4px_rgba(255,255,255,0.3)] w-10 h-10 rounded-full flex items-center justify-center shrink-0 relative z-10 backdrop-blur-sm border border-white/10">
@@ -346,7 +346,7 @@
                                                 class="w-full h-full object-cover opacity-90 hover:opacity-100 transition-opacity"
                                             />
                                             <!-- Verified Checkmark Overlay -->
-                                            <div class="absolute top-1 right-1 bg-[#00D165] text-white rounded-full p-0.5 shadow-sm">
+                                            <div class="absolute top-1 right-1 bg-verified text-verified-foreground rounded-full p-0.5 shadow-sm">
                                                 <CheckCircle class="h-3 w-3" />
                                             </div>
                                         </div>
