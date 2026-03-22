@@ -25,7 +25,7 @@
 	}
 </script>
 
-<div class="bg-background text-foreground min-h-screen antialiased overflow-x-hidden">
+<div class="landing-page bg-background text-foreground min-h-screen antialiased overflow-x-hidden">
 	<!-- Header -->
 	<LandingHeader 
 		session={data.session} 
@@ -69,8 +69,12 @@
 </div>
 
 <style>
-	h1,
-	h2 {
-		font-family: 'Karma' !important;
+	:global(.landing-page h1),
+	:global(.landing-page h2),
+	:global(.landing-page h3),
+	:global(.landing-page h4),
+	:global(.landing-page h5),
+	:global(.landing-page h6) {
+		font-family: 'Sentient', serif !important;
 	}
 </style>
