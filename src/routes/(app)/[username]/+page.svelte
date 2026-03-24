@@ -1,5 +1,5 @@
 <script>
-	import { Share2, Plus, User, Upload, Check } from 'lucide-svelte';
+	import { Plus, User, Upload, Check } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
@@ -67,7 +67,7 @@
 	let canEdit = $derived(data.canEdit);
 
 	// Extract interests from the nested structure
-	let interests = $derived(profile.interests.map((i) => i.interest));
+	let interests = $derived((profile?.interests ?? []).map((i) => i.interest));
 
 	// Track loaded state for each image in the gallery using an object map
 	let loaded = $state({});
@@ -76,14 +76,7 @@
 	// New photos will simply not be in the map yet (undefined -> falsy).
 
 	function getPhotoUrl(photo) {
-		if (photo.storage_key && data.supabase) {
-			const { data: urlData } = data.supabase.storage
-				.from('photos')
-				.getPublicUrl(photo.storage_key);
-			return urlData.publicUrl;
-		}
-
-		return photo.storage_url;
+		return photo.image_url || photo.storage_url;
 	}
 
 	let showCopiedTooltip = $state(false);
@@ -241,7 +234,7 @@
 						</button>
 						<p class="mt-2 max-w-xl text-balance text-sm sm:text-base">{profile.bio}</p>
 						<div class="mt-3 flex flex-wrap gap-2">
-							{#each interests as interest}
+							{#each interests as interest (interest)}
 								<Badge variant="secondary">{interest}</Badge>
 							{/each}
 						</div>
@@ -303,7 +296,7 @@
 
 			<!-- Photo Gallery Section -->
 			<div class="grid grid-cols-2 gap-2 sm:grid-cols-3 md:gap-4">
-				{#each photos as photo, i (photo.id)}
+				{#each photos as photo (photo.id)}
 					<a
 						href={`/${profile.username}/${photo.id}`}
 						class="group"

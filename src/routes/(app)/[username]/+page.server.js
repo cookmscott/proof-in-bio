@@ -1,6 +1,29 @@
 import { error, fail } from '@sveltejs/kit';
 import { ALLOW_ALL_PHOTOS } from '$lib/server/featureFlags';
 
+function isMissingColumnError(err) {
+	const combined = [err?.message, err?.details, err?.hint].filter(Boolean).join(' ').toLowerCase();
+	return (
+		combined.includes('column') ||
+		combined.includes('schema cache') ||
+		err?.code === 'PGRST204' ||
+		err?.code === '42703'
+	);
+}
+
+function resolvePhotoUrl(supabase, photo) {
+	if (photo?.storage_url) {
+		return photo.storage_url;
+	}
+
+	if (photo?.storage_key) {
+		const { data } = supabase.storage.from('photos').getPublicUrl(photo.storage_key);
+		return data?.publicUrl ?? null;
+	}
+
+	return null;
+}
+
 /**
  * Loads the profile and photos for a given username.
  */
@@ -31,8 +54,13 @@ export async function load({ params, locals }) {
 		throw error(404, 'User not found');
 	}
 
+	profile.interests = profile.interests || [];
+
 	// Fetch the user's photos
-	const { data: photos, error: photosError } = await supabase
+	let photos = [];
+	let photosError = null;
+
+	const primaryPhotosQuery = await supabase
 		.from('photos')
 		.select('id, storage_url, storage_key, title, description, width, height')
 		.eq('user_id', profile.id)
@@ -41,16 +69,36 @@ export async function load({ params, locals }) {
 		.is('deleted_at', null)
 		.order('created_at', { ascending: false });
 
+	photos = primaryPhotosQuery.data || [];
+	photosError = primaryPhotosQuery.error;
+
+	if (photosError && isMissingColumnError(photosError)) {
+		const fallbackPhotosQuery = await supabase
+			.from('photos')
+			.select('id, storage_url, storage_key, title, description, width, height')
+			.eq('user_id', profile.id)
+			.eq('is_public', true)
+			.order('created_at', { ascending: false });
+
+		photos = fallbackPhotosQuery.data || [];
+		photosError = fallbackPhotosQuery.error;
+	}
+
 	if (photosError) {
 		console.error('Error fetching photos:', photosError);
 	}
+
+	const normalizedPhotos = (photos || []).map((photo) => ({
+		...photo,
+		image_url: resolvePhotoUrl(supabase, photo)
+	}));
 
 	// Determine if the logged-in user can edit this profile
 	const canEdit = user?.id === profile.id;
 
 	return {
 		profile,
-		photos: photos || [],
+		photos: normalizedPhotos,
 		canEdit,
 		allowAllPhotos: ALLOW_ALL_PHOTOS
 	};
