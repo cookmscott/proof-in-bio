@@ -74,8 +74,8 @@
             <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
                 High-Stakes Proof
             </p>
-            <h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
-                Where Being Real Is Non-Negotiable
+            <h2 class="max-w-6xl text-balance font-serif text-4xl font-semibold leading-[0.9] tracking-[-0.04em] text-zinc-900 dark:text-zinc-100">
+                Trust is fragile when your work has to travel.
             </h2>
             <p class="text-zinc-500 text-base leading-relaxed">
                 Millions of images, infinite feeds, and one job: make what is real easy to prove in an era of synthetic media.

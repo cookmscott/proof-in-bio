@@ -155,7 +155,7 @@
             <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
                 Ecosystem Support
             </p>
-            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-6">C2PA Supported Cameras & Software</h2>
+            <h2 class="max-w-6xl text-balance font-serif text-4xl font-semibold leading-[0.9] tracking-[-0.04em] text-zinc-900 dark:text-zinc-100">Works with your gear.</h2>
             <p class="text-xl text-muted-foreground leading-relaxed">
                 Explore the growing ecosystem of cameras, software, and platforms that support Content Credentials.
             </p>

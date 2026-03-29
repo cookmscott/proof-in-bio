@@ -1,146 +1,125 @@
 <script>
-    import { ShieldCheck, Upload, Link2, Check } from 'lucide-svelte';
-    import DetectiveRobot from '$lib/components/DetectiveRobot.svelte';
+	import { Badge } from '$lib/ui/badge';
+	import { Separator } from '$lib/ui/separator';
 
-    const steps = [
-        {
-            icon: Upload,
-            title: 'You upload',
-            description: 'Drop in a photo from a supported camera or editing app. We read the built-in proof and show what was captured.',
-            points: [
-                'Read the proof data and capture info.',
-                'Capture time and camera/app details.',
-                'Keep the original file intact.'
-            ],
-            image: 'https://images.pexels.com/photos/3762375/pexels-photo-3762375.jpeg?w=800',
-            color: '#E9ECED'
-        },
-        {
-            icon: ShieldCheck,
-            title: "We check it's real",
-            description: "We check it's real and not fake or AI-generated. If anything doesn't add up, it's marked unproven.",
-            points: [
-                'Confirm it came from the original capture.',
-                'Call out edits recorded in the file.',
-                'Show a clear pass/fail badge.'
-            ],
-            image: 'https://images.pexels.com/photos/8090132/pexels-photo-8090132.jpeg?w=800',
-            color: '#FFFCEB'
-        },
-        {
-            icon: Link2,
-            title: 'Share a proof link',
-            description: 'Publish a proof page with a clear badge that says it’s not fake or AI-generated.',
-            points: [
-                'Use the URL in bios, portfolios, and client deliveries.',
-                'Details stay attached so anyone can check it’s real.',
-                'Share once, earn trust everywhere.'
-            ],
-            image: 'https://images.pexels.com/photos/1540338/pexels-photo-1540338.jpeg?w=800',
-            color: '#ECF9FD'
-        }
-    ];
+	const embedScale = 0.56;
+	const embedSize = `${100 / embedScale}%`;
+
+	const steps = [
+		{
+			title: 'Upload a provenance-backed image',
+			description:
+				'Start with a supported camera file or edited export that still carries its content credentials.'
+		},
+		{
+			title: 'We read and preserve its credentials',
+			description:
+				'Proof in Bio inspects the file, surfaces the capture and edit history, and keeps that record attached.'
+		},
+		{
+			title: 'We generate a shareable proof page',
+			description:
+				'The page turns metadata into a human-readable record with clear verification status and provenance context.'
+		},
+		{
+			title: 'You share it anywhere',
+			description:
+				'Use one proof link across bios, portfolios, submissions, client deliveries, and collector conversations.'
+		}
+	];
 </script>
 
-<section id="how-it-works" class="relative py-24 sm:py-32 bg-secondary/10 overflow-hidden">
-    <!-- Ambient Background Decorative Elements -->
-    <div class="absolute top-0 left-1/2 w-full -translate-x-1/2 h-full overflow-hidden pointer-events-none z-0">
-        <div class="absolute top-[10%] left-[-10%] w-[40%] aspect-square rounded-full bg-primary/5 blur-3xl"></div>
-        <div class="absolute bottom-[20%] right-[-10%] w-[40%] aspect-square rounded-full bg-verified/5 blur-3xl"></div>
-    </div>
+<section id="how-it-works" class="bg-background py-24">
+	<div class="container mx-auto max-w-5xl px-6">
+		<div class="mx-auto mb-12 max-w-3xl text-center sm:mb-14">
+			<p class="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-zinc-500">How it works</p>
+			<h2 class="text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+				How a photo becomes proof.
+			</h2>
+			<p class="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted-foreground md:text-xl">
+				One link that proves your work is real, with the capture and edit record intact.
+			</p>
+		</div>
 
-    <div class="container mx-auto max-w-5xl px-6 relative z-10">
-        <!-- Header -->
-        <div class="text-center max-w-3xl mx-auto mb-20 md:mb-32">
-            <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
-                Verification Process
-            </p>
-            <h2 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-6 text-foreground">
-                How It Works
-            </h2>
-            <p class="text-lg md:text-xl text-muted-foreground">
-                Turn a real photo into a shareable proof page. Every step keeps the proof trail intact so viewers can see it’s not fake or AI-generated.
-            </p>
-        </div>
+		<div class="grid gap-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)] lg:items-start lg:gap-10">
+			<div class="space-y-5">
+				<div class="flex items-start justify-between gap-4">
+					<div>
+						<p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+							Example proof page
+						</p>
+						<p class="mt-4 text-2xl font-semibold tracking-tight text-foreground">/cookmscott</p>
+					</div>
+					<Badge class="border-transparent bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
+						Verified
+					</Badge>
+				</div>
+				<Separator />
 
-        <!-- Steps Timeline -->
-        <div class="relative mx-auto">
-            <!-- Central connecting line (Desktop only) -->
-            <div class="hidden lg:block absolute left-1/2 top-10 bottom-10 w-px bg-gradient-to-b from-transparent via-border to-transparent -translate-x-1/2"></div>
+				<div class="rounded-[1.5rem] bg-muted/30 px-4 py-6 sm:px-6">
+					<div class="flex justify-center">
+						<div
+							class="w-full max-w-[300px] rounded-[2.2rem] bg-zinc-950 p-2.5 shadow-xl shadow-black/10"
+						>
+							<div class="flex justify-center pb-2.5">
+								<div class="h-1.5 w-16 rounded-full bg-zinc-700"></div>
+							</div>
+							<div class="h-[540px] overflow-hidden rounded-[1.7rem] bg-background">
+								<iframe
+									src="/cookmscott"
+									title="Example proof page"
+									class="block border-0 bg-background"
+									style={`width: ${embedSize}; height: ${embedSize}; transform: scale(${embedScale}); transform-origin: top left;`}
+									scrolling="no"
+								></iframe>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
 
-            <div class="space-y-24 lg:space-y-32">
-                {#each steps as step, i}
-                    <!-- Alternating layout: even items reverse row on large screens -->
-                    <div class="relative flex flex-col lg:flex-row items-center gap-12 lg:gap-24 {i % 2 !== 0 ? 'lg:flex-row-reverse' : ''}">
-                        
-                        <!-- Desktop Center Node -->
-                        <div class="hidden lg:flex absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-14 h-14 bg-background border-2 border-primary/20 rounded-full items-center justify-center shadow-sm z-20">
-                            <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold">
-                                {i + 1}
-                            </div>
-                        </div>
+			<div>
+				<div class="space-y-1">
+					<p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
+						Verification timeline
+					</p>
+					<p class="mt-4 text-2xl font-semibold tracking-tight text-foreground">
+						From file to shareable proof.
+					</p>
+				</div>
 
-                        <!-- Text Content -->
-                        <div class="flex-1 w-full relative z-10">
-                            <!-- Large watermark number -->
-                            <div class="absolute -top-16 -left-8 text-[12rem] font-black text-foreground/[0.03] dark:text-foreground/[0.02] select-none -z-10 leading-none tracking-tighter">
-                                0{i + 1}
-                            </div>
-                            
-                            <div class="relative">
-                                <div class="inline-flex items-center justify-center p-3 rounded-2xl bg-background shadow-sm border border-border mb-6 group-hover:scale-110 transition-transform">
-                                    <svelte:component this={step.icon} class="w-6 h-6 text-primary" strokeWidth={2.5} />
-                                </div>
-                                <h3 class="text-3xl lg:text-4xl font-bold leading-tight text-foreground mb-4">
-                                    {step.title}
-                                </h3>
-                                <p class="text-lg text-muted-foreground leading-relaxed mb-8">
-                                    {step.description}
-                                </p>
-                                <ul class="space-y-4">
-                                    {#each step.points as point}
-                                        <li class="flex items-start gap-3 text-muted-foreground">
-                                            <div class="mt-1 flex-shrink-0 w-5 h-5 rounded-full bg-verified/10 flex items-center justify-center">
-                                                <Check class="w-3 h-3 text-verified" strokeWidth={3} />
-                                            </div>
-                                            <span>{point}</span>
-                                        </li>
-                                    {/each}
-                                </ul>
-                            </div>
-                        </div>
+				<div class="mt-10">
+					{#each steps as step, index (step.title)}
+						<div class="relative grid grid-cols-[3.25rem_minmax(0,1fr)] gap-4 sm:gap-5">
+							<div class="relative flex justify-center">
+								{#if index < steps.length - 1}
+									<div
+										class="absolute top-11 bottom-[-1.5rem] left-1/2 w-px -translate-x-1/2 bg-border"
+									></div>
+								{/if}
+								<div
+									class="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-base font-semibold text-foreground"
+								>
+									{index + 1}
+								</div>
+							</div>
 
-                        <!-- Visual Content -->
-                        <div class="flex-1 w-full relative group perspective">
-                            <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-transparent rounded-[2rem] transform {i % 2 !== 0 ? '-rotate-3 translate-x-4' : 'rotate-3 -translate-x-4'} transition-all duration-500 group-hover:rotate-0 group-hover:translate-x-0 -z-10"></div>
-
-                            <div class="relative rounded-[2rem] overflow-hidden shadow-2xl bg-background aspect-[4/3] border border-border/50 transform transition-all duration-500 hover:-translate-y-2">
-                                <img
-                                    src={step.image}
-                                    alt={step.title}
-                                    class="h-full w-full object-cover opacity-90 transition-transform duration-700 group-hover:scale-105"
-                                />
-                                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent"></div>
-
-                                {#if i === 1}
-                                    <div class="absolute inset-0 z-20 pointer-events-none">
-                                        <DetectiveRobot />
-                                    </div>
-                                {/if}
-                                
-                                <div class="absolute bottom-6 left-6 z-30">
-                                    <div class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/50 backdrop-blur-md border border-white/20 text-xs font-bold text-white uppercase tracking-widest shadow-lg transition-transform hover:scale-105">
-                                        <span class="w-2 h-2 rounded-full bg-verified animate-pulse shadow-[0_0_8px_rgba(0,198,96,0.45)]"></span>
-                                        C2PA Verified
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-
-                    </div>
-                {/each}
-            </div>
-        </div>
-    </div>
+							<div class={`pb-8 ${index === steps.length - 1 ? 'pb-0' : ''}`}>
+								<div class="min-w-0 pt-1">
+									<p
+										class="text-base font-semibold leading-tight text-foreground sm:text-[1.05rem]"
+									>
+										{step.title}
+									</p>
+									<p class="mt-2 text-base leading-8 text-muted-foreground">
+										{step.description}
+									</p>
+								</div>
+							</div>
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
+	</div>
 </section>
