@@ -18,7 +18,7 @@
 
 <div class="container mx-auto max-w-5xl px-6">
 	<section class="my-8 rounded-2xl overflow-hidden border border-border/70 bg-card shadow-lg">
-		<div class="px-8 py-14 text-center md:px-12 md:py-20" style="background: #fefcf6;">
+		<div class="bg-[#fefcf6] dark:bg-accent px-8 py-14 text-center md:px-12 md:py-20">
 			<div class="mx-auto max-w-3xl space-y-6">
 				<h1 class="text-4xl font-bold tracking-tight text-balance text-foreground md:text-6xl">
 					When platforms strip metadata, your proof still has a home.
@@ -28,10 +28,13 @@
 					collectors, and clients anywhere.
 				</p>
 				<div class="flex flex-col items-center gap-4 pt-2">
-					<Button size="lg" class="group text-white font-bold" onclick={handleCtaClick}>
-						Create Your Verified Gallery
-						<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
-					</Button>
+					<div class="flex flex-col sm:flex-row items-center gap-3">
+						<Button size="lg" class="group text-white font-bold" onclick={handleCtaClick}>
+							Create Your Verified Gallery
+							<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
+						</Button>
+						<Button size="lg" variant="outline" href="/cookmscot">Example Page</Button>
+					</div>
 					<p class="text-sm font-medium text-muted-foreground">
 						No credit card required &middot; 50 photos free &middot; 2-minute setup
 					</p>

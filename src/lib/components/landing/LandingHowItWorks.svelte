@@ -33,7 +33,7 @@
 	<div class="container mx-auto max-w-5xl px-6">
 		<div class="mx-auto mb-12 max-w-3xl text-center sm:mb-14">
 			<p class="mb-4 text-xs font-bold uppercase tracking-[0.22em] text-zinc-500">How it works</p>
-			<h2 class="text-balance text-4xl font-semibold tracking-tight text-foreground md:text-5xl">
+			<h2 class="max-w-6xl text-balance font-serif text-4xl font-semibold leading-[0.9] tracking-[-0.04em] text-foreground">
 				How a photo becomes proof.
 			</h2>
 			<p class="mx-auto mt-4 max-w-2xl text-lg leading-8 text-muted-foreground md:text-xl">

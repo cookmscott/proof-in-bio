@@ -232,7 +232,7 @@
                                 <h3 class="text-lg font-bold">{brand.name}</h3>
                             </div>
 
-                            <div class="overflow-x-auto border border-border bg-background -mx-4 md:mx-0 rounded-none md:rounded-lg">
+                            <div class="overflow-x-auto border border-border bg-background -mx-4 md:mx-0">
                                 <table class="w-full min-w-[500px] md:min-w-0 text-sm text-left">
                                     <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                                         <tr>
@@ -279,7 +279,7 @@
                                 <h3 class="text-lg font-bold">{group.category}</h3>
                             </div>
 
-                            <div class="overflow-x-auto rounded-lg border border-border bg-background">
+                            <div class="overflow-x-auto border border-border bg-background">
                                 <table class="w-full min-w-[500px] md:min-w-0 text-sm text-left">
                                     <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
                                         <tr>

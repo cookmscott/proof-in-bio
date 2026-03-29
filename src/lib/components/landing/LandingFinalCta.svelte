@@ -8,10 +8,7 @@
 
 <section class="container mx-auto max-w-5xl px-6 py-20 md:py-28">
 	<Card class="relative overflow-hidden">
-		<div
-			class="absolute inset-0"
-			style="background: #fefcf6;"
-		></div>
+		<div class="absolute inset-0 bg-[#fefcf6] dark:bg-accent"></div>
 		<div class="relative p-12 md:p-16 text-center space-y-6">
 			<h2
 				class="max-w-6xl text-balance font-serif text-4xl font-semibold leading-[0.9] tracking-[-0.04em] text-foreground"
