@@ -79,7 +79,7 @@
 			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
 				Built on C2PA
 			</p>
-			<h2 class="text-center text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-foreground leading-[1.05]">
+			<h2 class="max-w-6xl text-balance font-serif text-4xl font-semibold leading-[0.9] tracking-[-0.04em] text-zinc-900 dark:text-zinc-100">
 				Photos with a
 				<span class="relative inline-block">
 					<span class="relative z-10">proof trail</span>

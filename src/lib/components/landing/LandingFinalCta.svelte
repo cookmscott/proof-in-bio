@@ -8,10 +8,13 @@
 
 <section class="container mx-auto max-w-5xl px-6 py-20 md:py-28">
 	<Card class="relative overflow-hidden">
-		<div class="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 opacity-10"></div>
+		<div class="absolute inset-0 bg-[#fefcf6] dark:bg-accent"></div>
 		<div class="relative p-12 md:p-16 text-center space-y-6">
-			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500">Final CTA</p>
-			<h2 class="text-4xl md:text-5xl font-bold text-zinc-900">Prove it's human.</h2>
+			<h2
+				class="max-w-6xl text-balance font-serif text-4xl font-semibold leading-[0.9] tracking-[-0.04em] text-foreground"
+			>
+				Start with one photo.<br />Share proof forever.
+			</h2>
 			<p class="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
 				Join thousands of creators building proof with every upload. Free to start, powerful
 				forever.
