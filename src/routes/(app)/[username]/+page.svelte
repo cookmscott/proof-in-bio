@@ -113,6 +113,13 @@
 		selectedPhotoIds = [...selectedPhotoIds, photoId];
 	}
 
+	function startEditingWithPhoto(photoId) {
+		editImages = true;
+		if (!isPhotoSelected(photoId)) {
+			selectedPhotoIds = [photoId];
+		}
+	}
+
 	async function handleDeleteSelected() {
 		if (selectedPhotoIds.length === 0 || deleteSubmitting) return;
 		const confirmed = confirm(
@@ -310,7 +317,7 @@
 						<Card
 							class={`overflow-hidden border-0 transition-all rounded-sm py-0 duration-200 ease-in-out ${
 								editImages ? 'ring-2 ring-transparent' : ''
-							} ${isPhotoSelected(photo.id) ? 'ring-2 ring-primary' : ''} group-hover:shadow-lg group-hover:-translate-y-1`}
+							} ${isPhotoSelected(photo.id) ? 'ring-2 ring-primary' : ''} group-hover:shadow-lg`}
 						>
 							<AspectRatio ratio={1} class="bg-slate-100 dark:bg-slate-800 rounded-sm relative">
 								{#if !loaded[photo.id]}
@@ -331,6 +338,19 @@
 										}}
 										aria-pressed={isPhotoSelected(photo.id)}
 										aria-label={`Select photo ${photo.title || photo.id}`}
+									>
+										<Check class="h-3 w-3" />
+									</button>
+								{:else if canEdit}
+									<button
+										type="button"
+										class="absolute top-2 right-2 z-10 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white/55 bg-background/45 text-transparent opacity-0 shadow-sm backdrop-blur transition-[opacity,border-color,background-color] duration-200 group-hover:opacity-100 hover:border-white/90 hover:bg-background/20"
+										onclick={(event) => {
+											event.preventDefault();
+											event.stopPropagation();
+											startEditingWithPhoto(photo.id);
+										}}
+										aria-label={`Edit and select photo ${photo.title || photo.id}`}
 									>
 										<Check class="h-3 w-3" />
 									</button>

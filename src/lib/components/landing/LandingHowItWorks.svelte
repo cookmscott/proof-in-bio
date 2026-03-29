@@ -1,6 +1,7 @@
 <script>
 	import { Badge } from '$lib/ui/badge';
 	import { Separator } from '$lib/ui/separator';
+	import { Button } from '$lib/ui/button';
 
 	const embedScale = 0.56;
 	const embedSize = `${100 / embedScale}%`;
@@ -48,11 +49,8 @@
 						<p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
 							Example proof page
 						</p>
-						<p class="mt-4 text-2xl font-semibold tracking-tight text-foreground">/cookmscott</p>
+						<Button variant="link" class="mt-4 text-2xl font-semibold tracking-tight text-foreground">@cookmscott</Button>
 					</div>
-					<Badge class="border-transparent bg-emerald-50 text-emerald-700 hover:bg-emerald-50">
-						Verified
-					</Badge>
 				</div>
 				<Separator />
 

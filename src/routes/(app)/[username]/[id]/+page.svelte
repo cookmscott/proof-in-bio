@@ -121,13 +121,10 @@
 
 <div class="container mx-auto my-6 px-4 md:px-6">
 	<div class="mb-4">
-		<a
-			href="/{$page.params.username}"
-			class="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4"
-		>
+		<Button variant="ghost" href="/{$page.params.username}" class="mb-4">
 			<ArrowLeft class="mr-2 h-4 w-4" />
 			Back to Profile
-		</a>
+		</Button>
 	</div>
 	{#if photo}
 		<div class="flex flex-col lg:flex-row gap-8 lg:gap-12 items-start">

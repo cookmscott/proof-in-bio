@@ -113,7 +113,7 @@
 			<!-- The "Other" App (Instagram Style) -->
 			<div class="relative group w-full max-w-[360px]">
 				<div class="text-center mb-8">
-					<h2 class="text-xl font-bold mb-2 text-primary">Unproven</h2>
+					<h2 class="text-xl font-bold mb-2 text-[#6b574a]">Unproven</h2>
 					<p class="text-sm text-muted-foreground">Is it real? Is it AI? Who knows.</p>
 				</div>
 				<!-- Thinking Cat (Always suspicious) -->
