@@ -250,9 +250,17 @@
 						class="flex-1 md:flex-none"
 					/>
 					{#if canEdit}
-						<Button href="/{data.profile.username}/edit" class="flex-1 md:flex-none"
-							>Edit Profile</Button
+						<Button
+							href="/{data.profile.username}/edit"
+							variant="secondary"
+							class="flex-1 md:flex-none"
 						>
+							Edit Profile
+						</Button>
+						<Button onclick={openUploadDialog} class="flex-1 md:flex-none">
+							<Plus class="h-4 w-4" />
+							Add Photos
+						</Button>
 					{/if}
 				</div>
 			</div>

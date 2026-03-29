@@ -10,18 +10,20 @@
 	<Card class="relative overflow-hidden">
 		<div class="absolute inset-0 bg-gradient-to-r from-amber-500 to-orange-500 opacity-10"></div>
 		<div class="relative p-12 md:p-16 text-center space-y-6">
-			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500">Final CTA</p>
-			<h2 class="text-4xl md:text-5xl font-bold text-zinc-900">Prove it's human.</h2>
+			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500">Start Here</p>
+			<h2 class="text-4xl md:text-5xl font-bold text-zinc-900">
+				Create your first proof-backed gallery
+			</h2>
 			<p class="text-xl text-muted-foreground max-w-2xl mx-auto text-balance">
-				Join thousands of creators building proof with every upload. Free to start, powerful
-				forever.
+				Upload a provenance-backed image, generate a proof page, and start sharing a link people can
+				verify.
 			</p>
-			<div class="flex flex-col sm:flex-row gap-4 justify-center pt-4">
+			<div class="flex flex-col justify-center gap-4 pt-4 sm:flex-row">
 				<Button size="lg" class="group" onclick={onAuthRequest}>
-					Create Your Gallery
+					Start Free
 					<ArrowRight class="ml-2 h-5 w-5 transition-transform group-hover:translate-x-1" />
 				</Button>
-				<Button size="lg" variant="outline">Learn About C2PA</Button>
+				<Button size="lg" variant="outline" href="/examples">View Demo Proof Page</Button>
 			</div>
 			<p class="text-sm text-muted-foreground">
 				No credit card required • 50 photos free • 2-minute setup

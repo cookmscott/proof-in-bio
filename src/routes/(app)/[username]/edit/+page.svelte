@@ -76,10 +76,15 @@
 <div class="min-h-screen bg-muted/30 py-10">
     <div class="container mx-auto max-w-3xl px-4">
         <div class="mb-8">
-            <a href="/{data.profile.username}" class="inline-flex items-center text-sm font-medium text-muted-foreground hover:text-primary transition-colors mb-4">
-                <ArrowLeft class="mr-2 h-4 w-4" />
+            <Button
+                href="/{data.profile.username}"
+                variant="ghost"
+                size="sm"
+                class="mb-4 rounded-full"
+            >
+                <ArrowLeft class="h-4 w-4" />
                 Back to Profile
-            </a>
+            </Button>
             <h1 class="text-3xl font-bold tracking-tight text-foreground">Edit Profile</h1>
             <p class="text-muted-foreground mt-1">Manage your profile settings and public preferences.</p>
         </div>

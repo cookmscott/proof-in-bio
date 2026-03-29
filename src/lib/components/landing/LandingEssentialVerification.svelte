@@ -1,192 +1,131 @@
 <script>
-    import { ArrowRight } from 'lucide-svelte';
-    import { Button } from '$lib/ui/button/index.js';
+	import { ArrowRight } from 'lucide-svelte';
+	import { Button } from '$lib/ui/button/index.js';
 
-    // Local static assets
-    let newsLogos = [
-        "/landing/carousel_news/abcnews.png",
-        "/landing/carousel_news/afp.png",
-        "/landing/carousel_news/associatedpress.png",
-        "/landing/carousel_news/bbcnews.png",
-        "/landing/carousel_news/bloomberg.png",
-        "/landing/carousel_news/cbsnews.png",
-        "/landing/carousel_news/cnn.png",
-        "/landing/carousel_news/foxnewschannel.png",
-        "/landing/carousel_news/france24.png",
-        "/landing/carousel_news/nbcnews.png",
-        "/landing/carousel_news/npr.png",
-        "/landing/carousel_news/pbs.png",
-        "/landing/carousel_news/reuters.png",
-        "/landing/carousel_news/theguardian.png"
-    ];
+	let newsLogos = [
+		'/landing/carousel_news/abcnews.png',
+		'/landing/carousel_news/afp.png',
+		'/landing/carousel_news/associatedpress.png',
+		'/landing/carousel_news/bbcnews.png',
+		'/landing/carousel_news/bloomberg.png',
+		'/landing/carousel_news/cbsnews.png',
+		'/landing/carousel_news/cnn.png',
+		'/landing/carousel_news/foxnewschannel.png',
+		'/landing/carousel_news/france24.png',
+		'/landing/carousel_news/nbcnews.png',
+		'/landing/carousel_news/npr.png',
+		'/landing/carousel_news/pbs.png',
+		'/landing/carousel_news/reuters.png',
+		'/landing/carousel_news/theguardian.png'
+	];
 
-    let photos = [
-        "/landing/carousel_photos/blackhole.jpg",
-        "/landing/carousel_photos/bluemarbleremastered.jpg",
-        "/landing/carousel_photos/chichenitza.jpg",
-        "/landing/carousel_photos/daphnia.jpg",
-        "/landing/carousel_photos/dmanisi-skull5excavation.jpg",
-        "/landing/carousel_photos/earthriseapollo15.jpg",
-        "/landing/carousel_photos/eiffeltowerparis.jpg",
-        "/landing/carousel_photos/grandcanyonusa.jpg",
-        "/landing/carousel_photos/hubbleultradeepfieldhigh.jpg",
-        "/landing/carousel_photos/jwstspacecraft.jpg",
-        "/landing/carousel_photos/machupicchuperu.jpg",
-        "/landing/carousel_photos/niagarafalls.jpg",
-        "/landing/carousel_photos/pillarsofcreation.jpg",
-        "/landing/carousel_photos/simonebilesrio2016.jpg",
-        "/landing/carousel_photos/snailporridgethefatduck.jpg",
-        "/landing/carousel_photos/spursvslakersnbaaction.jpg",
-        "/landing/carousel_photos/sydneyoperahousenight.jpg",
-        "/landing/carousel_photos/vancouverskyline.jpg"
-    ];
+	const situations = [
+		'Editorial submissions',
+		'Collector sales',
+		'Licensing conversations',
+		'Documentary work',
+		'Client deliveries'
+	];
 
-    // Helper to shuffle array (Fisher-Yates)
-    function shuffle(array) {
-        let currentIndex = array.length, randomIndex;
-        // While there remain elements to shuffle.
-        while (currentIndex > 0) {
-            // Pick a remaining element.
-            randomIndex = Math.floor(Math.random() * currentIndex);
-            currentIndex--;
-            // And swap it with the current element.
-            [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
-        }
-        return array;
-    }
+	function shuffle(array) {
+		let currentIndex = array.length;
+		let randomIndex;
 
-    // Shuffle the base arrays on load
-    newsLogos = shuffle(newsLogos);
-    photos = shuffle(photos);
+		while (currentIndex > 0) {
+			randomIndex = Math.floor(Math.random() * currentIndex);
+			currentIndex--;
+			[array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+		}
 
-    // Helper to duplicate array for seamless looping
-    const triple = (arr) => [...arr, ...arr, ...arr];
-    
-    // Create rows (triple the shuffled arrays)
-    const row1 = triple([...newsLogos]);
-    const row2 = triple([...photos]);
+		return array;
+	}
 
+	newsLogos = shuffle(newsLogos);
+	const row1 = [...newsLogos, ...newsLogos, ...newsLogos];
 </script>
 
 <section class="bg-zinc-50 dark:bg-zinc-900 py-20 border-y border-border/40 overflow-hidden">
-    <div class="container mx-auto max-w-5xl px-6 mb-12">
-        <div class="text-center max-w-3xl mx-auto pb-8">
-            <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
-                High-Stakes Proof
-            </p>
-            <h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
-                Where Being Real Is Non-Negotiable
-            </h2>
-            <p class="text-zinc-500 text-base leading-relaxed">
-                Millions of images, infinite feeds, and one job: make what is real easy to prove in an era of synthetic media.
-            </p>
-            <div class="mt-6">
-                <Button variant="outline" href="#how-it-works" class="group rounded-full bg-background">
-                    Prove It’s Real
-                    <ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
-            </div>
-        </div>
-    </div>
+	<div class="container mx-auto max-w-5xl px-6">
+		<div class="text-center max-w-3xl mx-auto">
+			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
+				When Proof Matters
+			</p>
+			<h2 class="text-3xl md:text-4xl font-semibold tracking-tight text-foreground mb-4">
+				Trust is fragile when your work has to travel.
+			</h2>
+			<p class="text-zinc-500 text-base md:text-lg leading-relaxed">
+				The same verification standard used by newsrooms and wire services is becoming essential
+				where image credibility affects publication, licensing, and sales.
+			</p>
+			<p class="mt-4 text-sm md:text-base text-zinc-500 leading-relaxed">
+				It doesn't magically prove truth. It gives people something better than trust-me: a
+				verifiable provenance trail.
+			</p>
+		</div>
 
-    <!-- Marquee Rows -->
-    <div class="flex flex-col gap-4 relative isolate">
-        <!-- Centered vertical glow to lift logo contrast in dark mode -->
-        <div
-            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[125%] pointer-events-none -z-10
-            bg-gradient-to-b from-transparent via-zinc-100/70 to-transparent dark:via-white/8 blur-2xl"
-        ></div>
-        <div
-            class="absolute inset-x-0 top-1/2 -translate-y-1/2 h-[78%] pointer-events-none -z-10
-            bg-gradient-to-b from-transparent via-white/60 to-transparent dark:via-zinc-100/10"
-        ></div>
-        
-        <!-- Row 1: News Logos (Right to Left) - Slow -->
-        <div class="relative flex overflow-hidden w-full select-none">
-            <div class="flex gap-4 animate-marquee whitespace-nowrap items-center will-change-transform" style="animation-duration: 80s;">
-                {#each row1 as url}
-                    <div class="h-16 w-32 md:h-20 md:w-40 flex items-center justify-center p-4 transition-all duration-500">
-                        <img 
-                            src={url} 
-                            alt="News Agency Logo" 
-                            loading="lazy"
-                            class="max-w-full max-h-full object-contain"
-                        />
-                    </div>
-                {/each}
-            </div>
-             <!-- Saturation Vignette Overlay -->
-             <div class="absolute inset-0 z-10 pointer-events-none vignette-saturation"></div>
-        </div>
+		<div class="mt-10 grid gap-4 md:grid-cols-5">
+			{#each situations as situation}
+				<div
+					class="rounded-2xl border border-border/60 bg-background px-4 py-4 text-center text-sm font-medium text-foreground shadow-sm"
+				>
+					{situation}
+				</div>
+			{/each}
+		</div>
 
-        <!-- Row 2: Photos (Left to Right) - Slower (Focus) -->
-        <div class="relative flex overflow-hidden w-full select-none">
-            <div class="flex gap-3 animate-marquee-reverse whitespace-nowrap items-center will-change-transform" style="animation-duration: 100s;">
-                {#each row2 as url}
-                    <div class="relative h-40 w-56 md:h-52 md:w-80 rounded-lg overflow-hidden shrink-0">
-                        <img 
-                            src={url} 
-                            alt="Proven Photo" 
-                            loading="lazy"
-                            class="w-full h-full object-cover"
-                        />
-                        <div class="absolute inset-0 bg-black/5"></div>
-                    </div>
-                {/each}
-            </div>
-        </div>
+		<div
+			class="mt-8 rounded-2xl border border-amber-300/40 bg-amber-50 px-5 py-4 text-sm text-amber-950"
+		>
+			Major platforms are already flagging some real edited photos as AI-generated. Your proof page
+			lives outside their systems.
+		</div>
 
-        <!-- Side Fades (Opacity/Background blend) -->
-        <div class="absolute inset-y-0 left-0 w-16 md:w-48
-        bg-gradient-to-r
-        from-zinc-100 via-zinc-100/80 to-transparent
-        dark:from-neutral-900 dark:via-neutral-900/80
-        z-10 pointer-events-none"></div>
+		<div class="mt-10">
+			<div
+				class="relative flex overflow-hidden w-full select-none rounded-3xl border border-border/50 bg-background/60 py-6"
+			>
+				<div
+					class="flex gap-4 animate-marquee whitespace-nowrap items-center will-change-transform"
+					style="animation-duration: 80s;"
+				>
+					{#each row1 as url}
+						<div class="h-16 w-32 md:h-20 md:w-40 flex items-center justify-center p-4">
+							<img
+								src={url}
+								alt="News outlet logo"
+								loading="lazy"
+								class="max-w-full max-h-full object-contain"
+							/>
+						</div>
+					{/each}
+				</div>
+			</div>
+		</div>
 
-        <div class="absolute inset-y-0 right-0 w-16 md:w-48
-        bg-gradient-to-l
-        from-zinc-100 via-zinc-100/80 to-transparent
-        dark:from-neutral-900 dark:via-neutral-900/80
-        z-10 pointer-events-none"></div>
-
-    </div>
+		<div class="mt-8 text-center">
+			<Button variant="outline" href="#supported-devices" class="group rounded-full bg-background">
+				Check Supported Gear
+				<ArrowRight class="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
+			</Button>
+		</div>
+	</div>
 </section>
 
 <style>
-    .animate-marquee {
-        animation: marquee 60s linear infinite;
-    }
+	.animate-marquee {
+		animation: marquee 60s linear infinite;
+	}
 
-    .animate-marquee-reverse {
-        animation: marquee-reverse 60s linear infinite;
-    }
+	@keyframes marquee {
+		0% {
+			transform: translateX(0);
+		}
+		100% {
+			transform: translateX(-33.33%);
+		}
+	}
 
-    @keyframes marquee {
-        0% { transform: translateX(0); }
-        100% { transform: translateX(-33.33%); }
-    }
-
-    @keyframes marquee-reverse {
-        0% { transform: translateX(-33.33%); }
-        100% { transform: translateX(0%); }
-    }
-
-    .will-change-transform {
-        will-change: transform;
-    }
-
-    /* 
-       This overlay applies a grayscale backdrop filter to the sides, 
-       while keeping the center fully colored (transparent mask).
-       - backdrop-filter: grayscale(100%) makes everything behind it grayscale.
-       - mask-image: defines WHERE this backdrop filter is visible.
-         - white/black = visible (filter applied)
-         - transparent = invisible (filter NOT applied, original color shows)
-    */
-    .vignette-saturation {
-        backdrop-filter: grayscale(100%);
-        -webkit-backdrop-filter: grayscale(100%);
-        mask-image: linear-gradient(to right, black 0%, transparent 35%, transparent 65%, black 100%);
-        -webkit-mask-image: linear-gradient(to right, black 0%, transparent 35%, transparent 65%, black 100%);
-    }
+	.will-change-transform {
+		will-change: transform;
+	}
 </style>

@@ -1,310 +1,74 @@
 <script>
-    import { tick } from 'svelte';
-    import { Camera, Monitor, Smartphone, Search } from 'lucide-svelte';
-    
-    const manufacturers = [
-        {
-            name: "Leica",
-            description: "First to integrate hardware-based signing.",
-            iconBg: "bg-red-100 dark:bg-red-900/20",
-            iconColor: "text-red-600",
-            models: [
-                { name: "M11-P", status: "Current", implementation: "Native", details: "The world's first camera with built-in C2PA Content Credentials, setting the standard for the industry." },
-                { name: "M11-D", status: "Current", implementation: "Native", details: "The second Leica model to feature native C2PA integration." },
-                { name: "SL3-S", status: "Current", implementation: "Native", details: "Expands C2PA support to Leica's SL line of mirrorless cameras." },
-                { name: "Q3 Monochrom", status: "Current", implementation: "Native", details: "The first camera in the Leica Q family to feature C2PA technology." }
-            ]
-        },
-        {
-            name: "Sony",
-            description: "Authenticity via firmware updates.",
-            iconBg: "bg-zinc-100 dark:bg-zinc-800",
-            iconColor: "text-zinc-900 dark:text-zinc-100",
-            models: [
-                { name: "Alpha 1 (ILCE-1)", status: "Current", implementation: "Firmware v2.00+", details: "Support for still images added via firmware. Video support is planned for a future update after November 2025." },
-                { name: "A7S III", status: "Current", implementation: "Firmware v3.00+", details: "Still image support added. C2PA for video is planned for a 2026 firmware update." },
-                { name: "A7 IV", status: "Current", implementation: "Firmware v3.00+", details: "Still image support added via firmware. Video support planned for after November 2025." },
-                { name: "A9 III", status: "Current", implementation: "Firmware v2.00+", details: "One of the first models to receive C2PA support for both still images and video." },
-                { name: "Alpha 1 II", status: "Current", implementation: "Firmware v2.00+", details: "Supports C2PA for both stills and video from a recent firmware update." },
-                { name: "FX3", status: "Current", implementation: "Firmware Update", details: "Part of Sony's professional cinema line, this camera now supports C2PA for video, aimed at news and broadcast industries." },
-                { name: "FX30", status: "Current", implementation: "Firmware Update", details: "Alongside the FX3, this model received a firmware update to enable C2PA-compliant video authenticity." },
-                { name: "A7R V", status: "Upcoming Support", implementation: "Firmware Update", details: "Sony has announced C2PA support for video will be added via a firmware update sometime after November 2025." }
-            ]
-        },
-        {
-            name: "Canon",
-            description: "Native support in pro mirrorless.",
-            iconBg: "bg-red-100 dark:bg-red-900/20",
-            iconColor: "text-red-700",
-            models: [
-                { name: "EOS R1", status: "Current", implementation: "Native", details: "Canon's flagship professional mirrorless camera, launched with C2PA support." },
-                { name: "EOS R5 Mark II", status: "Current", implementation: "Native", details: "C2PA support was included at launch for this high-end hybrid camera." }
-            ]
-        },
-        {
-            name: "Nikon",
-            description: "Cloud-linked authenticity service.",
-            iconBg: "bg-yellow-100 dark:bg-yellow-900/20",
-            iconColor: "text-yellow-600",
-            models: [
-                { name: "Z6 III", status: "Current (Suspended)", implementation: "Firmware v2.00 Beta", details: "Nikon's authenticity service was temporarily suspended in September 2025 after a vulnerability was discovered that allowed AI-generated images to be signed. All certificates issued were revoked. A fix is in development." }
-            ]
-        },
-        {
-            name: "Fujifilm",
-            description: "Integrated C2PA in GFX & X series.",
-            iconBg: "bg-verified/10",
-            iconColor: "text-verified",
-            models: [
-                { name: "GFX100S II", status: "Current", implementation: "Native", details: "Fujifilm announced its commitment to C2PA by including support in its new GFX and X series cameras." },
-                { name: "X-T50", status: "Current", implementation: "Native", details: "Launched alongside the GFX100S II with native C2PA support." }
-            ]
-        },
-        {
-            name: "Samsung",
-            description: "Mobile credentials via Galaxy AI.",
-            icon: Smartphone,
-            iconBg: "bg-primary/10",
-            iconColor: "text-primary",
-            models: [
-                { name: "Galaxy S25 Series", status: "Current", implementation: "Native", details: "The first smartphone lineup with native C2PA support, creating Content Credentials for images generated or edited with Galaxy AI features. Support is expanding to more devices via One UI 7." }
-            ]
-        },
-        {
-            name: "Google",
-            description: "Mobile credentials via Pixel Camera.",
-            icon: Smartphone,
-            iconBg: "bg-primary/10",
-            iconColor: "text-primary",
-            models: [
-                { name: "Pixel 10 Series", status: "Upcoming (2025)", implementation: "Native", details: "Google announced the Pixel 10 will embed C2PA metadata by default in every photo taken with the native camera app, a major step for widespread consumer adoption." }
-            ]
-        }
-    ];
+	const gearBrands = [
+		{ name: 'Sony', note: 'Alpha and FX families' },
+		{ name: 'Canon', note: 'EOS R professional bodies' },
+		{ name: 'Leica', note: 'Native C2PA-enabled models' },
+		{ name: 'Nikon', note: 'Authenticity service support' },
+		{ name: 'Fujifilm', note: 'GFX and X series support' },
+		{ name: 'Google Pixel 10', note: 'Native smartphone momentum' }
+	];
 
-    const software = [
-        {
-            category: "Adobe Ecosystem",
-            tools: [
-                { name: "Adobe Photoshop", description: "Supports Content Credentials metadata in edits." },
-                { name: "Adobe Lightroom / Classic / Mobile", description: "Attach and preserve Content Credentials on photos." },
-                { name: "Adobe Premiere Pro", description: "Supports Content Credentials for video." },
-                { name: "Adobe Stock & Behance", description: "Display/preserve Content Credentials with assets." },
-                { name: "Adobe Content Authenticity (Beta) & Extension", description: "Tools for applying and inspecting credentials." },
-                { name: "Adobe Firefly (and APIs)", description: "Automatically apply credentials to AI-generated assets." }
-            ]
-        },
-        {
-            category: "Other Platforms & Services",
-            tools: [
-                { name: "Cloudinary", description: "Integrates C2PA into media management and delivery workflows." },
-                { name: "Google Photos", description: "Displays C2PA metadata for compatible images." },
-                { name: "LinkedIn", description: "Shows Content Credentials on images in feeds." },
-                { name: "ChatGPT / OpenAI Images", description: "C2PA credentials embedded in generated images." },
-                { name: "Stability AI / Google Gemini", description: "Generative AI tools with manifest support." }
-            ]
-        }
-    ];
-
-    let selectedId = manufacturers[0].name;
-    let scrollContainer;
-    
-    async function scrollToSection(id) {
-        selectedId = id;
-        await tick();
-        const element = document.getElementById(id);
-        if (element && scrollContainer) {
-            const top = element.getBoundingClientRect().top - scrollContainer.getBoundingClientRect().top + scrollContainer.scrollTop;
-            scrollContainer.scrollTo({ top: top - 32, behavior: 'smooth' });
-        }
-    }
-
-    let searchTerm = "";
-
-    $: filteredManufacturers = searchTerm ? manufacturers.map(brand => {
-        const brandMatches = brand.name.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchingModels = brand.models.filter(m => 
-            m.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            m.details.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-        
-        if (brandMatches) return brand;
-        if (matchingModels.length > 0) return { ...brand, models: matchingModels };
-        return null;
-    }).filter(Boolean) : manufacturers;
-
-    $: filteredSoftware = searchTerm ? software.map(group => {
-        const categoryMatches = group.category.toLowerCase().includes(searchTerm.toLowerCase());
-        const matchingTools = group.tools.filter(t => 
-            t.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-            t.description.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-        if (categoryMatches) return group;
-        if (matchingTools.length > 0) return { ...group, tools: matchingTools };
-        return null;
-    }).filter(Boolean) : software;
+	const faqs = [
+		{
+			question: 'What if I edit in Lightroom?',
+			answer:
+				'Compatible edits can stay in the provenance trail, so your proof page can show what changed instead of hiding it.'
+		},
+		{
+			question: 'What if a platform strips metadata?',
+			answer:
+				'The proof page still works because it lives outside the platform and preserves the provenance record in a shareable format.'
+		},
+		{
+			question: 'Can I still share a proof page anywhere?',
+			answer:
+				'Yes. The point is one link you can use across editorial, licensing, collector, and client workflows.'
+		}
+	];
 </script>
 
 <section class="py-24 relative overflow-hidden" id="supported-devices">
-    <!-- Subtle grid background -->
-    <div class="absolute inset-0 -z-10 h-full w-full bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)]"></div>
+	<div
+		class="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_top,_rgba(245,158,11,0.08),_transparent_45%)]"
+	></div>
 
-    <div class="container mx-auto max-w-5xl px-6">
-        <div class="text-center max-w-3xl mx-auto mb-16">
-            <p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">
-                Ecosystem Support
-            </p>
-            <h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-6">C2PA Supported Cameras & Software</h2>
-            <p class="text-xl text-muted-foreground leading-relaxed">
-                Explore the growing ecosystem of cameras, software, and platforms that support Content Credentials.
-            </p>
-        </div>
+	<div class="container mx-auto max-w-5xl px-6">
+		<div class="text-center max-w-3xl mx-auto mb-14">
+			<p class="text-xs font-bold tracking-widest uppercase text-zinc-500 mb-4">Supported Gear</p>
+			<h2 class="text-4xl md:text-5xl font-bold tracking-tight mb-6">
+				Works with the cameras and tools professionals already use
+			</h2>
+			<p class="text-lg md:text-xl text-muted-foreground leading-relaxed">
+				Proof in Bio is built for provenance-backed files from leading camera makers and editing
+				workflows, with smartphone momentum now reaching devices like the Google Pixel 10.
+			</p>
+		</div>
 
-        <div class="flex flex-col md:flex-row gap-8 lg:gap-12">
-            <!-- Sidebar Navigation -->
-            <nav class="w-full md:w-64 shrink-0">
-                <div class="relative mb-4">
-                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <input 
-                        type="text"
-                        bind:value={searchTerm}
-                        placeholder="Search..."
-                        class="w-full pl-9 pr-4 py-2 rounded-lg border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 transition-shadow"
-                    />
-                </div>
+		<div class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+			{#each gearBrands as brand}
+				<div class="rounded-2xl border border-border/60 bg-card p-5 shadow-sm">
+					<p class="text-lg font-semibold text-foreground">{brand.name}</p>
+					<p class="mt-2 text-sm leading-6 text-muted-foreground">{brand.note}</p>
+				</div>
+			{/each}
+		</div>
 
-                <div class="flex md:flex-col overflow-x-auto md:overflow-visible gap-2 pb-4 md:pb-0 no-scrollbar snap-x">
-                    
-                    <!-- Hardware Section -->
-                    {#if filteredManufacturers.length > 0}
-                        <div class="hidden md:block px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Hardware
-                        </div>
-                    {/if}
-                    {#each filteredManufacturers as brand}
-                        <button 
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap snap-start
-                            {selectedId === brand.name ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'}"
-                            on:click={() => scrollToSection(brand.name)}
-                        >
-                            {#if brand.icon}
-                                <svelte:component this={brand.icon} class="h-4 w-4" />
-                            {:else}
-                                <Camera class="h-4 w-4" />
-                            {/if}
-                            {brand.name}
-                        </button>
-                    {/each}
+		<div class="mt-6 text-center">
+			<a href="/supported-cameras" class="text-sm font-semibold text-primary hover:text-foreground">
+				See the full compatibility list &rarr;
+			</a>
+		</div>
 
-                    <!-- Software Section -->
-                    {#if filteredSoftware.length > 0}
-                        <div class="hidden md:block px-3 py-2 mt-4 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                            Software
-                        </div>
-                    {/if}
-                    {#each filteredSoftware as group}
-                        <button 
-                            class="flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap snap-start
-                            {selectedId === group.category ? 'bg-secondary text-secondary-foreground' : 'text-muted-foreground hover:bg-secondary/50 hover:text-foreground'}"
-                            on:click={() => scrollToSection(group.category)}
-                        >
-                            <Monitor class="h-4 w-4" />
-                            {group.category}
-                        </button>
-                    {/each}
-                </div>
-            </nav>
-
-            <!-- Main Content Area -->
-            <div class="flex-1 min-w-0 bg-card rounded-2xl border shadow-sm flex flex-col h-[600px] overflow-hidden">
-                <div class="flex-1 overflow-y-auto px-4 md:px-8 pb-0 md:pb-8 space-y-12 no-scrollbar scroll-smooth" bind:this={scrollContainer}>
-                    {#each filteredManufacturers as brand}
-                        <div id={brand.name} class="scroll-mt-6 {!searchTerm && selectedId !== brand.name ? 'hidden md:block' : ''}">
-                            <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-0 md:mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
-                                <div class="p-1.5 rounded-md {brand.iconBg}">
-                                    {#if brand.icon}
-                                        <svelte:component this={brand.icon} class="h-4 w-4 {brand.iconColor}" />
-                                    {:else}
-                                        <Camera class="h-4 w-4 {brand.iconColor}" />
-                                    {/if}
-                                </div>
-                                <h3 class="text-lg font-bold">{brand.name}</h3>
-                            </div>
-
-                            <div class="overflow-x-auto border border-border bg-background -mx-4 md:mx-0 rounded-none md:rounded-lg">
-                                <table class="w-full min-w-[500px] md:min-w-0 text-sm text-left">
-                                    <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
-                                        <tr>
-                                            <th class="px-3 md:px-4 py-3 w-[28%]">Model</th>
-                                            <th class="px-3 md:px-4 py-3 w-[22%]">Implementation</th>
-                                            <th class="px-3 md:px-4 py-3">Details</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-border">
-                                        {#each brand.models as model}
-                                            <tr class="group hover:bg-muted/20 transition-colors">
-                                                <td class="px-3 md:px-4 py-2.5 font-medium text-foreground align-top">
-                                                    <div class="flex flex-col items-start gap-1.5">
-                                                        <span>{model.name}</span>
-                                                        {#if model.status.includes('Upcoming') || model.status.includes('Suspended')}
-                                                            <span class="inline-flex items-center rounded-full border px-1.5 py-0.5 text-[10px] font-semibold transition-colors border-transparent bg-amber-100 text-amber-700 dark:bg-amber-900/30 leading-none">
-                                                                {model.status}
-                                                            </span>
-                                                        {/if}
-                                                    </div>
-                                                </td>
-                                                <td class="px-3 md:px-4 py-2.5 align-top">
-                                                    <span class="inline-flex items-center rounded-md bg-secondary/50 px-2 py-1 text-xs font-medium text-secondary-foreground ring-1 ring-inset ring-border/50 whitespace-nowrap">
-                                                        {model.implementation}
-                                                    </span>
-                                                </td>
-                                                <td class="px-3 md:px-4 py-2.5 text-muted-foreground align-top leading-snug">
-                                                    {model.details}
-                                                </td>
-                                            </tr>
-                                        {/each}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {/each}
-
-                    {#each filteredSoftware as group}
-                        <div id={group.category} class="scroll-mt-6 {!searchTerm && selectedId !== group.category ? 'hidden md:block' : ''}">
-                            <div class="sticky top-0 z-10 bg-muted/50 border-b backdrop-blur-sm mb-4 py-2 px-4 md:px-8 -mx-4 md:-mx-8 flex items-center gap-3">
-                                <div class="p-1.5 rounded-md bg-primary/10">
-                                    <Monitor class="h-4 w-4 text-primary" />
-                                </div>
-                                <h3 class="text-lg font-bold">{group.category}</h3>
-                            </div>
-
-                            <div class="overflow-x-auto rounded-lg border border-border bg-background">
-                                <table class="w-full min-w-[500px] md:min-w-0 text-sm text-left">
-                                    <thead class="bg-muted/40 text-xs uppercase text-muted-foreground font-semibold tracking-wider">
-                                        <tr>
-                                            <th class="px-3 md:px-4 py-3 w-[40%]">Tool / Platform</th>
-                                            <th class="px-3 md:px-4 py-3">Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody class="divide-y divide-border">
-                                        {#each group.tools as tool}
-                                            <tr class="group hover:bg-muted/20 transition-colors">
-                                                <td class="px-3 md:px-4 py-2.5 font-medium text-foreground align-top">
-                                                    {tool.name}
-                                                </td>
-                                                <td class="px-3 md:px-4 py-2.5 text-muted-foreground align-top leading-snug">
-                                                    {tool.description}
-                                                </td>
-                                            </tr>
-                                        {/each}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    {/each}
-                </div>
-            </div>
-        </div>
-    </div>
+		<div class="mt-14 rounded-3xl border border-border/60 bg-background p-6 md:p-8">
+			<p class="text-xs font-bold uppercase tracking-[0.18em] text-zinc-500 mb-6">Quick Answers</p>
+			<div class="grid gap-4 md:grid-cols-3">
+				{#each faqs as faq}
+					<div class="rounded-2xl border border-border/60 bg-card p-5">
+						<h3 class="text-base font-semibold text-foreground">{faq.question}</h3>
+						<p class="mt-3 text-sm leading-6 text-muted-foreground">{faq.answer}</p>
+					</div>
+				{/each}
+			</div>
+		</div>
+	</div>
 </section>
