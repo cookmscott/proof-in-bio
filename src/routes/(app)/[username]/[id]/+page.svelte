@@ -121,7 +121,7 @@
 
 <div class="container mx-auto my-6 px-4 md:px-6">
 	<div class="mb-4">
-		<Button variant="ghost" href="/{$page.params.username}" class="mb-4">
+		<Button variant="ghost" href="/{$page.params.username}" class="mb-4 rounded-full">
 			<ArrowLeft class="mr-2 h-4 w-4" />
 			Back to Profile
 		</Button>

@@ -12,6 +12,7 @@
 	import LandingCompatibility from '$lib/components/landing/LandingCompatibility.svelte';
 	import LandingHowItWorks from '$lib/components/landing/LandingHowItWorks.svelte';
 	import LandingWhoItsFor from '$lib/components/landing/LandingWhoItsFor.svelte';
+	import LandingFAQ from '$lib/components/landing/LandingFAQ.svelte';
 	import LandingFinalCta from '$lib/components/landing/LandingFinalCta.svelte';
 	import LandingFooter from '$lib/components/landing/LandingFooter.svelte';
 
@@ -58,6 +59,9 @@
 
 		<!-- Final CTA -->
 		<LandingFinalCta onAuthRequest={openAuth} />
+
+		<!-- FAQ -->
+		<LandingFAQ />		
 	</main>
 
 	<!-- Footer -->

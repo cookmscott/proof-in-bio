@@ -1,4 +1,5 @@
 <script>
+	import { onMount } from 'svelte';
 	import { Badge } from '$lib/ui/badge';
 	import { Separator } from '$lib/ui/separator';
 	import { Button } from '$lib/ui/button';
@@ -28,6 +29,38 @@
 				'Use one proof link across bios, portfolios, submissions, client deliveries, and collector conversations.'
 		}
 	];
+
+	let stepsContainer = $state(null);
+	let visibleStepCount = $state(0);
+	let revealStarted = false;
+
+	onMount(() => {
+		if (!stepsContainer) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (!entry?.isIntersecting || revealStarted) return;
+
+				revealStarted = true;
+
+				steps.forEach((_, index) => {
+					window.setTimeout(() => {
+						visibleStepCount = index + 1;
+					}, index * 110);
+				});
+
+				observer.disconnect();
+			},
+			{
+				threshold: 0.2,
+				rootMargin: '0px 0px -10% 0px'
+			}
+		);
+
+		observer.observe(stepsContainer);
+
+		return () => observer.disconnect();
+	});
 </script>
 
 <section id="how-it-works" class="bg-background py-24">
@@ -49,7 +82,22 @@
 						<p class="text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
 							Example proof page
 						</p>
-						<Button variant="link" class="mt-4 text-2xl font-semibold tracking-tight text-foreground">@cookmscott</Button>
+						<div class="mt-4 flex flex-wrap items-baseline gap-3">
+							<Button
+								variant="link"
+								href="/cookmscott"
+								class="h-auto p-0 text-2xl font-semibold tracking-tight text-foreground"
+							>
+								@cookmscott
+							</Button>
+							<Button
+								variant="link"
+								href="/cookmscott"
+								class="h-auto p-0 text-sm leading-none font-medium text-muted-foreground/70"
+							>
+								view profile
+							</Button>
+						</div>
 					</div>
 				</div>
 				<Separator />
@@ -86,7 +134,7 @@
 					</p>
 				</div>
 
-				<div class="mt-10">
+				<div class="mt-10" bind:this={stepsContainer}>
 					{#each steps as step, index (step.title)}
 						<div class="relative grid grid-cols-[3.25rem_minmax(0,1fr)] gap-4 sm:gap-5">
 							<div class="relative flex justify-center">
@@ -96,13 +144,23 @@
 									></div>
 								{/if}
 								<div
-									class="relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-base font-semibold text-foreground"
+									class={`relative z-10 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-base font-semibold text-foreground transition-all duration-300 ease-out ${
+										index < visibleStepCount
+											? 'translate-y-0 scale-100 opacity-100'
+											: 'translate-y-3 scale-95 opacity-0'
+									}`}
 								>
 									{index + 1}
 								</div>
 							</div>
 
-							<div class={`pb-8 ${index === steps.length - 1 ? 'pb-0' : ''}`}>
+							<div
+								class={`pb-8 transition-all duration-300 ease-out ${
+									index < visibleStepCount
+										? 'translate-y-0 opacity-100'
+										: 'translate-y-4 opacity-0'
+								} ${index === steps.length - 1 ? 'pb-0' : ''}`}
+							>
 								<div class="min-w-0 pt-1">
 									<p
 										class="text-base font-semibold leading-tight text-foreground sm:text-[1.05rem]"

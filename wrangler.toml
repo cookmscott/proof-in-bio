@@ -6,3 +6,6 @@ routes = [
   { pattern = "proof-in-bio.com", custom_domain = true },
   { pattern = "www.proof-in-bio.com", custom_domain = true },
 ]
+
+[vars]
+PUBLIC_UPLOAD_API_URL = "https://kz053hdb9k.execute-api.us-east-1.amazonaws.com/upload"
