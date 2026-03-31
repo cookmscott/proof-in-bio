@@ -1,5 +1,5 @@
 <script>
-	import { Plus, User, Upload, Check } from 'lucide-svelte';
+	import { User, Upload, Check } from 'lucide-svelte';
 	import { invalidateAll } from '$app/navigation';
 	import { toast } from 'svelte-sonner';
 	import { Avatar, AvatarFallback, AvatarImage } from '$lib/ui/avatar';
@@ -11,6 +11,7 @@
 	import ShareDrawer from '$lib/components/share-drawer.svelte';
 	import AuthenticatedPhotosAlert from '$lib/components/authenticated-photos-alert.svelte';
 	import C2paUploadDialog from '$lib/components/c2pa-upload-dialog.svelte';
+	import FullPageUploadSplay from '$lib/components/full-page-upload-splay.svelte';
 
 	let { data } = $props();
 
@@ -163,19 +164,24 @@
 	ondragleave={handleWindowDragLeave}
 />
 
+<div
+	aria-hidden="true"
+	class="pointer-events-none fixed left-0 top-0 h-0 w-0 overflow-hidden opacity-0"
+>
+	<FullPageUploadSplay />
+</div>
+
 {#if isDragging && !uploadDialogOpen}
 	<div
 		class="fixed inset-0 z-[1000] flex items-center justify-center bg-background/20 backdrop-blur-sm pointer-events-none"
 	>
 		<div
-			class="bg-background/40 backdrop-blur-xl border-2 border-dashed border-primary/50 p-12 rounded-3xl shadow-2xl flex flex-col items-center gap-4 animate-in zoom-in-95 duration-200 ring-1 ring-white/10"
+			class="flex flex-col items-center gap-4 rounded-3xl border border-border/60 bg-background/55 p-12 shadow-2xl ring-1 ring-white/10 backdrop-blur-xl animate-in zoom-in-95 duration-200"
 		>
-			<div class="p-5 rounded-full bg-primary/10 shadow-inner">
-				<Upload class="h-12 w-12 text-primary animate-pulse" />
-			</div>
+			<FullPageUploadSplay />
 
 			<div class="space-y-1 text-center">
-				<p class="text-3xl font-bold text-primary tracking-tight">Drop to Add Photos</p>
+				<p class="text-3xl font-bold tracking-tight text-foreground">Drop to Add Photos</p>
 				<p class="text-muted-foreground font-medium">Import and verify your images instantly</p>
 			</div>
 		</div>
@@ -257,9 +263,19 @@
 						class="flex-1 md:flex-none"
 					/>
 					{#if canEdit}
-						<Button href="/{data.profile.username}/edit" class="flex-1 md:flex-none"
-							>Edit Profile</Button
+						<Button
+							href="/{data.profile.username}/edit"
+							variant="secondary"
+							class="flex-1 md:flex-none"
 						>
+							Edit Profile</Button
+						>
+						<Button
+							onclick={openUploadDialog}
+							class="flex-1 bg-orange-500 text-white hover:bg-orange-600 md:flex-none"
+						>
+							Add photos
+						</Button>
 					{/if}
 				</div>
 			</div>
@@ -269,7 +285,7 @@
 
 			{#if canEdit}
 				<div class="my-3 flex items-center justify-end">
-					<Button variant="ghost" size="sm" onclick={toggleEditImages}>
+					<Button variant="ghost" size="sm" class="rounded-full" onclick={toggleEditImages}>
 						{editImages ? 'Done Editing' : 'Edit Images'}
 					</Button>
 				</div>
@@ -370,26 +386,6 @@
 		</main>
 	</div>
 
-	<!-- Fixed "Add Images" Button -->
-	{#if canEdit && !editImages}
-		<Button
-			style="z-index: 999"
-			class="group fixed bottom-6 right-6 h-14 min-w-[3.5rem] rounded-full shadow-2xl transition-all duration-300 ease-out hover:pr-6 hover:pl-4 flex items-center justify-center overflow-hidden init-expand-btn"
-			onclick={openUploadDialog}
-		>
-			<span class="flex items-center">
-				<Plus
-					class="h-10 w-10 transition-[margin] duration-300 ease-out group-hover:mr-2 init-expand-icon"
-				/>
-				<span
-					class="max-w-0 overflow-hidden whitespace-nowrap transition-all duration-300 ease-out group-hover:max-w-[6rem] init-expand-text"
-				>
-					Add Images
-				</span>
-			</span>
-			<span class="sr-only">Add Images</span>
-		</Button>
-	{/if}
 </div>
 
 {#if canEdit && editImages}
@@ -461,4 +457,5 @@
 	:global(.init-expand-text) {
 		animation: expand-text 3s ease-out;
 	}
+
 </style>

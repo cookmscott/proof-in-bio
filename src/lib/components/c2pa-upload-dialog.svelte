@@ -415,10 +415,14 @@
 						/>
 
 						<div class="flex flex-col items-center gap-4 text-center p-4">
-							<div class="p-3 rounded-full bg-muted">
+							<div
+								class="rounded-full bg-muted p-3 animate-in fade-in zoom-in-95 slide-in-from-bottom-2 duration-200 ease-out"
+							>
 								<Upload class="h-6 w-6 text-muted-foreground" />
 							</div>
-							<div class="space-y-1">
+							<div
+								class="space-y-1 animate-in fade-in slide-in-from-bottom-2 duration-200 ease-out"
+							>
 								<p class="text-sm font-medium">Drag & drop or click to upload multiple images</p>
 								<p class="text-xs text-muted-foreground">Supports JPEG, PNG, WebP</p>
 							</div>

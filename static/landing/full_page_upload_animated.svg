@@ -1,0 +1,37 @@
+<svg viewBox="0 0 300 300" width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            
+            <defs>
+                <!-- Soft drop shadow for a modern, layered look -->
+                <filter id="soft-shadow" x="-20%" y="-20%" width="140%" height="140%">
+                    <feDropShadow dx="0" dy="8" stdDeviation="6" flood-color="#000000" flood-opacity="0.12"/>
+                </filter>
+            </defs>
+
+            <!-- Back Left Icon: Image Variant 1 (Single Mountain) -->
+            <g class="icon img-left" filter="url(#soft-shadow)">
+                <rect x="110" y="110" width="80" height="80" rx="20" fill="#A8B8FF"/>
+                <!-- Sun floating on the left -->
+                <circle cx="132" cy="132" r="6" fill="white"/>
+                <!-- Single large mountain -->
+                <path d="M 120 170 L 155 135 L 180 160" stroke="white" stroke-width="7" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            </g>
+
+            <!-- Back Right Icon: Image Variant 2 (Two Sharp Peaks) -->
+            <g class="icon img-right" filter="url(#soft-shadow)">
+                <rect x="110" y="105" width="80" height="90" rx="18" fill="#6B83FF"/>
+                <!-- Sun floating on the right -->
+                <circle cx="165" cy="125" r="5" fill="white"/>
+                <!-- Two mountains, different heights -->
+                <path d="M 115 170 L 140 138 L 160 158 L 175 145 L 185 160" stroke="white" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </g>
+
+            <!-- Front Center Icon: Original Image Icon (Valley) -->
+            <g class="icon img-center" filter="url(#soft-shadow)">
+                <rect x="105" y="112.5" width="90" height="75" rx="20" fill="#3858FF"/>
+                <!-- Sun floating above the valley -->
+                <circle cx="165" cy="128" r="7" fill="white"/>
+                <!-- Mountain vector line -->
+                <path d="M 120 160 L 135 135 L 152 153 L 165 143 L 180 160" stroke="white" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+            </g>
+
+        </svg>

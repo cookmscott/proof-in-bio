@@ -1,4 +1,6 @@
 <script>
+	import { onMount } from 'svelte';
+
 	const audiences = [
 		{
 			title: 'Photographers',
@@ -21,6 +23,38 @@
 				'Use one proof link across submissions, deliveries, licensing, and internal review workflows.'
 		}
 	];
+
+	let cardsContainer = $state(null);
+	let visibleCardCount = $state(0);
+	let revealStarted = false;
+
+	onMount(() => {
+		if (!cardsContainer) return;
+
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (!entry?.isIntersecting || revealStarted) return;
+
+				revealStarted = true;
+
+				audiences.forEach((_, index) => {
+					window.setTimeout(() => {
+						visibleCardCount = index + 1;
+					}, index * 110);
+				});
+
+				observer.disconnect();
+			},
+			{
+				threshold: 0.2,
+				rootMargin: '0px 0px -10% 0px'
+			}
+		);
+
+		observer.observe(cardsContainer);
+
+		return () => observer.disconnect();
+	});
 </script>
 
 <section class="bg-background py-24">
@@ -38,13 +72,21 @@
 		</div>
 
 		<div class="overflow-hidden rounded-2xl bg-border p-[2px]">
-			<div class="grid gap-[2px] bg-border md:grid-cols-2">
-				{#each audiences as audience (audience.title)}
+			<div class="grid gap-[2px] bg-border md:grid-cols-2" bind:this={cardsContainer}>
+				{#each audiences as audience, index (audience.title)}
 					<div class="bg-background px-7 py-7">
-						<p class="text-xl font-medium tracking-tight text-foreground">
+						<p
+							class={`text-xl font-medium tracking-tight text-foreground transition-all duration-300 ease-out ${
+								index < visibleCardCount ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+							}`}
+						>
 							{audience.title}
 						</p>
-						<p class="mt-2 text-base leading-7 text-muted-foreground">
+						<p
+							class={`mt-2 text-base leading-7 text-muted-foreground transition-all duration-300 ease-out ${
+								index < visibleCardCount ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+							}`}
+						>
 							{audience.description}
 						</p>
 					</div>
